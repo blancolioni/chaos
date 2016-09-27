@@ -1,0 +1,8 @@
+identity: wizard;
+role: controller;
+power-source: arcane;
+abilities: [int, wis, dex];
+defences: {will: 2};
+base-hit-points: 6
+hit-points-per-level: 4
+healing-surges-per-day: 6

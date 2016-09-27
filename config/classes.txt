@@ -1,0 +1,3 @@
+normal
+fighter
+wizard

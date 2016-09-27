@@ -1,0 +1,44 @@
+project_name = Chaos
+source_dir = src
+source_dir = src/abilities
+source_dir = src/actors
+source_dir = src/areas
+source_dir = src/classes
+source_dir = src/config
+source_dir = src/creatures
+source_dir = src/dialog
+source_dir = src/dice
+source_dir = src/driver
+source_dir = src/equipment
+source_dir = src/expressions
+source_dir = src/items
+source_dir = src/localisation
+source_dir = src/objects
+source_dir = src/powers
+source_dir = src/races
+source_dir = src/resources
+source_dir = src/ui
+source_dir = src/ui/gtk
+source_dir = src/ui/gtk/character_gen
+source_dir = src/ui/gtk/main
+source_dir = src/ui/gtk/start
+source_dir = src/world
+depend = { project = Tropos version = any }
+depend = { project = Wlib version = any }
+depend = { project = GCS version = any }
+depend = { project = Lith version = any }
+depend = { project = Memor version = any }
+depend = { project = gtkada external = yes }
+main_unit = chaos-driver
+exec_name = chaos
+config_dir = config
+path_unit = { unit = Chaos.Paths path = src/config/chaos-paths.ads }
+builder_option = "-g"
+builder_option = "-k"
+builder_option = "-s"
+compiler_option = "-g"
+compiler_option = "-gnatwa"
+compiler_option = "-gnatyabcefhiklmnoprstOSuxB"
+compiler_option = "-gnat2012"
+linker_option = "-g"
+linker_option = "-lpixman-1"

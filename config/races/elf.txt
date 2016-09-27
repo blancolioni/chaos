@@ -1,0 +1,12 @@
+abilities = {
+   dex = 2
+}
+
+defences = {
+  will = 1
+}
+
+size = medium
+speed = 6
+vision = low_light
+origin = fey

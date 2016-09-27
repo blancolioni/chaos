@@ -1,0 +1,8 @@
+identity: fighter;
+role: defender;
+power-source: martial;
+abilities: [str, dex, wis, con];
+defences: {fort: 2};
+base-hit-points: 9
+hit-points-per-level: 6
+healing-surges-per-day: 9

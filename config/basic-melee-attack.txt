@@ -1,0 +1,9 @@
+identity: basic-melee-attack
+action: standard
+source: martial
+implement: weapon
+attack: str
+defence: ac
+use: at-will
+target: one-creature
+hit-damage: 1d6 + str.bonus

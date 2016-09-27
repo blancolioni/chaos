@@ -1,0 +1,9 @@
+abilities = {
+}
+
+defences = {
+}
+
+size = medium
+speed = 6
+vision = normal

@@ -1,0 +1,1 @@
+path = "C:/Gog/Baldurs Gate/"

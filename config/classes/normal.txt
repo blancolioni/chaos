@@ -1,0 +1,8 @@
+identity: no-class;
+role: defender;
+power-source: martial;
+abilities: [str, con, int];
+defences: {};
+base-hit-points: 4
+hit-points-per-level: 1
+healing-surges-per-day: 1
