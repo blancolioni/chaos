@@ -1,5 +1,6 @@
 with Chaos.Resources.Area;
 with Chaos.Resources.Bcs;
+with Chaos.Resources.Tis;
 with Chaos.Resources.Wed;
 
 with Chaos.Resources.Manager;
@@ -30,6 +31,13 @@ package body Chaos.Areas.Import is
                 (Chaos.Resources.Manager.Load_Resource
                    (Reference => Are.Wed_Resource,
                     Res_Type  => Chaos.Resources.Wed_Resource).all);
+
+      Tis : Chaos.Resources.Tis.Tis_Resource'Class renames
+              Chaos.Resources.Tis.Tis_Resource'Class
+                (Chaos.Resources.Manager.Load_Resource
+                   (Reference => Wed.Overlays.Element (1).Tileset_Name,
+                    Res_Type  => Chaos.Resources.Tileset_Resource).all);
+      pragma Unreferenced (Tis);
 
       procedure Create (Area : in out Chaos_Area_Record'Class);
 

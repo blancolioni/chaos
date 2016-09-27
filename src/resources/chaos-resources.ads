@@ -24,6 +24,7 @@ package Chaos.Resources is
    Creature_Resource : constant Resource_Type;
    Dialog_Resource   : constant Resource_Type;
    Script_Resource   : constant Resource_Type;
+   Tileset_Resource  : constant Resource_Type;
    Wed_Resource      : constant Resource_Type;
 
    type Chaos_Resource is abstract tagged limited private;
@@ -41,6 +42,11 @@ package Chaos.Resources is
    procedure Load
      (Resource : in out Chaos_Resource)
    is abstract;
+
+   function Has_Header
+     (Resource : Chaos_Resource)
+      return Boolean
+   is (True);
 
    procedure Open
      (Resource : in out Chaos_Resource'Class;
@@ -66,6 +72,7 @@ private
    type Resource_Type is new Word_16;
 
    Wed_Resource      : constant Resource_Type := 16#03E9#;
+   Tileset_Resource  : constant Resource_Type := 16#03EB#;
    Script_Resource   : constant Resource_Type := 16#03EF#;
    Creature_Resource : constant Resource_Type := 16#03F1#;
    Area_Resource     : constant Resource_Type := 16#03F2#;

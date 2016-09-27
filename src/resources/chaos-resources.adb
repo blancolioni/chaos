@@ -303,11 +303,41 @@ package body Chaos.Resources is
      (Resource : in out Chaos_Resource'Class;
       Path     : String)
    is
+      Required : constant String := Resource.Signature;
+      Found    : String (Required'Range);
+      Version  : String (1 .. 4);
+      X        : Word_8;
    begin
       Chaos.Logging.Log
         ("RESOURCE", "loading: " & Path);
       Open (Resource.File, In_File, Path);
+
+      if Resource.Has_Header then
+         for I in Required'Range loop
+            Resource.Get (X);
+            Found (I) := Character'Val (X);
+         end loop;
+         if Found /= Required then
+            raise Constraint_Error with
+              "invalid signature: expected " & Required
+              & "; found " & Found;
+         elsif Found'Length = 4 then
+            for I in Version'Range loop
+               Resource.Get (X);
+               Version (I) := Character'Val (X);
+            end loop;
+
+            Chaos.Logging.Log
+              ("RESOURCE",
+               "Signature: [" & Found & "] " & Version);
+         end if;
+      end if;
+
    end Open;
+
+   ----------
+   -- Open --
+   ----------
 
    procedure Open
      (Resource : in out Chaos_Resource'Class;
@@ -315,11 +345,25 @@ package body Chaos.Resources is
       Start    : WL.Binary_IO.Word_32;
       Length   : WL.Binary_IO.Word_32)
    is
+      Required : constant String := Resource.Signature;
+      Found    : String (Required'Range);
+      X   : Word_8;
    begin
       Resource.File := View (From.File);
       Resource.Start := Start;
       Resource.Length := Length;
       Resource.Set_Offset (0);
+      if Resource.Has_Header then
+         for I in Required'Range loop
+            Resource.Get (X);
+            Found (I) := Character'Val (X);
+         end loop;
+         if Found /= Required then
+            raise Constraint_Error with
+              "invalid signature: expected " & Required
+              & "; found " & Found;
+         end if;
+      end if;
    end Open;
 
    ----------------

@@ -1,3 +1,5 @@
+with Chaos.Logging;
+
 package body Chaos.Resources.Wed is
 
    ----------
@@ -23,6 +25,7 @@ package body Chaos.Resources.Wed is
             Wed.Get (Overlay.Width);
             Wed.Get (Overlay.Height);
             Wed.Get (Overlay.Tileset_Name);
+            Chaos.Logging.Log ("WED", String (Overlay.Tileset_Name));
             Wed.Get (Overlay.Unique_Tile_Count);
             Wed.Get (Overlay.Movement_Type);
             Wed.Get (Overlay.Tilemap_Offset);

@@ -8,6 +8,7 @@ with Chaos.Resources.Biff;
 with Chaos.Resources.Cre;
 with Chaos.Resources.Dlg;
 with Chaos.Resources.Key;
+with Chaos.Resources.Tis;
 with Chaos.Resources.Wed;
 
 package body Chaos.Resources.Manager is
@@ -58,6 +59,8 @@ package body Chaos.Resources.Manager is
             return new Chaos.Resources.Dlg.Dlg_Resource;
          when Script_Resource =>
             return new Chaos.Resources.Bcs.Bcs_Resource;
+         when Tileset_Resource =>
+            return new Chaos.Resources.Tis.Tis_Resource;
          when Wed_Resource =>
             return new Chaos.Resources.Wed.Wed_Resource;
          when others =>
