@@ -11,6 +11,7 @@ source_dir = src/dice
 source_dir = src/driver
 source_dir = src/equipment
 source_dir = src/expressions
+source_dir = src/game
 source_dir = src/items
 source_dir = src/localisation
 source_dir = src/objects
@@ -28,7 +29,6 @@ depend = { project = Wlib version = any }
 depend = { project = GCS version = any }
 depend = { project = Lith version = any }
 depend = { project = Memor version = any }
-depend = { project = gtkada external = yes }
 main_unit = chaos-driver
 exec_name = chaos
 config_dir = config
@@ -41,4 +41,3 @@ compiler_option = "-gnatwa"
 compiler_option = "-gnatyabcefhiklmnoprstOSuxB"
 compiler_option = "-gnat2012"
 linker_option = "-g"
-linker_option = "-lpixman-1"
