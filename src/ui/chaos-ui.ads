@@ -1,55 +1,7 @@
 with Chaos.Actors;
 with Chaos.Battles;
-with Chaos.Locations;
-with Chaos.Players;
 
 package Chaos.UI is
-
-   type Root_UI_Model is abstract tagged private;
-
-   procedure On_Encounter_Start
-     (Model    : in out Root_UI_Model)
-   is null;
-
-   procedure On_Encounter_End
-     (Model    : in out Root_UI_Model)
-   is null;
-
-   procedure Start_Dialog
-     (Model    : in out Root_UI_Model;
-      Actor    : Chaos.Actors.Chaos_Actor;
-      Target   : Chaos.Actors.Chaos_Actor)
-   is null;
-
-   procedure On_Creature_Death
-     (Model    : Root_UI_Model;
-      Creature : Chaos.Actors.Chaos_Actor)
-   is null;
-
-   procedure Creature_Walk
-     (Model    : in out Root_UI_Model;
-      Creature : Chaos.Actors.Chaos_Actor;
-      Path     : Chaos.Locations.Square_Path)
-   is null;
-
-   procedure Active_Creature
-     (Model : in out Root_UI_Model;
-      Creature : Chaos.Actors.Chaos_Actor)
-   is null;
-
-   procedure Creature_End_Turn
-     (Model : in out Root_UI_Model;
-      Creature : Chaos.Actors.Chaos_Actor)
-   is null;
-
-   procedure Creature_Wait
-     (Model : in out Root_UI_Model;
-      Creature : Chaos.Actors.Chaos_Actor)
-   is null;
-
-   type UI_Model is access all Root_UI_Model'Class;
-
-   function Current_Model return UI_Model;
 
    type Root_Chaos_UI is abstract new Chaos.Battles.Battle_Manager_Interface
    with private;
@@ -63,14 +15,24 @@ package Chaos.UI is
 
    procedure Stop (UI : in out Root_Chaos_UI) is abstract;
 
-   procedure Show_Model
+   procedure Display_Text
      (UI    : in out Root_Chaos_UI;
-      Model : not null access Root_UI_Model'Class)
+      Text  : String)
    is abstract;
 
-   function Party
-     (Model : Root_Chaos_UI'Class)
-      return Chaos.Players.Party_Type;
+   procedure Display_Localised_Text
+     (UI    : in out Root_Chaos_UI'Class;
+      Tag   : String);
+
+   procedure Activate
+     (UI    : in out Root_Chaos_UI;
+      Actor : Chaos.Actors.Chaos_Actor)
+   is null;
+
+   procedure Deactivate
+     (UI    : in out Root_Chaos_UI;
+      Actor : Chaos.Actors.Chaos_Actor)
+   is null;
 
    type Chaos_UI is access all Root_Chaos_UI'Class;
 
@@ -83,11 +45,9 @@ private
    type Root_Chaos_UI is abstract new
      Chaos.Battles.Battle_Manager_Interface with
       record
-         Party : Chaos.Players.Party_Type :=
-                   new Chaos.Players.Root_Party_Type;
+         null;
       end record;
 
    Local_Current_UI    : Chaos_UI;
-   Local_Current_Model : UI_Model;
 
 end Chaos.UI;

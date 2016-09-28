@@ -10,9 +10,10 @@ with Chaos.Dialog;
 with Chaos.Classes;
 with Chaos.Races;
 
-with Chaos.Actors.Visibility;
+with Chaos.Party;
+with Chaos.Game;
 
-with Chaos.Expressions.Environments;
+with Chaos.Actors.Visibility;
 
 package body Chaos.UI.Text_UI is
 
@@ -29,10 +30,9 @@ package body Chaos.UI.Text_UI is
      (UI : in out Chaos_Text_UI)
    is null;
 
-   overriding procedure Show_Model
+   overriding procedure Display_Text
      (UI : in out Chaos_Text_UI;
-      Model : not null access Root_UI_Model'Class)
-   is null;
+      Text : String);
 
    ------------
    -- Create --
@@ -53,10 +53,12 @@ package body Chaos.UI.Text_UI is
                         (Protagonist, Area,
                          Area.To_Square
                            (Chaos.Configuration.Start_Location));
+      Party       : constant Chaos.Party.Party_Type :=
+                      Chaos.Party.Create_Party;
    begin
-      UI.Area := Area;
-      UI.Party.Add_Party_Member (Actor);
+      Party.Add_Party_Member (Actor);
 
+      Chaos.Game.Create_Game (Area, Party);
       declare
          use Chaos.Actors.Visibility;
          Group : Actor_Groups;
@@ -86,8 +88,22 @@ package body Chaos.UI.Text_UI is
          Iterate (Group, Report'Access);
       end;
 
-      return new Chaos_Text_UI'(UI);
+      Local_Current_UI := new Chaos_Text_UI'(UI);
+      return Local_Current_UI;
    end Create;
+
+   ------------------
+   -- Display_Text --
+   ------------------
+
+   overriding procedure Display_Text
+     (UI   : in out Chaos_Text_UI;
+      Text : String)
+   is
+      pragma Unreferenced (UI);
+   begin
+      Ada.Text_IO.Put (Text);
+   end Display_Text;
 
    -----------
    -- Start --
@@ -97,9 +113,8 @@ package body Chaos.UI.Text_UI is
      (UI : in out Chaos_Text_UI)
    is
    begin
-      Chaos.Expressions.Execute
-        (Chaos.Expressions.Environments.Standard_Environment,
-         UI.Area.Script);
+      UI.Display_Text ("Starting text interface ...");
+      Chaos.Game.Current_Game.Start;
    end Start;
 
 end Chaos.UI.Text_UI;
