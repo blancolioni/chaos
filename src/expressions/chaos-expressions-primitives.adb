@@ -3,6 +3,7 @@ package body Chaos.Expressions.Primitives is
    type Primitive_Expression_Record is
      new Root_Chaos_Expression_Record with
       record
+         Property  : Boolean;
          Arg_Count : Natural;
          Fn        : Primitive_Evaluator;
       end record;
@@ -60,10 +61,26 @@ package body Chaos.Expressions.Primitives is
       return Chaos_Expression
    is
       Rec : constant Primitive_Expression_Record :=
-              (Root_Chaos_Expression_Record with Argument_Count, Evaluator);
+              (Root_Chaos_Expression_Record with
+               False, Argument_Count, Evaluator);
    begin
       return Express (Rec);
    end Bind_Function;
+
+   -------------------
+   -- Bind_Property --
+   -------------------
+
+   function Bind_Property
+     (Evaluator      : Primitive_Evaluator)
+      return Chaos_Expression
+   is
+      Rec : constant Primitive_Expression_Record :=
+              (Root_Chaos_Expression_Record with
+               True, 1, Evaluator);
+   begin
+      return Express (Rec);
+   end Bind_Property;
 
    --------------
    -- Evaluate --
@@ -81,5 +98,18 @@ package body Chaos.Expressions.Primitives is
          return Create (Expression);
       end if;
    end Evaluate;
+
+   -----------------
+   -- Is_Property --
+   -----------------
+
+   function Is_Property
+     (Expression : Chaos_Expression)
+      return Boolean
+   is
+   begin
+      return Get (Expression) in Primitive_Expression_Record'Class
+        and then Primitive_Expression_Record'Class (Get (Expression)).Property;
+   end Is_Property;
 
 end Chaos.Expressions.Primitives;

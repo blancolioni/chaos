@@ -46,6 +46,21 @@ package body Chaos.Expressions.Environments is
       Arguments   : Array_Of_Expressions)
       return Chaos_Expression;
 
+   ------------------------
+   -- Add_Standard_Value --
+   ------------------------
+
+   procedure Add_Standard_Value
+     (Name  : String;
+      Value : Chaos_Expression)
+   is
+   begin
+      if not Standard_Created then
+         Create_Standard;
+      end if;
+      Insert (Local_Standard_Environment, Name, Value);
+   end Add_Standard_Value;
+
    ---------------------
    -- Create_Standard --
    ---------------------
@@ -73,8 +88,9 @@ package body Chaos.Expressions.Environments is
       end Fn;
 
    begin
-      Push_Table (Local_Standard_Environment);
-      Push_Table (Local_Global_Environment);
+      Local_Standard_Environment := New_Environment;
+      Local_Global_Environment := New_Environment;
+
       Insert (Local_Standard_Environment, "global",
               Global_Object);
       Fn ("=", 2, Evaluate_Equal'Access);
@@ -151,6 +167,17 @@ package body Chaos.Expressions.Environments is
    begin
       return Create (Local_Global_Object);
    end Global_Object;
+
+   ---------------------
+   -- New_Environment --
+   ---------------------
+
+   function New_Environment return Chaos_Environment is
+   begin
+      return Env : Chaos_Environment do
+         Push_Table (Env);
+      end return;
+   end New_Environment;
 
    ---------
    -- Set --

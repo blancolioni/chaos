@@ -7,6 +7,7 @@ with Chaos.Settings;
 with Chaos.Parser;
 with Chaos.Expressions;
 
+with Chaos.Expressions.Environments;
 with Chaos.Expressions.Maps;
 with Chaos.Expressions.Numbers;
 with Chaos.Expressions.Vectors;
@@ -122,6 +123,29 @@ package body Chaos.Classes.Configure is
       Chaos.Parser.Load_Directory
         (Chaos.Paths.Config_File ("classes"), "class",
          Create_Class'Access);
+
+      declare
+         Class_Map : constant Chaos.Expressions.Chaos_Expression :=
+                       Chaos.Expressions.Maps.Map_Expression;
+
+         procedure Add_Class (Class : Chaos_Class);
+
+         ---------------
+         -- Add_Class --
+         ---------------
+
+         procedure Add_Class (Class : Chaos_Class) is
+         begin
+            Chaos.Expressions.Maps.Set
+              (Class_Map, Class.Identifier, Class.To_Expression);
+         end Add_Class;
+
+      begin
+         Db.Scan (Add_Class'Access);
+
+         Chaos.Expressions.Environments.Add_Standard_Value
+           ("classes", Class_Map);
+      end;
 
    end Read_Config;
 

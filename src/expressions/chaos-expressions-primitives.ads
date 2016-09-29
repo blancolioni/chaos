@@ -10,4 +10,12 @@ package Chaos.Expressions.Primitives is
       Argument_Count : Natural)
       return Chaos_Expression;
 
+   function Bind_Property
+     (Evaluator : Primitive_Evaluator)
+      return Chaos_Expression;
+
+   function Is_Property
+     (Expression : Chaos_Expression)
+      return Boolean;
+
 end Chaos.Expressions.Primitives;

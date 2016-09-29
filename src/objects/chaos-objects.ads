@@ -1,6 +1,9 @@
 private with Ada.Strings.Unbounded;
+private with Chaos.Expressions.Primitives;
 
 with Memor;
+
+with Chaos.Expressions;
 
 package Chaos.Objects is
 
@@ -24,6 +27,10 @@ package Chaos.Objects is
       return String
    is (Object.Identifier);
 
+   function To_Expression
+     (Object : access constant Root_Chaos_Object_Record'Class)
+      return Chaos.Expressions.Chaos_Expression;
+
    procedure Log
      (Object  : Root_Chaos_Object_Record'Class;
       Message : String);
@@ -41,8 +48,19 @@ private
      abstract limited new Memor.Root_Record_Type
      and Memor.Identifier_Record_Type with
       record
-         Identifier : Ada.Strings.Unbounded.Unbounded_String;
+         Identity : Ada.Strings.Unbounded.Unbounded_String;
       end record;
+
+   procedure Create_Method_Table
+     (Object : Root_Chaos_Object_Record;
+      Table  : in out Chaos.Expressions.Chaos_Environment);
+
+   procedure Add_Method
+     (Object         : Root_Chaos_Object_Record'Class;
+      Table          : in out Chaos.Expressions.Chaos_Environment;
+      Name           : String;
+      Argument_Count : Natural;
+      Method         : Chaos.Expressions.Primitives.Primitive_Evaluator);
 
    type Root_Localised_Object_Record is
      abstract limited new Root_Chaos_Object_Record with null record;

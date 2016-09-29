@@ -1,6 +1,9 @@
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
+with Chaos.Expressions.Maps;
+with Chaos.Expressions.Primitives;
+
 package body Chaos.Expressions.Functions is
 
    package Argument_Vectors is
@@ -175,19 +178,28 @@ package body Chaos.Expressions.Functions is
                   (if Is_Null (Expression.Object)
                    then Null_Value
                    else Evaluate (Environment, Expression.Object));
-      Fn      : constant Chaos_Expression :=
+      Fn      : Chaos_Expression :=
                   (if Is_Null (Object)
                    then Find (Environment, Name)
                    else Find
                      (Get (Object).Local_Environment, Name));
    begin
+      if Fn = Undefined_Value
+        and then not Is_Null (Object)
+        and then Chaos.Expressions.Maps.Is_Map (Object)
+      then
+         Fn := Chaos.Expressions.Maps.Get (Object, Name);
+      end if;
+
       for I in Actuals'Range loop
          Actuals (I) :=
            Evaluate (Environment, Expression.Arguments.Element (I));
       end loop;
 
       if not Is_Null (Object) then
-         if Actuals'Length = 0 then
+         if Actuals'Length = 0
+           and then not Chaos.Expressions.Primitives.Is_Property (Fn)
+         then
             return Fn;
          else
             return Get (Fn).Apply (Environment, Object & Actuals);
