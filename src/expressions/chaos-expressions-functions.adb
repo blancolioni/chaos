@@ -59,7 +59,7 @@ package body Chaos.Expressions.Functions is
    overriding function To_Boolean
      (Expression  : Function_Call_Expression)
       return Boolean
-   is (False);
+   is (True);
 
    overriding function Apply
      (Expression  : Function_Call_Expression;
@@ -69,6 +69,36 @@ package body Chaos.Expressions.Functions is
 
    overriding function To_String
      (Expression  : Function_Call_Expression)
+      return String;
+
+   type Lambda_Expression is
+     new Root_Chaos_Expression_Record with
+      record
+         Arguments   : Argument_Vectors.Vector;
+         Lambda_Body : Chaos_Expression;
+      end record;
+
+   overriding function Evaluate
+     (Expression  : Lambda_Expression;
+      Environment : Chaos_Environment)
+      return Chaos_Expression
+   is ((if Expression.Arguments.Last_Index = 0
+        then Evaluate (Environment, Expression.Lambda_Body)
+        else Create (Expression)));
+
+   overriding function To_Boolean
+     (Expression  : Lambda_Expression)
+      return Boolean
+   is (True);
+
+   overriding function Apply
+     (Expression  : Lambda_Expression;
+      Environment : Chaos_Environment;
+      Arguments   : Array_Of_Expressions)
+      return Chaos_Expression;
+
+   overriding function To_String
+     (Expression  : Lambda_Expression)
       return String;
 
    -----------
@@ -84,6 +114,30 @@ package body Chaos.Expressions.Functions is
    begin
       return Get (Expression.Evaluate (Environment)).Apply
         (Environment, Arguments);
+   end Apply;
+
+   -----------
+   -- Apply --
+   -----------
+
+   overriding function Apply
+     (Expression  : Lambda_Expression;
+      Environment : Chaos_Environment;
+      Arguments   : Array_Of_Expressions)
+      return Chaos_Expression
+   is
+      Env : Chaos_Environment := New_Environment (Environment);
+   begin
+      for I in 1 .. Expression.Arguments.Last_Index loop
+         if I in Arguments'Range then
+            Insert (Env, To_String (Expression.Arguments (I)),
+                    Arguments (I));
+         else
+            Insert (Env, To_String (Expression.Arguments (I)),
+                    Undefined_Value);
+         end if;
+      end loop;
+      return Evaluate (Env, Expression.Lambda_Body);
    end Apply;
 
    -----------------------
@@ -121,6 +175,24 @@ package body Chaos.Expressions.Functions is
       end loop;
       return Create (Rec);
    end Create_Function_Call;
+
+   ------------------------------
+   -- Create_Lambda_Expression --
+   ------------------------------
+
+   function Create_Lambda_Expression
+     (Arguments   : Array_Of_Expressions;
+      Lambda_Body : Chaos_Expression)
+      return Chaos_Expression
+   is
+      Rec : Lambda_Expression;
+   begin
+      for Arg of Arguments loop
+         Rec.Arguments.Append (Arg);
+      end loop;
+      Rec.Lambda_Body := Lambda_Body;
+      return Create (Rec);
+   end Create_Lambda_Expression;
 
    ------------------------
    -- Create_Method_Call --
@@ -235,6 +307,23 @@ package body Chaos.Expressions.Functions is
       else
          return To_String (Expression.Name) & To_String (Args);
       end if;
+   end To_String;
+
+   ---------------
+   -- To_String --
+   ---------------
+
+   overriding function To_String
+     (Expression  : Lambda_Expression)
+      return String
+   is
+      use Ada.Strings.Unbounded;
+      Result : Unbounded_String := To_Unbounded_String ("\");
+   begin
+      for Arg of Expression.Arguments loop
+         Result := Result & " " & To_String (Arg);
+      end loop;
+      return To_String (Result & " -> " & To_String (Expression.Lambda_Body));
    end To_String;
 
 end Chaos.Expressions.Functions;

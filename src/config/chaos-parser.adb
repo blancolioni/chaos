@@ -23,11 +23,12 @@ package body Chaos.Parser is
    type Precedence_Table is array (Token) of Precedence_Level;
 
    Operator_Precedence : constant Precedence_Table :=
-                 (Tok_Asterisk => 3, Tok_Forward_Slash => 3,
-                  Tok_Plus     => 4, Tok_Minus => 4,
-                  Tok_Less     => 5, Tok_Less_Equal => 5,
-                  Tok_Greater  => 5, Tok_Greater_Equal => 5,
-                  Tok_Equal    => 6, Tok_Not_Equal => 6,
+                 (Tok_Asterisk => 2, Tok_Forward_Slash => 2,
+                  Tok_Plus     => 3, Tok_Minus => 3,
+                  Tok_Less     => 4, Tok_Less_Equal => 4,
+                  Tok_Greater  => 4, Tok_Greater_Equal => 4,
+                  Tok_Equal    => 5, Tok_Not_Equal => 5,
+                  Tok_And      => 6, Tok_Or => 7,
                   Tok_Arrow    => 8,
                   others       => 9);
 
@@ -40,14 +41,19 @@ package body Chaos.Parser is
      (Precedence : Precedence_Level)
       return Chaos.Expressions.Chaos_Expression;
 
+   function Parse_Arguments
+     return Chaos.Expressions.Array_Of_Expressions;
+
    function At_Expression return Boolean
    is (Tok = Tok_Left_Paren or else Tok = Tok_Left_Brace
-       or else Tok = Tok_Left_Bracket or else Tok = Tok_Identifier);
+       or else Tok = Tok_Left_Bracket or else Tok = Tok_Identifier
+       or else Tok = Tok_Lambda);
 
    function At_Operator return Boolean is
      (Tok <= +(Tok_Asterisk, Tok_Forward_Slash, Tok_Plus, Tok_Minus,
                Tok_Less, Tok_Less_Equal, Tok_Greater, Tok_Greater_Equal,
-               Tok_Equal, Tok_Not_Equal, Tok_Arrow));
+               Tok_Equal, Tok_Not_Equal, Tok_Arrow,
+               Tok_And, Tok_Or));
 
    function Is_Number
      (Text : String)
@@ -187,6 +193,71 @@ package body Chaos.Parser is
       return Result;
    end Load_Script;
 
+   ---------------------
+   -- Parse_Arguments --
+   ---------------------
+
+   function Parse_Arguments
+     return Chaos.Expressions.Array_Of_Expressions
+   is
+      use type Chaos.Expressions.Array_Of_Expressions;
+
+      function Parse_Rest_Of_Arguments
+        return Chaos.Expressions.Array_Of_Expressions;
+
+      -----------------------------
+      -- Parse_Rest_Of_Arguments --
+      -----------------------------
+
+      function Parse_Rest_Of_Arguments
+        return Chaos.Expressions.Array_Of_Expressions
+      is
+      begin
+         if At_Expression then
+            declare
+               E : constant Chaos.Expressions.Chaos_Expression :=
+                     Parse_Expression;
+            begin
+               if Tok = Tok_Comma then
+                  if Next_Tok = Tok_Right_Paren then
+                     Error ("extra ',' ignored");
+                     Scan;
+                     Scan;
+                     return (1 => E);
+                  else
+                     Scan;
+                     if not At_Expression then
+                        Error ("expected an expression");
+                        return (1 => E);
+                     else
+                        return E & Parse_Rest_Of_Arguments;
+                     end if;
+                  end if;
+               elsif Tok = Tok_Right_Paren then
+                  Scan;
+                  return (1 => E);
+               else
+                  Error ("missing ')'");
+                  return (1 => E);
+               end if;
+            end;
+         elsif Tok = Tok_Right_Paren then
+            return Chaos.Expressions.No_Array;
+         else
+            Error ("syntax error");
+            return Chaos.Expressions.No_Array;
+         end if;
+      end Parse_Rest_Of_Arguments;
+
+   begin
+      if Tok = Tok_Left_Paren then
+         Scan;
+         return Parse_Rest_Of_Arguments;
+      else
+         return Chaos.Expressions.No_Array;
+      end if;
+   end Parse_Arguments;
+
    -----------------------------
    -- Parse_Atomic_Expression --
    -----------------------------
@@ -199,23 +270,37 @@ package body Chaos.Parser is
       if Tok = Tok_Identifier then
          if Tok_Text = "always" then
             E := Chaos.Expressions.Always;
+            Scan;
          elsif Tok_Text = "never" then
             E := Chaos.Expressions.Never;
+            Scan;
          elsif Tok_Text = "null" then
             E := Chaos.Expressions.Null_Value;
+            Scan;
          elsif Tok_Text = "undefined" then
             E := Chaos.Expressions.Undefined_Value;
+            Scan;
          elsif Chaos.Dice.Is_Die_Roll (Tok_Text) then
             E :=
               Chaos.Dice.To_Expression
                 (Chaos.Dice.Parse_Die_Roll (Tok_Text));
+            Scan;
          elsif Is_Number (Tok_Text) then
             E := Chaos.Expressions.Numbers.To_Expression
               (Integer'Value (Tok_Text));
+            Scan;
+         elsif Next_Tok = Tok_Left_Paren then
+            declare
+               Name  : constant String := Tok_Text;
+            begin
+               Scan;
+               E := Chaos.Expressions.Functions.Create_Function_Call
+                 (Name, Parse_Arguments);
+            end;
          else
             E := Chaos.Expressions.Identifiers.To_Expression (Tok_Text);
+            Scan;
          end if;
-         Scan;
       elsif Tok = Tok_Left_Bracket then
          Scan;
          E := Chaos.Expressions.Vectors.Vector_Expression;
@@ -304,10 +389,14 @@ package body Chaos.Parser is
                       (E, Name, Value);
                end;
             else
-               E :=
-                 Chaos.Expressions.Functions.Create_Method_Call
-                   (E, Tok_Text, Chaos.Expressions.No_Array);
-               Scan;
+               declare
+                  Name : constant String := Tok_Text;
+               begin
+                  Scan;
+                  E :=
+                    Chaos.Expressions.Functions.Create_Method_Call
+                      (E, Name, Parse_Arguments);
+               end;
             end if;
          else
             Error ("missing identifier");
@@ -348,6 +437,27 @@ package body Chaos.Parser is
             return Chaos.Expressions.Conditional.Create_Conditional
               (Condition, True_Part, False_Part);
          end;
+      elsif Tok = Tok_Lambda then
+         Scan;
+         declare
+            Args : Chaos.Expressions.Array_Of_Expressions (1 .. 10);
+            Count : Natural := 0;
+         begin
+            while Tok = Tok_Identifier loop
+               Count := Count + 1;
+               Args (Count) :=
+                 Chaos.Expressions.Identifiers.To_Expression
+                   (Tok_Text);
+               Scan;
+            end loop;
+            if Tok = Tok_Arrow then
+               Scan;
+            else
+               Error ("expected '->'");
+            end if;
+            return Chaos.Expressions.Functions.Create_Lambda_Expression
+              (Args (1 .. Count), Parse_Expression);
+         end;
       else
          return Parse_Operator_Expression (Precedence_Level'Last);
       end if;
@@ -369,6 +479,10 @@ package body Chaos.Parser is
       return Result;
    end Parse_Expression;
 
+   -------------------------------
+   -- Parse_Operator_Expression --
+   -------------------------------
+
    function Parse_Operator_Expression
      (Precedence : Precedence_Level)
       return Chaos.Expressions.Chaos_Expression
@@ -380,6 +494,11 @@ package body Chaos.Parser is
       else
          Result := Parse_Operator_Expression (Precedence - 1);
       end if;
+
+--        if Tok /= Tok_End_Of_File then
+--           Warning ("operator expression: precedence" & Precedence'Img
+--                    & "; tok = " & Token'Image (Tok));
+--        end if;
 
       while At_Operator and then Operator_Precedence (Tok) = Precedence loop
          declare

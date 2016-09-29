@@ -16,10 +16,10 @@ private package Chaos.Parser.Lexical is
                  Tok_Integer        => Tok_None,
                  Tok_Float          => Tok_None,
                  First_Keyword      => Tok_If,
-                 Keywords           => "if then else",
+                 Keywords           => "if then else and or not -",
                  First_Symbol       => Tok_Left_Brace,
                  Symbols            => "{ } [ ] ( ) , : ; . & / * # @ "
-                                     & " + - := => "
+                                     & " + := => \ "
                                      & " = /= <= < >= >",
                  Identifier_Start   => "abcdefghijklmnopqrstuvwxyz" &
                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" &
@@ -29,7 +29,7 @@ private package Chaos.Parser.Lexical is
                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" &
                                        "0123456789" &
                                        "_-%$",
-                 Line_Comment_Start => "//",
+                 Line_Comment_Start => "--",
                  Block_Comment_Start => "/*",
                  Block_Comment_End   => "*/",
                  Properties         => (GCS.Styles.Multi_Characters => True,

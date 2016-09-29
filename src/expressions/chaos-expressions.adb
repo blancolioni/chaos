@@ -188,6 +188,20 @@ package body Chaos.Expressions is
       return Local_Never_Value;
    end Never;
 
+   ---------------------
+   -- New_Environment --
+   ---------------------
+
+   function New_Environment
+     (Base : Chaos_Environment)
+      return Chaos_Environment
+   is
+   begin
+      return Environment : Chaos_Environment := Base do
+         Push_Table (Environment);
+      end return;
+   end New_Environment;
+
    --------------
    -- No_Array --
    --------------

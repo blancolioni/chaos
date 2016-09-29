@@ -7,6 +7,10 @@ package Chaos.Expressions is
 
    type Chaos_Environment is private;
 
+   function New_Environment
+     (Base : Chaos_Environment)
+      return Chaos_Environment;
+
    type Chaos_Expression is private;
 
    type Array_Of_Expressions is

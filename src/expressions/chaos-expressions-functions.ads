@@ -17,4 +17,9 @@ package Chaos.Expressions.Functions is
       Value     : Chaos_Expression)
       return Chaos_Expression;
 
+   function Create_Lambda_Expression
+     (Arguments : Array_Of_Expressions;
+      Lambda_Body : Chaos_Expression)
+      return Chaos_Expression;
+
 end Chaos.Expressions.Functions;
