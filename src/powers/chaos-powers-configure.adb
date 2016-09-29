@@ -32,9 +32,6 @@ package body Chaos.Powers.Configure is
      (Name    : String;
       Handler : Configure_Power_Handler);
 
-   procedure Load_Power
-     (Path : String);
-
    procedure Set_Attack
      (Power : in out Chaos_Power_Record'Class;
       Value : Chaos.Expressions.Chaos_Expression);
@@ -55,6 +52,10 @@ package body Chaos.Powers.Configure is
      (Power : in out Chaos_Power_Record'Class;
       Value : Chaos.Expressions.Chaos_Expression);
 
+   procedure Set_Miss_Damage
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression);
+
    procedure Set_Source
      (Power : in out Chaos_Power_Record'Class;
       Value : Chaos.Expressions.Chaos_Expression);
@@ -67,8 +68,9 @@ package body Chaos.Powers.Configure is
    -- Load_Power --
    ----------------
 
-   procedure Load_Power
+   function Load_Power
      (Path : String)
+      return Chaos_Power
    is
       procedure Create
         (Power : in out Chaos_Power_Record'Class);
@@ -109,7 +111,7 @@ package body Chaos.Powers.Configure is
       end Create;
 
    begin
-      Chaos.Powers.Db.Create (Create'Access);
+      return Chaos.Powers.Db.Create (Create'Access);
    end Load_Power;
 
    -----------------
@@ -123,12 +125,21 @@ package body Chaos.Powers.Configure is
       Setting ("attack", Set_Attack'Access);
       Setting ("defence", Set_Defence'Access);
       Setting ("hit-damage", Set_Hit_Damage'Access);
+      Setting ("miss-damage", Set_Miss_Damage'Access);
       Setting ("identity", Set_Identity'Access);
       Setting ("source", Set_Source'Access);
       Setting ("use", Set_Use'Access);
 
-      Load_Power
-        (Chaos.Paths.Config_File ("basic-melee-attack.txt"));
+      declare
+         Basic_Melee_Attack : constant Chaos_Power :=
+                                Load_Power
+                                  (Chaos.Paths.Config_File
+                                     ("basic-melee-attack.txt"));
+         pragma Unreferenced (Basic_Melee_Attack);
+      begin
+         null;
+      end;
+
    end Read_Config;
 
    ----------------
@@ -176,6 +187,7 @@ package body Chaos.Powers.Configure is
       Value : Chaos.Expressions.Chaos_Expression)
    is
    begin
+      Power.Log ("hit: " & Chaos.Expressions.To_String (Value));
       Power.Hit.Append ((Chaos.Expressions.Always, Value));
    end Set_Hit_Damage;
 
@@ -192,6 +204,19 @@ package body Chaos.Powers.Configure is
       Chaos.Logging.Log
         ("CONFIG", "new power: " & Power.Identifier);
    end Set_Identity;
+
+   ---------------------
+   -- Set_Miss_Damage --
+   ---------------------
+
+   procedure Set_Miss_Damage
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression)
+   is
+   begin
+      Power.Log ("miss: " & Chaos.Expressions.To_String (Value));
+      Power.Miss.Append ((Chaos.Expressions.Always, Value));
+   end Set_Miss_Damage;
 
    ----------------
    -- Set_Source --

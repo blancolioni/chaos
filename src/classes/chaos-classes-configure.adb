@@ -1,3 +1,5 @@
+with Ada.Directories;
+
 with Chaos.Logging;
 with Chaos.Paths;
 with Chaos.Settings;
@@ -8,6 +10,8 @@ with Chaos.Expressions;
 with Chaos.Expressions.Maps;
 with Chaos.Expressions.Numbers;
 with Chaos.Expressions.Vectors;
+
+with Chaos.Powers.Configure;
 
 with Chaos.Classes.Db;
 
@@ -61,9 +65,38 @@ package body Chaos.Classes.Configure is
       ------------
 
       procedure Create (Class : in out Chaos_Class_Record'Class) is
+         use Ada.Directories;
+
+         procedure Add_Power (Path : String);
+
+         ---------------
+         -- Add_Power --
+         ---------------
+
+         procedure Add_Power (Path : String) is
+         begin
+            Class.Add_Power (Chaos.Powers.Configure.Load_Power (Path));
+         end Add_Power;
+
       begin
          Class_Settings.Load_Object
            (Class, Path);
+
+         declare
+            Power_Directory : constant String :=
+                                Compose
+                                  (Containing_Directory (Path),
+                                   Class.Identifier & "-powers");
+         begin
+            if Exists (Power_Directory) then
+               Chaos.Parser.Load_Directory
+                 (Power_Directory, "power", Add_Power'Access);
+            else
+               Chaos.Logging.Log
+                 ("CLASS", Class.Identifier & " has no powers");
+            end if;
+         end;
+
       end Create;
 
    begin
