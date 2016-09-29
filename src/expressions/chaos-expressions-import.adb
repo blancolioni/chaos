@@ -470,7 +470,7 @@ package body Chaos.Expressions.Import is
    is
       Line : constant String := Resource.Line (Line_Number);
    begin
-      if True then
+      if False then
          Ada.Text_IO.Put_Line
            (Line_Number'Img & ": " & Line);
       end if;

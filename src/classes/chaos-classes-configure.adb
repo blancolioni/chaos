@@ -1,9 +1,8 @@
-with Tropos.Reader;
-
 with Chaos.Logging;
 with Chaos.Paths;
 with Chaos.Settings;
 
+with Chaos.Parser;
 with Chaos.Expressions;
 
 with Chaos.Expressions.Maps;
@@ -64,7 +63,7 @@ package body Chaos.Classes.Configure is
       procedure Create (Class : in out Chaos_Class_Record'Class) is
       begin
          Class_Settings.Load_Object
-           (Class, Path & ".txt");
+           (Class, Path);
       end Create;
 
    begin
@@ -76,9 +75,6 @@ package body Chaos.Classes.Configure is
    -----------------
 
    procedure Read_Config is
-      Config : constant Tropos.Configuration :=
-                 Tropos.Reader.Read_Config
-                   (Chaos.Paths.Config_File ("classes.txt"));
    begin
       Class_Settings.Setting ("abilities",
                               Set_Key_Abilities'Access);
@@ -90,11 +86,10 @@ package body Chaos.Classes.Configure is
       Class_Settings.Setting ("power-source", Set_Power_Source'Access);
       Class_Settings.Setting ("role", Set_Role'Access);
 
-      for Class_Name_Config of Config loop
-         Create_Class
-           (Chaos.Paths.Config_File
-              ("classes/" & Class_Name_Config.Config_Name));
-      end loop;
+      Chaos.Parser.Load_Directory
+        (Chaos.Paths.Config_File ("classes"), "class",
+         Create_Class'Access);
+
    end Read_Config;
 
    -------------------------

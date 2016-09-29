@@ -8,6 +8,12 @@ package Chaos.Parser is
         procedure (Name  : String;
                    Value : Chaos.Expressions.Chaos_Expression));
 
+   procedure Load_Directory
+     (Path      : String;
+      Extension : String;
+      Loader    : not null access
+        procedure (Path : String));
+
    function Load_Script
      (Path : String)
       return Chaos.Expressions.Chaos_Expression;

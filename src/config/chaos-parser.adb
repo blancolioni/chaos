@@ -1,4 +1,5 @@
 with Ada.Characters.Handling;
+with Ada.Directories;
 
 with Chaos.Parser.Tokens;              use Chaos.Parser.Tokens;
 with Chaos.Parser.Lexical;             use Chaos.Parser.Lexical;
@@ -101,6 +102,41 @@ package body Chaos.Parser is
       end loop;
       Close;
    end Load_Configuration;
+
+   --------------------
+   -- Load_Directory --
+   --------------------
+
+   procedure Load_Directory
+     (Path      : String;
+      Extension : String;
+      Loader    : not null access
+        procedure (Path : String))
+   is
+      Ordinary_File : Ada.Directories.File_Kind renames
+                        Ada.Directories.Ordinary_File;
+
+      procedure Process
+        (Directory_Entry : Ada.Directories.Directory_Entry_Type);
+
+      -------------
+      -- Process --
+      -------------
+
+      procedure Process
+        (Directory_Entry : Ada.Directories.Directory_Entry_Type)
+      is
+      begin
+         Loader (Ada.Directories.Full_Name (Directory_Entry));
+      end Process;
+
+   begin
+      Ada.Directories.Search
+        (Directory => Path,
+         Pattern   => "*." & Extension,
+         Filter    => (Ordinary_File => True, others => False),
+         Process   => Process'Access);
+   end Load_Directory;
 
    -----------------
    -- Load_Script --
