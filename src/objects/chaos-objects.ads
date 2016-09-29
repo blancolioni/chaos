@@ -24,6 +24,10 @@ package Chaos.Objects is
       return String
    is (Object.Identifier);
 
+   procedure Log
+     (Object  : Root_Chaos_Object_Record'Class;
+      Message : String);
+
    type Root_Localised_Object_Record is
      abstract limited new Root_Chaos_Object_Record with private;
 

@@ -1,4 +1,7 @@
+with Ada.Characters.Handling;
+
 with Chaos.Localisation;
+with Chaos.Logging;
 
 package body Chaos.Objects is
 
@@ -39,5 +42,20 @@ package body Chaos.Objects is
       Object.Identifier :=
         Ada.Strings.Unbounded.To_Unbounded_String (Identity);
    end Initialize;
+
+   ---------
+   -- Log --
+   ---------
+
+   procedure Log
+     (Object  : Root_Chaos_Object_Record'Class;
+      Message : String)
+   is
+   begin
+      Chaos.Logging.Log
+        (Ada.Characters.Handling.To_Upper
+           (Object.Object_Database.Database_Class_Name),
+         Message);
+   end Log;
 
 end Chaos.Objects;
