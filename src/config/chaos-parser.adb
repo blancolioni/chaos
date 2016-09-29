@@ -4,6 +4,7 @@ with Ada.Directories;
 with Chaos.Parser.Tokens;              use Chaos.Parser.Tokens;
 with Chaos.Parser.Lexical;             use Chaos.Parser.Lexical;
 
+with Chaos.Expressions.Conditional;
 with Chaos.Expressions.Functions;
 with Chaos.Expressions.Identifiers;
 with Chaos.Expressions.Maps;
@@ -15,14 +16,38 @@ with Chaos.Dice;
 
 package body Chaos.Parser is
 
+   use Set_Of_Tokens;
+
+   type Precedence_Level is range 1 .. 9;
+
+   type Precedence_Table is array (Token) of Precedence_Level;
+
+   Operator_Precedence : constant Precedence_Table :=
+                 (Tok_Asterisk => 3, Tok_Forward_Slash => 3,
+                  Tok_Plus     => 4, Tok_Minus => 4,
+                  Tok_Less     => 5, Tok_Less_Equal => 5,
+                  Tok_Greater  => 5, Tok_Greater_Equal => 5,
+                  Tok_Equal    => 6, Tok_Not_Equal => 6,
+                  Tok_Arrow    => 8,
+                  others       => 9);
+
    function Parse_Atomic_Expression
      return Chaos.Expressions.Chaos_Expression;
 
    function Parse_Expression return Chaos.Expressions.Chaos_Expression;
 
+   function Parse_Operator_Expression
+     (Precedence : Precedence_Level)
+      return Chaos.Expressions.Chaos_Expression;
+
    function At_Expression return Boolean
    is (Tok = Tok_Left_Paren or else Tok = Tok_Left_Brace
        or else Tok = Tok_Left_Bracket or else Tok = Tok_Identifier);
+
+   function At_Operator return Boolean is
+     (Tok <= +(Tok_Asterisk, Tok_Forward_Slash, Tok_Plus, Tok_Minus,
+               Tok_Less, Tok_Less_Equal, Tok_Greater, Tok_Greater_Equal,
+               Tok_Equal, Tok_Not_Equal, Tok_Arrow));
 
    function Is_Number
      (Text : String)
@@ -299,23 +324,33 @@ package body Chaos.Parser is
    ----------------------
 
    function Parse_Expression return Chaos.Expressions.Chaos_Expression is
-      E : Chaos.Expressions.Chaos_Expression :=
-            Parse_Atomic_Expression;
    begin
-      while Tok = Tok_Plus or else Tok = Tok_Minus loop
+      if Tok = Tok_If then
          declare
-            Name : constant String := Tok_Text;
-            E2   : Chaos.Expressions.Chaos_Expression;
+            Condition,
+            True_Part,
+            False_Part : Chaos.Expressions.Chaos_Expression;
          begin
             Scan;
-            E2 := Parse_Atomic_Expression;
-            E :=
-              Chaos.Expressions.Functions.Create_Function_Call
-                (Name, (E, E2));
+            Condition := Parse_Expression;
+            if Tok = Tok_Then then
+               Scan;
+            else
+               Error ("missing 'then'");
+            end if;
+            True_Part := Parse_Expression;
+            if Tok = Tok_Else then
+               Scan;
+               False_Part := Parse_Expression;
+            else
+               False_Part := Chaos.Expressions.Null_Value;
+            end if;
+            return Chaos.Expressions.Conditional.Create_Conditional
+              (Condition, True_Part, False_Part);
          end;
-      end loop;
-
-      return E;
+      else
+         return Parse_Operator_Expression (Precedence_Level'Last);
+      end if;
    end Parse_Expression;
 
    ----------------------
@@ -333,5 +368,46 @@ package body Chaos.Parser is
       Close;
       return Result;
    end Parse_Expression;
+
+   function Parse_Operator_Expression
+     (Precedence : Precedence_Level)
+      return Chaos.Expressions.Chaos_Expression
+   is
+      Result : Chaos.Expressions.Chaos_Expression;
+   begin
+      if Precedence = 1 then
+         Result := Parse_Atomic_Expression;
+      else
+         Result := Parse_Operator_Expression (Precedence - 1);
+      end if;
+
+      while At_Operator and then Operator_Precedence (Tok) = Precedence loop
+         declare
+            Op    : constant Token := Tok;
+            Name  : constant String := Tok_Text;
+            Right : Chaos.Expressions.Chaos_Expression;
+         begin
+            Scan;
+            if Precedence = 1 then
+               Right := Parse_Atomic_Expression;
+            else
+               Right := Parse_Operator_Expression (Precedence - 1);
+            end if;
+
+            if Op = Tok_Arrow then
+               Result :=
+                 Chaos.Expressions.Conditional.Create_Conditional
+                   (Result, Right, Chaos.Expressions.Null_Value);
+            else
+               Result :=
+                 Chaos.Expressions.Functions.Create_Function_Call
+                   (Name, (Result, Right));
+            end if;
+         end;
+      end loop;
+
+      return Result;
+
+   end Parse_Operator_Expression;
 
 end Chaos.Parser;

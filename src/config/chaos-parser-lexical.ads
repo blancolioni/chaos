@@ -15,11 +15,12 @@ private package Chaos.Parser.Lexical is
                  Tok_Character      => Tok_String_Constant,
                  Tok_Integer        => Tok_None,
                  Tok_Float          => Tok_None,
-                 First_Keyword      => Tok_None,
-                 Keywords           => "",
+                 First_Keyword      => Tok_If,
+                 Keywords           => "if then else",
                  First_Symbol       => Tok_Left_Brace,
                  Symbols            => "{ } [ ] ( ) , : ; . & / * # @ "
-                                     & " + - :=",
+                                     & " + - := => "
+                                     & " = /= <= < >= >",
                  Identifier_Start   => "abcdefghijklmnopqrstuvwxyz" &
                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" &
                                        "0123456789" &
