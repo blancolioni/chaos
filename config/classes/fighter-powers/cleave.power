@@ -7,6 +7,6 @@ defence: ac
 use: at-will
 target: one-creature
 hit: { damage: weapon + str.bonus + (level > 20 => weapon),
-       effect: choose-creature (\ x => adjacent (x) and hostile (x),
-                                \ x => x.take-damage (str.bonus))
+       effect: choose-creature (\ x => adjacent (x) and hostile (x))
+                               (\ x => x.take-damage (str.bonus))
      }

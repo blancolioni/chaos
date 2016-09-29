@@ -1,24 +1,23 @@
 package Chaos.Expressions.Functions is
 
-   function Create_Function_Call
-     (Function_Name : String;
-      Arguments     : Array_Of_Expressions)
+   function Apply
+     (Expression : Chaos_Expression;
+      Argument   : Chaos_Expression)
       return Chaos_Expression;
 
-   function Create_Method_Call
+   function Object_Method
      (Object    : Chaos_Expression;
-      Method    : String;
-      Arguments : Array_Of_Expressions)
+      Method    : String)
       return Chaos_Expression;
 
-   function Create_Assignment
+   function Assign
      (Object    : Chaos_Expression;
       Name      : String;
       Value     : Chaos_Expression)
       return Chaos_Expression;
 
-   function Create_Lambda_Expression
-     (Arguments : Array_Of_Expressions;
+   function Lambda
+     (Argument    : String;
       Lambda_Body : Chaos_Expression)
       return Chaos_Expression;
 

@@ -1,7 +1,6 @@
-with Chaos.Localisation;
-
 with Chaos.Expressions.Functions;
-with Chaos.Expressions.Text;
+with Chaos.Expressions.Identifiers;
+with Chaos.Expressions.Numbers;
 
 with Chaos.Parser;
 
@@ -32,11 +31,9 @@ package body Chaos.Expressions.Import.Actions is
    begin
       case Action_Id is
          when Display_String_Action =>
-            return Chaos.Expressions.Functions.Create_Function_Call
-              ("display-string",
-               (1 => Chaos.Expressions.Text.To_Expression
-                    (Chaos.Localisation.Indexed_Text
-                       (Chaos.Localisation.Local_Text_Index (Integer_1)))));
+            return Chaos.Expressions.Functions.Apply
+              (Chaos.Expressions.Identifiers.To_Expression ("display-string"),
+               Chaos.Expressions.Numbers.To_Expression (Integer_1));
          when Increment_Chapter_Action =>
             return Chaos.Parser.Parse_Expression
               ("global.chapter := global.chapter + 1");

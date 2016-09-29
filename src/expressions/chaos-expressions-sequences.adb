@@ -21,9 +21,10 @@ package body Chaos.Expressions.Sequences is
 
    overriding function Apply
      (Expression  : Sequence_Expression_Record;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
-      return Chaos_Expression;
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
+      return Chaos_Expression
+   is (raise Constraint_Error with "can't apply a sequence");
 
    overriding function To_Boolean
      (Expression  : Sequence_Expression_Record)
@@ -48,24 +49,6 @@ package body Chaos.Expressions.Sequences is
         (Value);
    end Append;
 
-   -----------
-   -- Apply --
-   -----------
-
-   overriding function Apply
-     (Expression  : Sequence_Expression_Record;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
-      return Chaos_Expression
-   is
-      Result : Chaos_Expression := Null_Value;
-   begin
-      for Expr of Expression.Items loop
-         Result := Apply (Get (Expr), Environment, Arguments);
-      end loop;
-      return Result;
-   end Apply;
-
    --------------
    -- Evaluate --
    --------------
@@ -78,7 +61,7 @@ package body Chaos.Expressions.Sequences is
       Result : Chaos_Expression := Null_Value;
    begin
       for Expr of Expression.Items loop
-         Result := Evaluate (Environment, Expr);
+         Result := Evaluate (Expr, Environment);
       end loop;
       return Result;
    end Evaluate;

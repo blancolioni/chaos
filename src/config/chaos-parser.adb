@@ -35,14 +35,17 @@ package body Chaos.Parser is
    function Parse_Atomic_Expression
      return Chaos.Expressions.Chaos_Expression;
 
+   function Parse_Lambda_Expression
+     return Chaos.Expressions.Chaos_Expression;
+
    function Parse_Expression return Chaos.Expressions.Chaos_Expression;
 
    function Parse_Operator_Expression
      (Precedence : Precedence_Level)
       return Chaos.Expressions.Chaos_Expression;
 
-   function Parse_Arguments
-     return Chaos.Expressions.Array_Of_Expressions;
+   function Parse_Function_Call_Expression
+      return Chaos.Expressions.Chaos_Expression;
 
    function At_Expression return Boolean
    is (Tok = Tok_Left_Paren or else Tok = Tok_Left_Brace
@@ -193,71 +196,6 @@ package body Chaos.Parser is
       return Result;
    end Load_Script;
 
-   ---------------------
-   -- Parse_Arguments --
-   ---------------------
-
-   function Parse_Arguments
-     return Chaos.Expressions.Array_Of_Expressions
-   is
-      use type Chaos.Expressions.Array_Of_Expressions;
-
-      function Parse_Rest_Of_Arguments
-        return Chaos.Expressions.Array_Of_Expressions;
-
-      -----------------------------
-      -- Parse_Rest_Of_Arguments --
-      -----------------------------
-
-      function Parse_Rest_Of_Arguments
-        return Chaos.Expressions.Array_Of_Expressions
-      is
-      begin
-         if At_Expression then
-            declare
-               E : constant Chaos.Expressions.Chaos_Expression :=
-                     Parse_Expression;
-            begin
-               if Tok = Tok_Comma then
-                  if Next_Tok = Tok_Right_Paren then
-                     Error ("extra ',' ignored");
-                     Scan;
-                     Scan;
-                     return (1 => E);
-                  else
-                     Scan;
-                     if not At_Expression then
-                        Error ("expected an expression");
-                        return (1 => E);
-                     else
-                        return E & Parse_Rest_Of_Arguments;
-                     end if;
-                  end if;
-               elsif Tok = Tok_Right_Paren then
-                  Scan;
-                  return (1 => E);
-               else
-                  Error ("missing ')'");
-                  return (1 => E);
-               end if;
-            end;
-         elsif Tok = Tok_Right_Paren then
-            return Chaos.Expressions.No_Array;
-         else
-            Error ("syntax error");
-            return Chaos.Expressions.No_Array;
-         end if;
-      end Parse_Rest_Of_Arguments;
-
-   begin
-      if Tok = Tok_Left_Paren then
-         Scan;
-         return Parse_Rest_Of_Arguments;
-      else
-         return Chaos.Expressions.No_Array;
-      end if;
-   end Parse_Arguments;
-
    -----------------------------
    -- Parse_Atomic_Expression --
    -----------------------------
@@ -270,37 +208,23 @@ package body Chaos.Parser is
       if Tok = Tok_Identifier then
          if Tok_Text = "always" then
             E := Chaos.Expressions.Always;
-            Scan;
          elsif Tok_Text = "never" then
             E := Chaos.Expressions.Never;
-            Scan;
          elsif Tok_Text = "null" then
             E := Chaos.Expressions.Null_Value;
-            Scan;
          elsif Tok_Text = "undefined" then
             E := Chaos.Expressions.Undefined_Value;
-            Scan;
          elsif Chaos.Dice.Is_Die_Roll (Tok_Text) then
             E :=
               Chaos.Dice.To_Expression
                 (Chaos.Dice.Parse_Die_Roll (Tok_Text));
-            Scan;
          elsif Is_Number (Tok_Text) then
             E := Chaos.Expressions.Numbers.To_Expression
               (Integer'Value (Tok_Text));
-            Scan;
-         elsif Next_Tok = Tok_Left_Paren then
-            declare
-               Name  : constant String := Tok_Text;
-            begin
-               Scan;
-               E := Chaos.Expressions.Functions.Create_Function_Call
-                 (Name, Parse_Arguments);
-            end;
          else
             E := Chaos.Expressions.Identifiers.To_Expression (Tok_Text);
-            Scan;
          end if;
+         Scan;
       elsif Tok = Tok_Left_Bracket then
          Scan;
          E := Chaos.Expressions.Vectors.Vector_Expression;
@@ -385,7 +309,7 @@ package body Chaos.Parser is
                   Scan;
                   Value := Parse_Expression;
                   E :=
-                    Chaos.Expressions.Functions.Create_Assignment
+                    Chaos.Expressions.Functions.Assign
                       (E, Name, Value);
                end;
             else
@@ -394,8 +318,8 @@ package body Chaos.Parser is
                begin
                   Scan;
                   E :=
-                    Chaos.Expressions.Functions.Create_Method_Call
-                      (E, Name, Parse_Arguments);
+                    Chaos.Expressions.Functions.Object_Method
+                      (E, Name);
                end;
             end if;
          else
@@ -439,25 +363,7 @@ package body Chaos.Parser is
          end;
       elsif Tok = Tok_Lambda then
          Scan;
-         declare
-            Args : Chaos.Expressions.Array_Of_Expressions (1 .. 10);
-            Count : Natural := 0;
-         begin
-            while Tok = Tok_Identifier loop
-               Count := Count + 1;
-               Args (Count) :=
-                 Chaos.Expressions.Identifiers.To_Expression
-                   (Tok_Text);
-               Scan;
-            end loop;
-            if Tok = Tok_Arrow then
-               Scan;
-            else
-               Error ("expected '->'");
-            end if;
-            return Chaos.Expressions.Functions.Create_Lambda_Expression
-              (Args (1 .. Count), Parse_Expression);
-         end;
+         return Parse_Lambda_Expression;
       else
          return Parse_Operator_Expression (Precedence_Level'Last);
       end if;
@@ -479,6 +385,49 @@ package body Chaos.Parser is
       return Result;
    end Parse_Expression;
 
+   ------------------------------------
+   -- Parse_Function_Call_Expression --
+   ------------------------------------
+
+   function Parse_Function_Call_Expression
+     return Chaos.Expressions.Chaos_Expression
+   is
+      Indent : constant Positive := Tok_Indent;
+      E : Chaos.Expressions.Chaos_Expression := Parse_Atomic_Expression;
+   begin
+      while Tok_Indent > Indent and then At_Expression loop
+         E := Chaos.Expressions.Functions.Apply (E, Parse_Atomic_Expression);
+      end loop;
+      return E;
+   end Parse_Function_Call_Expression;
+
+   -----------------------------
+   -- Parse_Lambda_Expression --
+   -----------------------------
+
+   function Parse_Lambda_Expression
+     return Chaos.Expressions.Chaos_Expression
+   is
+      Argument : constant String := Tok_Text;
+   begin
+      Scan;
+      if Tok = Tok_Identifier then
+         return Chaos.Expressions.Functions.Lambda
+           (Argument, Parse_Lambda_Expression);
+      elsif Tok = Tok_Arrow then
+         Scan;
+         return Chaos.Expressions.Functions.Lambda
+           (Argument, Parse_Expression);
+      else
+         Error ("expected an identifier or '=>'");
+         if At_Expression then
+            return Parse_Expression;
+         else
+            return Chaos.Expressions.Null_Value;
+         end if;
+      end if;
+   end Parse_Lambda_Expression;
+
    -------------------------------
    -- Parse_Operator_Expression --
    -------------------------------
@@ -490,7 +439,7 @@ package body Chaos.Parser is
       Result : Chaos.Expressions.Chaos_Expression;
    begin
       if Precedence = 1 then
-         Result := Parse_Atomic_Expression;
+         Result := Parse_Function_Call_Expression;
       else
          Result := Parse_Operator_Expression (Precedence - 1);
       end if;
@@ -508,7 +457,7 @@ package body Chaos.Parser is
          begin
             Scan;
             if Precedence = 1 then
-               Right := Parse_Atomic_Expression;
+               Right := Parse_Function_Call_Expression;
             else
                Right := Parse_Operator_Expression (Precedence - 1);
             end if;
@@ -519,8 +468,11 @@ package body Chaos.Parser is
                    (Result, Right, Chaos.Expressions.Null_Value);
             else
                Result :=
-                 Chaos.Expressions.Functions.Create_Function_Call
-                   (Name, (Result, Right));
+                 Chaos.Expressions.Functions.Apply
+                   (Chaos.Expressions.Functions.Apply
+                      (Chaos.Expressions.Identifiers.To_Expression (Name),
+                       Result),
+                    Right);
             end if;
          end;
       end loop;

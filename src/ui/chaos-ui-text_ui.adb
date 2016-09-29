@@ -12,7 +12,7 @@ with Chaos.Races;
 
 with Chaos.Actors.Visibility;
 
-with Chaos.Expressions.Environments;
+with Chaos.Expressions;
 
 package body Chaos.UI.Text_UI is
 
@@ -98,8 +98,7 @@ package body Chaos.UI.Text_UI is
    is
    begin
       Chaos.Expressions.Execute
-        (Chaos.Expressions.Environments.Standard_Environment,
-         UI.Area.Script);
+        (UI.Area.Script);
    end Start;
 
 end Chaos.UI.Text_UI;

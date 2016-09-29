@@ -1,10 +1,16 @@
+with Ada.Containers.Vectors;
+
 package body Chaos.Expressions.Primitives is
+
+   package Argument_Vectors is
+     new Ada.Containers.Vectors (Positive, Chaos_Expression);
 
    type Primitive_Expression_Record is
      new Root_Chaos_Expression_Record with
       record
          Property  : Boolean;
          Arg_Count : Natural;
+         Partial   : Argument_Vectors.Vector;
          Fn        : Primitive_Evaluator;
       end record;
 
@@ -12,6 +18,11 @@ package body Chaos.Expressions.Primitives is
      (Expression : Primitive_Expression_Record)
       return String
    is ("[primitive]");
+
+   overriding function Is_Atom
+     (Expression : Primitive_Expression_Record)
+      return Boolean
+   is (False);
 
    overriding function To_Boolean
      (Expression : Primitive_Expression_Record)
@@ -25,8 +36,8 @@ package body Chaos.Expressions.Primitives is
 
    overriding function Apply
      (Expression  : Primitive_Expression_Record;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression;
 
    -----------
@@ -35,20 +46,29 @@ package body Chaos.Expressions.Primitives is
 
    overriding function Apply
      (Expression  : Primitive_Expression_Record;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression
    is
-      Actual_Args : Array_Of_Expressions (1 .. Expression.Arg_Count);
    begin
-      for I in Actual_Args'Range loop
-         if I in Arguments'Range then
-            Actual_Args (I) := Arguments (I);
-         else
-            Actual_Args (I) := Null_Value;
-         end if;
-      end loop;
-      return Expression.Fn (Environment, Actual_Args);
+      if Expression.Partial.Last_Index + 1 = Expression.Arg_Count then
+         declare
+            Args : Array_Of_Expressions (1 .. Expression.Arg_Count);
+         begin
+            for I in 1 .. Expression.Partial.Last_Index loop
+               Args (I) := Expression.Partial.Element (I);
+            end loop;
+            Args (Args'Last) := Argument;
+            return Expression.Fn (Environment, Args);
+         end;
+      else
+         declare
+            Copy : Primitive_Expression_Record'Class := Expression;
+         begin
+            Copy.Partial.Append (Argument);
+            return Create (Copy);
+         end;
+      end if;
    end Apply;
 
    -------------------
@@ -62,7 +82,8 @@ package body Chaos.Expressions.Primitives is
    is
       Rec : constant Primitive_Expression_Record :=
               (Root_Chaos_Expression_Record with
-               False, Argument_Count, Evaluator);
+               False, Argument_Count, Argument_Vectors.Empty_Vector,
+               Evaluator);
    begin
       return Express (Rec);
    end Bind_Function;
@@ -77,7 +98,7 @@ package body Chaos.Expressions.Primitives is
    is
       Rec : constant Primitive_Expression_Record :=
               (Root_Chaos_Expression_Record with
-               True, 1, Evaluator);
+               True, 1, Argument_Vectors.Empty_Vector, Evaluator);
    begin
       return Express (Rec);
    end Bind_Property;

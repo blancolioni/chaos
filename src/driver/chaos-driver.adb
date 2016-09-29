@@ -4,6 +4,7 @@ with Chaos.Configuration;
 with Chaos.Dice;
 with Chaos.Expressions;
 with Chaos.Expressions.Environments;
+with Chaos.Expressions.Functions;
 with Chaos.Localisation;
 with Chaos.Parser;
 with Chaos.Vision;
@@ -26,6 +27,7 @@ with Chaos.UI.Text_UI;
 with Chaos.Paths;
 
 procedure Chaos.Driver is
+   Test_Only : constant Boolean := True;
    Expr : constant Chaos.Expressions.Chaos_Expression :=
             Chaos.Vision.To_Expression (Chaos.Vision.Low_Light);
    Roll : constant Chaos.Expressions.Chaos_Expression :=
@@ -45,8 +47,7 @@ begin
       Ada.Text_IO.Put_Line
         (Chaos.Expressions.To_String
            (Chaos.Expressions.Evaluate
-                (Chaos.Expressions.Environments.Standard_Environment,
-                 Start)));
+                (Start, Chaos.Expressions.Environments.Standard_Environment)));
    end;
 
    Ada.Text_IO.Put_Line
@@ -57,8 +58,8 @@ begin
       Ada.Text_IO.Put
         (Chaos.Expressions.To_String
            (Chaos.Expressions.Evaluate
-                (Chaos.Expressions.Environments.Standard_Environment,
-                 Roll, "roll", Chaos.Expressions.No_Array)));
+                (Chaos.Expressions.Functions.Object_Method
+                   (Roll, "roll"))));
       Ada.Text_IO.Put (" ");
    end loop;
    Ada.Text_IO.New_Line;
@@ -67,70 +68,16 @@ begin
    Tlk.Load;
    Tlk.Close;
 
---     declare
---        Area : constant Chaos.Areas.Chaos_Area :=
---                 Chaos.Areas.Import.Import_Area ("AR2600");
---     begin
---        Ada.Text_IO.Put_Line
---          (Area.Identifier & ":"
---           & Natural'Image (Area.Squares_Across)
---           & " x"
---           & Natural'Image (Area.Squares_Down));
---     end;
---
---     declare
---        Area : constant Chaos.Areas.Chaos_Area :=
---                 Chaos.Areas.Import.Import_Area ("AR2602");
---     begin
---        Ada.Text_IO.Put_Line
---          (Area.Identifier & ":"
---           & Natural'Image (Area.Squares_Across)
---           & " x"
---           & Natural'Image (Area.Squares_Down));
---     end;
---
---     declare
---        Shank : constant Chaos.Creatures.Chaos_Creature :=
---                  Chaos.Creatures.Import.Import_Creature ("SHANK");
---     begin
---        Chaos.Creatures.Reports.Report (Shank);
---     end;
---
---     declare
---        Test : constant Chaos.Creatures.Chaos_Creature :=
---                 Chaos.Creatures.Quick.Quick_Creature
---                   ("Aramael Musitello",
---                    Chaos.Races.Get ("elf"),
---                    Chaos.Classes.Get ("fighter"));
---     begin
---        Chaos.Creatures.Reports.Report (Test);
---     end;
-
---     declare
---        Creature : constant access constant
---          Chaos.Resources.Chaos_Resource'Class :=
---            Chaos.Resources.Manager.Load_Resource
---              (Reference => "SHANK   ",
---               Res_Type  => Chaos.Resources.Creature_Resource);
---     begin
---        pragma Unreferenced (Creature);
---     end;
-
---     declare
---        Dialog : constant Chaos.Dialog.Chaos_Dialog :=
---                   Chaos.Dialog.Import.Import_Dialog ("SHANK");
---     begin
---        Ada.Text_IO.Put_Line (Dialog.Identifier);
---     end;
-
    Ada.Text_IO.Put_Line
      ("2000: " & Chaos.Localisation.Indexed_Text (2000));
 
-   declare
-      UI : constant Chaos.UI.Chaos_UI :=
-             Chaos.UI.Text_UI.Create;
-   begin
-      UI.Start;
-   end;
+   if not Test_Only then
+      declare
+         UI : constant Chaos.UI.Chaos_UI :=
+                Chaos.UI.Text_UI.Create;
+      begin
+         UI.Start;
+      end;
+   end if;
 
 end Chaos.Driver;

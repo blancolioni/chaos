@@ -2,7 +2,6 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 
 with Chaos.Expressions.Maps;
-with Chaos.Expressions.Primitives;
 
 package body Chaos.Expressions.Functions is
 
@@ -29,10 +28,10 @@ package body Chaos.Expressions.Functions is
 
    overriding function Apply
      (Expression  : Assignment_Expression;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression
-   is (Evaluate (Environment, Expression.Value));
+   is (raise Constraint_Error with "cannot apply an assignment");
 
    overriding function To_String
      (Expression  : Assignment_Expression)
@@ -43,48 +42,81 @@ package body Chaos.Expressions.Functions is
        & ":="
        & To_String (Expression.Value));
 
-   type Function_Call_Expression is
+   type Application_Expression is
      new Root_Chaos_Expression_Record with
       record
-         Name      : Ada.Strings.Unbounded.Unbounded_String;
-         Object    : Chaos_Expression;
-         Arguments : Argument_Vectors.Vector;
+         Fun : Chaos_Expression;
+         Arg : Chaos_Expression;
       end record;
 
    overriding function Evaluate
-     (Expression  : Function_Call_Expression;
+     (Expression  : Application_Expression;
       Environment : Chaos_Environment)
       return Chaos_Expression;
 
    overriding function To_Boolean
-     (Expression  : Function_Call_Expression)
+     (Expression  : Application_Expression)
       return Boolean
    is (True);
 
    overriding function Apply
-     (Expression  : Function_Call_Expression;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+     (Expression  : Application_Expression;
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression;
 
    overriding function To_String
-     (Expression  : Function_Call_Expression)
+     (Expression  : Application_Expression)
       return String;
+
+   type Method_Expression is
+     new Root_Chaos_Expression_Record with
+      record
+         Source : Chaos_Expression;
+         Name   : Ada.Strings.Unbounded.Unbounded_String;
+      end record;
+
+   overriding function Evaluate
+     (Expression  : Method_Expression;
+      Environment : Chaos_Environment)
+      return Chaos_Expression;
+
+   overriding function To_Boolean
+     (Expression  : Method_Expression)
+      return Boolean
+   is (True);
+
+   overriding function Apply
+     (Expression  : Method_Expression;
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
+      return Chaos_Expression
+   is (raise Constraint_Error with "cannot apply a method");
+
+   overriding function To_String
+     (Expression  : Method_Expression)
+      return String
+   is (To_String (Expression.Source)
+       & "."
+       & Ada.Strings.Unbounded.To_String (Expression.Name));
 
    type Lambda_Expression is
      new Root_Chaos_Expression_Record with
       record
-         Arguments   : Argument_Vectors.Vector;
+         Argument    : Ada.Strings.Unbounded.Unbounded_String;
          Lambda_Body : Chaos_Expression;
       end record;
+
+   overriding function Is_Atom
+     (Expression : Lambda_Expression)
+      return Boolean
+   is (False);
 
    overriding function Evaluate
      (Expression  : Lambda_Expression;
       Environment : Chaos_Environment)
       return Chaos_Expression
-   is ((if Expression.Arguments.Last_Index = 0
-        then Evaluate (Environment, Expression.Lambda_Body)
-        else Create (Expression)));
+   is (Create (Expression));
 
    overriding function To_Boolean
      (Expression  : Lambda_Expression)
@@ -93,8 +125,8 @@ package body Chaos.Expressions.Functions is
 
    overriding function Apply
      (Expression  : Lambda_Expression;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression;
 
    overriding function To_String
@@ -106,14 +138,14 @@ package body Chaos.Expressions.Functions is
    -----------
 
    overriding function Apply
-     (Expression  : Function_Call_Expression;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+     (Expression  : Application_Expression;
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression
    is
+      pragma Unreferenced (Environment);
    begin
-      return Get (Expression.Evaluate (Environment)).Apply
-        (Environment, Arguments);
+      return Apply (Create (Expression), Argument);
    end Apply;
 
    -----------
@@ -122,29 +154,38 @@ package body Chaos.Expressions.Functions is
 
    overriding function Apply
      (Expression  : Lambda_Expression;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression
    is
+      use Ada.Strings.Unbounded;
       Env : Chaos_Environment := New_Environment (Environment);
    begin
-      for I in 1 .. Expression.Arguments.Last_Index loop
-         if I in Arguments'Range then
-            Insert (Env, To_String (Expression.Arguments (I)),
-                    Arguments (I));
-         else
-            Insert (Env, To_String (Expression.Arguments (I)),
-                    Undefined_Value);
-         end if;
-      end loop;
-      return Evaluate (Env, Expression.Lambda_Body);
+      Insert (Env, To_String (Expression.Argument), Argument);
+      return Evaluate (Expression.Lambda_Body, Env);
+   end Apply;
+
+   -----------
+   -- Apply --
+   -----------
+
+   function Apply
+     (Expression : Chaos_Expression;
+      Argument   : Chaos_Expression)
+      return Chaos_Expression
+   is
+      Rec : Application_Expression;
+   begin
+      Rec.Fun := Expression;
+      Rec.Arg := Argument;
+      return Create (Rec);
    end Apply;
 
    -----------------------
    -- Create_Assignment --
    -----------------------
 
-   function Create_Assignment
+   function Assign
      (Object    : Chaos_Expression;
       Name      : String;
       Value     : Chaos_Expression)
@@ -156,63 +197,7 @@ package body Chaos.Expressions.Functions is
       Rec.Name := Ada.Strings.Unbounded.To_Unbounded_String (Name);
       Rec.Value := Value;
       return Create (Rec);
-   end Create_Assignment;
-
-   --------------------------
-   -- Create_Function_Call --
-   --------------------------
-
-   function Create_Function_Call
-     (Function_Name : String;
-      Arguments     : Array_Of_Expressions)
-      return Chaos_Expression
-   is
-      Rec : Function_Call_Expression;
-   begin
-      Rec.Name := Ada.Strings.Unbounded.To_Unbounded_String (Function_Name);
-      for Arg of Arguments loop
-         Rec.Arguments.Append (Arg);
-      end loop;
-      return Create (Rec);
-   end Create_Function_Call;
-
-   ------------------------------
-   -- Create_Lambda_Expression --
-   ------------------------------
-
-   function Create_Lambda_Expression
-     (Arguments   : Array_Of_Expressions;
-      Lambda_Body : Chaos_Expression)
-      return Chaos_Expression
-   is
-      Rec : Lambda_Expression;
-   begin
-      for Arg of Arguments loop
-         Rec.Arguments.Append (Arg);
-      end loop;
-      Rec.Lambda_Body := Lambda_Body;
-      return Create (Rec);
-   end Create_Lambda_Expression;
-
-   ------------------------
-   -- Create_Method_Call --
-   ------------------------
-
-   function Create_Method_Call
-     (Object    : Chaos_Expression;
-      Method    : String;
-      Arguments : Array_Of_Expressions)
-      return Chaos_Expression
-   is
-      Rec : Function_Call_Expression;
-   begin
-      Rec.Name := Ada.Strings.Unbounded.To_Unbounded_String (Method);
-      Rec.Object := Object;
-      for Arg of Arguments loop
-         Rec.Arguments.Append (Arg);
-      end loop;
-      return Create (Rec);
-   end Create_Method_Call;
+   end Assign;
 
    --------------
    -- Evaluate --
@@ -225,9 +210,9 @@ package body Chaos.Expressions.Functions is
    is
       use Ada.Strings.Unbounded;
       Object : constant Chaos_Expression :=
-                 Evaluate (Environment, Expression.Target);
+                 Evaluate (Expression.Target, Environment);
       Value  : constant Chaos_Expression :=
-                 Evaluate (Environment, Expression.Value);
+                 Evaluate (Expression.Value, Environment);
    begin
       Set (Object).Set (To_String (Expression.Name),
                         Value);
@@ -239,73 +224,95 @@ package body Chaos.Expressions.Functions is
    --------------
 
    overriding function Evaluate
-     (Expression  : Function_Call_Expression;
+     (Expression  : Application_Expression;
       Environment : Chaos_Environment)
       return Chaos_Expression
    is
-      Actuals : Array_Of_Expressions (1 .. Expression.Arguments.Last_Index);
-      Name    : constant String :=
-                  Ada.Strings.Unbounded.To_String (Expression.Name);
-      Object  : constant Chaos_Expression :=
-                  (if Is_Null (Expression.Object)
-                   then Null_Value
-                   else Evaluate (Environment, Expression.Object));
-      Fn      : Chaos_Expression :=
-                  (if Is_Null (Object)
-                   then Find (Environment, Name)
-                   else Find
-                     (Get (Object).Local_Environment, Name));
+      Fun : constant Chaos_Expression :=
+              Evaluate (Expression.Fun, Environment);
+      Arg : constant Chaos_Expression :=
+              Evaluate (Expression.Arg, Environment);
    begin
-      if Fn = Undefined_Value
-        and then not Is_Null (Object)
-        and then Chaos.Expressions.Maps.Is_Map (Object)
-      then
-         Fn := Chaos.Expressions.Maps.Get (Object, Name);
-      end if;
-
-      for I in Actuals'Range loop
-         Actuals (I) :=
-           Evaluate (Environment, Expression.Arguments.Element (I));
-      end loop;
-
-      if not Is_Null (Object) then
-         if Actuals'Length = 0
-           and then not Chaos.Expressions.Primitives.Is_Property (Fn)
-         then
-            return Fn;
-         else
-            return Get (Fn).Apply (Environment, Object & Actuals);
-         end if;
-      else
-         return Get (Fn).Apply (Environment, Actuals);
-      end if;
+      return Get (Fun).Apply (Arg, Environment);
    end Evaluate;
+
+   --------------
+   -- Evaluate --
+   --------------
+
+   overriding function Evaluate
+     (Expression  : Method_Expression;
+      Environment : Chaos_Environment)
+      return Chaos_Expression
+   is
+      Object : constant Chaos_Expression :=
+                 Evaluate (Expression.Source, Environment);
+      Env : Chaos_Environment renames
+                 Get (Object).Local_Environment;
+      Name : constant String :=
+                 Ada.Strings.Unbounded.To_String (Expression.Name);
+      Result : Chaos_Expression;
+   begin
+      if Contains (Env, Name) then
+         Result := Find (Env, Name);
+      elsif Chaos.Expressions.Maps.Is_Map (Object) then
+         Result := Chaos.Expressions.Maps.Get (Object, Name);
+      else
+         Result := Undefined_Value;
+      end if;
+      if Get (Result).Is_Function then
+         Result := Evaluate (Apply (Result, Object), Environment);
+      end if;
+      return Result;
+   end Evaluate;
+
+   ------------
+   -- Lambda --
+   ------------
+
+   function Lambda
+     (Argument    : String;
+      Lambda_Body : Chaos_Expression)
+      return Chaos_Expression
+   is
+      Rec : Lambda_Expression;
+   begin
+      Rec.Argument := Ada.Strings.Unbounded.To_Unbounded_String (Argument);
+      Rec.Lambda_Body := Lambda_Body;
+      return Create (Rec);
+   end Lambda;
+
+   -------------------
+   -- Object_Method --
+   -------------------
+
+   function Object_Method
+     (Object    : Chaos_Expression;
+      Method    : String)
+      return Chaos_Expression
+   is
+      Rec : Method_Expression;
+   begin
+      Rec.Source := Object;
+      Rec.Name := Ada.Strings.Unbounded.To_Unbounded_String (Method);
+      return Create (Rec);
+   end Object_Method;
 
    ---------------
    -- To_String --
    ---------------
 
    overriding function To_String
-     (Expression  : Function_Call_Expression)
+     (Expression  : Application_Expression)
       return String
    is
-      use Ada.Strings.Unbounded;
-      Args : Unbounded_String;
+      Left  : constant String := To_String (Expression.Fun);
+      Right : constant String := To_String (Expression.Arg);
    begin
-      if not Expression.Arguments.Is_Empty then
-         for Arg of Expression.Arguments loop
-            if Args /= Null_Unbounded_String then
-               Args := Args & ",";
-            end if;
-            Args := Args & To_String (Arg);
-         end loop;
-         Args := "(" & Args & ")";
-      end if;
-      if not Is_Null (Expression.Object) then
-         return To_String (Expression.Object) & "."
-           & To_String (Expression.Name) & To_String (Args);
+      if Get (Expression.Arg) in Application_Expression'Class then
+         return Left & " (" & Right & ")";
       else
-         return To_String (Expression.Name) & To_String (Args);
+         return Left & " " & Right;
       end if;
    end To_String;
 
@@ -317,13 +324,9 @@ package body Chaos.Expressions.Functions is
      (Expression  : Lambda_Expression)
       return String
    is
-      use Ada.Strings.Unbounded;
-      Result : Unbounded_String := To_Unbounded_String ("\");
    begin
-      for Arg of Expression.Arguments loop
-         Result := Result & " " & To_String (Arg);
-      end loop;
-      return To_String (Result & " -> " & To_String (Expression.Lambda_Body));
+      return "\" & Ada.Strings.Unbounded.To_String (Expression.Argument)
+        & " => " & To_String (Expression.Lambda_Body);
    end To_String;
 
 end Chaos.Expressions.Functions;

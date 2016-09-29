@@ -63,8 +63,8 @@ package body Chaos.Expressions is
    --------------
 
    function Evaluate
-     (Environment : Chaos_Environment;
-      Expression  : Chaos_Expression)
+     (Expression  : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression
    is
    begin
@@ -80,20 +80,26 @@ package body Chaos.Expressions is
    --------------
 
    function Evaluate
-     (Environment : Chaos_Environment;
-      Expression  : Chaos_Expression;
-      Name        : String;
-      Arguments   : Array_Of_Expressions)
+     (Expression  : Chaos_Expression)
       return Chaos_Expression
    is
-      Local : constant Chaos_Environment := Get (Expression).Local_Environment;
    begin
-      if not Contains (Local, Name) then
-         return Undefined_Value;
-      else
-         return Get (Find (Local, Name)).Apply
-           (Environment, Expression & Arguments);
-      end if;
+      return Evaluate (Expression, Standard_Env);
+   end Evaluate;
+
+   --------------
+   -- Evaluate --
+   --------------
+
+   function Evaluate
+     (Expression  : Chaos_Expression;
+      Name        : String;
+      Environment : Chaos_Environment)
+      return Chaos_Expression
+   is
+   begin
+      return Find (Get (Evaluate (Expression, Environment)).Local_Environment,
+                   Name);
    end Evaluate;
 
    -------------
@@ -101,14 +107,25 @@ package body Chaos.Expressions is
    -------------
 
    procedure Execute
-     (Environment : Chaos_Environment;
-      Expression  : Chaos_Expression)
+     (Expression  : Chaos_Expression;
+      Environment : Chaos_Environment)
    is
       Ignored : constant Chaos_Expression :=
-                  Evaluate (Environment, Expression);
+                  Evaluate (Expression, Environment);
       pragma Unreferenced (Ignored);
    begin
       null;
+   end Execute;
+
+   -------------
+   -- Execute --
+   -------------
+
+   procedure Execute
+     (Expression  : Chaos_Expression)
+   is
+   begin
+      Execute (Expression, Standard_Env);
    end Execute;
 
    ----------
@@ -297,12 +314,7 @@ package body Chaos.Expressions is
       Env        : constant Chaos_Environment :=
                      Expr_Class.Local_Environment;
    begin
-      if Contains (Env, "to_integer") then
-         return Evaluate (Env, Create (Expr_Class), "to_integer",
-                          No_Array);
-      else
-         return Undefined_Value;
-      end if;
+      return Evaluate (Create (Expr_Class), "to_integer", Env);
    end To_Integer;
 
    ---------------

@@ -1,6 +1,7 @@
-with Chaos.Expressions.Environments;
 with Chaos.Expressions.Functions;
-with Chaos.Expressions.Numbers;
+with Chaos.Expressions.Identifiers;
+
+with Chaos.Parser;
 
 with Chaos.Logging;
 
@@ -29,17 +30,14 @@ package body Chaos.Expressions.Import.Triggers is
    begin
       case Trigger_Id is
          when Global_Trigger =>
-            if Text_1'Length > 6
-              and then Text_1 (Text_1'First .. Text_1'First + 5) = "GLOBAL"
-            then
-               Result :=
-                 Chaos.Expressions.Functions.Create_Function_Call
-                   ("=",
-                    (Chaos.Expressions.Functions.Create_Method_Call
-                       (Chaos.Expressions.Environments.Global_Object,
-                        Text_1 (Text_1'First + 6 .. Text_1'Last),
-                        No_Array),
-                     Chaos.Expressions.Numbers.To_Expression (Integer_1)));
+            if Text_1'Length > 6 then
+               return Chaos.Parser.Parse_Expression
+                 (Text_1 (Text_1'First .. Text_1'First + 5) & "."
+                  & Text_1 (Text_1'First + 6 .. Text_1'Last)
+                  & " = " & Integer'Image (Integer_1));
+            else
+               return Chaos.Parser.Parse_Expression
+                 (Text_1 & " = " & Integer'Image (Integer_1));
             end if;
          when others =>
             Chaos.Logging.Log ("SCRIPT", "unknown trigger" & Trigger_Id'Img);
@@ -47,8 +45,10 @@ package body Chaos.Expressions.Import.Triggers is
       end case;
 
       if Flags mod 2 = 1 then
-         Result := Chaos.Expressions.Functions.Create_Function_Call
-           ("not", (1 => Result));
+         Result :=
+           Chaos.Expressions.Functions.Apply
+             (Chaos.Expressions.Identifiers.To_Expression ("not"),
+              Result);
       end if;
 
       return Result;

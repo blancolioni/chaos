@@ -5,8 +5,10 @@ with WL.Binary_IO;                     use WL.Binary_IO;
 
 with Chaos.Expressions.Conditional;
 with Chaos.Expressions.Functions;
+with Chaos.Expressions.Identifiers;
 with Chaos.Expressions.Numbers;
 with Chaos.Expressions.Sequences;
+with Chaos.Expressions.Vectors;
 
 with Chaos.Expressions.Import.Actions;
 with Chaos.Expressions.Import.Objects;
@@ -160,8 +162,11 @@ package body Chaos.Expressions.Import is
                First := False;
             else
                Result :=
-                 Chaos.Expressions.Functions.Create_Function_Call
-                   ("and", (Result, TR));
+                 Chaos.Expressions.Functions.Apply
+                   (Chaos.Expressions.Functions.Apply
+                      (Chaos.Expressions.Identifiers.To_Expression ("and"),
+                       Result),
+                    TR);
             end if;
          end;
       end loop;
@@ -283,16 +288,21 @@ package body Chaos.Expressions.Import is
          return Responses (1);
       else
          declare
-            Args : Array_Of_Expressions (1 .. Response_Count * 2);
+            Result : constant Chaos.Expressions.Chaos_Expression :=
+                       Chaos.Expressions.Identifiers.To_Expression
+                         ("random-choice");
+            Args   : constant Chaos.Expressions.Chaos_Expression :=
+                       Chaos.Expressions.Vectors.Vector_Expression;
          begin
             for I in 1 .. Response_Count loop
-               Args (I * 2 - 1) :=
-                 Chaos.Expressions.Numbers.To_Expression
-                   (Probabilities (I));
-               Args (I * 2) := Responses (I);
+               Chaos.Expressions.Vectors.Append
+                 (Args, Chaos.Expressions.Numbers.To_Expression
+                    (Probabilities (I)));
+               Chaos.Expressions.Vectors.Append
+                 (Args, Responses (I));
             end loop;
-            return Chaos.Expressions.Functions.Create_Function_Call
-              ("random-choice", Args);
+            return Chaos.Expressions.Functions.Apply
+              (Result, Args);
          end;
       end if;
    end Import_RS;

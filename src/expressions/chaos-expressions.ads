@@ -33,19 +33,25 @@ package Chaos.Expressions is
       return Chaos_Expression;
 
    procedure Execute
-     (Environment : Chaos_Environment;
-      Expression  : Chaos_Expression);
+     (Expression  : Chaos_Expression;
+      Environment : Chaos_Environment);
 
    function Evaluate
-     (Environment : Chaos_Environment;
-      Expression  : Chaos_Expression)
+     (Expression  : Chaos_Expression;
+      Environment : Chaos_Environment)
+      return Chaos_Expression;
+
+   procedure Execute
+     (Expression  : Chaos_Expression);
+
+   function Evaluate
+     (Expression  : Chaos_Expression)
       return Chaos_Expression;
 
    function Evaluate
-     (Environment : Chaos_Environment;
-      Expression  : Chaos_Expression;
+     (Expression  : Chaos_Expression;
       Name        : String;
-      Arguments   : Array_Of_Expressions)
+      Environment : Chaos_Environment)
       return Chaos_Expression;
 
    function To_String
@@ -71,6 +77,16 @@ private
 
    type Root_Chaos_Expression_Record is abstract tagged null record;
 
+   function Is_Atom
+     (Expression : Root_Chaos_Expression_Record)
+      return Boolean
+   is (True);
+
+   function Is_Function
+     (Expression : Root_Chaos_Expression_Record)
+      return Boolean
+   is (not (Root_Chaos_Expression_Record'Class (Expression).Is_Atom));
+
    function Evaluate
      (Expression  : Root_Chaos_Expression_Record;
       Environment : Chaos_Environment)
@@ -84,8 +100,8 @@ private
 
    function Apply
      (Expression  : Root_Chaos_Expression_Record;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression
       is abstract;
 
@@ -100,6 +116,12 @@ private
       Name        : String;
       Value       : Chaos_Expression)
    is null;
+
+   function Get
+     (Expression  : in out Root_Chaos_Expression_Record;
+      Name        : String)
+      return Chaos_Expression
+   is (Undefined_Value);
 
    function Local_Environment
      (Expression  : Root_Chaos_Expression_Record)
@@ -169,9 +191,11 @@ private
 
    overriding function Apply
      (Expression  : Constant_Chaos_Expression_Record;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression
    is (Chaos_Expression (Expression_Handles.Create (Expression)));
+
+   Standard_Env : Chaos_Environment;
 
 end Chaos.Expressions;

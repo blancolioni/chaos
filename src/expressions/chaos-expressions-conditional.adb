@@ -15,8 +15,8 @@ package body Chaos.Expressions.Conditional is
 
    overriding function Apply
      (Expression  : Conditional_Expression;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression;
 
    overriding function To_Boolean
@@ -37,15 +37,15 @@ package body Chaos.Expressions.Conditional is
 
    overriding function Apply
      (Expression  : Conditional_Expression;
-      Environment : Chaos_Environment;
-      Arguments   : Array_Of_Expressions)
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
       return Chaos_Expression
    is
    begin
-      if To_Boolean (Evaluate (Environment, Expression.Condition)) then
-         return Get (Expression.True_Part).Apply (Environment, Arguments);
+      if To_Boolean (Evaluate (Expression.Condition, Environment)) then
+         return Get (Expression.True_Part).Apply (Argument, Environment);
       else
-         return Get (Expression.False_Part).Apply (Environment, Arguments);
+         return Get (Expression.False_Part).Apply (Argument, Environment);
       end if;
    end Apply;
 
@@ -77,10 +77,10 @@ package body Chaos.Expressions.Conditional is
       return Chaos_Expression
    is
    begin
-      if To_Boolean (Evaluate (Environment, Expression.Condition)) then
-         return Evaluate (Environment, Expression.True_Part);
+      if To_Boolean (Evaluate (Expression.Condition, Environment)) then
+         return Evaluate (Expression.True_Part, Environment);
       else
-         return Evaluate (Environment, Expression.False_Part);
+         return Evaluate (Expression.False_Part, Environment);
       end if;
    end Evaluate;
 
