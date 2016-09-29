@@ -1,0 +1,9 @@
+identity: sure-strike
+action: standard
+source: martial
+implement: weapon
+attack: str + 2
+defence: ac
+use: at-will
+target: one-creature
+hit-damage: weapon + str.bonus + (level > 20 => weapon)
