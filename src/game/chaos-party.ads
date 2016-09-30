@@ -10,7 +10,7 @@ package Chaos.Party is
 
    type Chaos_Party is access all Chaos_Party_Record'Class;
 
-   function Get_Party_Member
+   function Party_Member
      (Party    : Chaos_Party_Record'Class;
       Position : Party_Member_Index)
       return Chaos.Actors.Chaos_Actor;

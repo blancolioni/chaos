@@ -78,14 +78,14 @@ package body Chaos.Party is
    -- Get_Party_Member --
    ----------------------
 
-   function Get_Party_Member
+   function Party_Member
      (Party    : Chaos_Party_Record'Class;
       Position : Party_Member_Index)
       return Chaos.Actors.Chaos_Actor
    is
    begin
       return Party.Members (Position);
-   end Get_Party_Member;
+   end Party_Member;
 
    -------------------------
    -- Remove_Party_Member --
