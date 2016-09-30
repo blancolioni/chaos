@@ -10,6 +10,9 @@ with Xi.Texture;
 
 with Chaos.Xi_UI.Images;
 
+with Chaos.Locations;
+with Chaos.Game;
+
 with Chaos.Logging;
 
 package body Chaos.Xi_UI.Areas is
@@ -25,6 +28,7 @@ package body Chaos.Xi_UI.Areas is
      new Chaos.Xi_UI.Models.Root_Chaos_Xi_Model with
       record
          Scene : Xi.Scene.Xi_Scene;
+         Top   : Xi.Node.Xi_Node;
          Area  : Chaos.Areas.Chaos_Area;
       end record;
 
@@ -60,6 +64,7 @@ package body Chaos.Xi_UI.Areas is
 
       Model.Area := Area;
       Model.Scene := Xi.Scene.Create_Scene;
+      Model.Top := Model.Scene.Create_Node ("map-top");
 
       for Tile_Y in 1 .. Area.Tiles_Down loop
          declare
@@ -78,7 +83,7 @@ package body Chaos.Xi_UI.Areas is
                                  "tile" & Integer'Image (-Tile_X)
                                & Integer'Image (-Tile_Y);
                   Node       : constant Xi.Node.Xi_Node :=
-                                 Model.Scene.Create_Node (Name);
+                                 Model.Top.Create_Child (Name);
                   Square     : constant Xi.Entity.Xi_Entity :=
                                  Xi.Shapes.Square (32.0);
                   Tile_Index : constant Positive :=
@@ -104,12 +109,32 @@ package body Chaos.Xi_UI.Areas is
          & Natural'Image (Area.Tiles_Across * Area.Tiles_Down) & " tiles");
 
       declare
-         use type Xi.Xi_Float;
+         use Xi;
          Camera : constant Xi.Camera.Xi_Camera :=
                     Model.Scene.Active_Camera;
+         Start_Loc : constant Chaos.Locations.Square_Location :=
+                       Chaos.Game.Current_Game.Party.Party_Member (1)
+                       .Location;
+         Pixel_Loc : constant Chaos.Locations.Pixel_Location :=
+                       Model.Area.To_Pixels (Start_Loc);
       begin
-         Camera.Set_Position (0.0, 0.0, 1500.0);
-         Camera.Look_At (0.0, 0.0, 0.0);
+         Chaos.Logging.Log ("XI",
+                            "start location:"
+                            & Start_Loc.X'Img & Start_Loc.Y'Img);
+         Chaos.Logging.Log ("XI",
+                            "start pixel location:"
+                            & Pixel_Loc.X'Img & Pixel_Loc.Y'Img);
+
+         declare
+            Camera_X : constant Xi_Float :=
+                         Xi_Float (Pixel_Loc.X - Model.Area.Pixels_Across / 2);
+            Camera_Y : constant Xi_Float :=
+                         Xi_Float (Model.Area.Pixels_Down / 2 - Pixel_Loc.Y);
+         begin
+            Camera.Set_Position (Camera_X, Camera_Y, 1000.0);
+            Camera.Look_At (Camera_X, Camera_Y, 0.0);
+         end;
+
          Camera.Perspective (45.0, 100.0, 2000.0);
       end;
 
