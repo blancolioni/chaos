@@ -1,5 +1,3 @@
-with Ada.Text_IO;
-
 with GL;
 
 with Xi.Font;
@@ -8,7 +6,6 @@ with Xi.Render_Window;
 with Xi.Scene;
 
 with Xtk;
-with Xtk.Label;
 with Xtk.Panel;
 with Xtk.Text.Buffer;
 with Xtk.Text.View;
@@ -34,7 +31,6 @@ package body Chaos.Xi_UI is
          Log       : Xtk.Text.Buffer.Xtk_Text_Buffer;
          Log_View  : Xtk.Text.View.Xtk_Text_View;
          Log_Panel : Xtk.Panel.Xtk_Panel;
-         Log_Label : Xtk.Label.Xtk_Label;
          Font      : Xi.Font.Xi_Font;
       end record;
 
@@ -71,7 +67,6 @@ package body Chaos.Xi_UI is
       Xtk.Text.View.Xtk_New (Result.Log_View);
       Result.Log := Result.Log_View.Text_Buffer;
       Result.Log.Set_Font (Xi.Font.Get_Font ("SegoeUI", 12.0));
-      Xtk.Label.Xtk_New (Result.Log_Label, "");
       Xtk.Panel.Xtk_New (Result.Log_Panel, Result.Log_View);
       Result.Log_Panel.Set_Element_Id ("log-panel");
       Result.Log_Panel.Position_Anchor (Xtk.Right, Xtk.Bottom);
@@ -105,9 +100,7 @@ package body Chaos.Xi_UI is
       Text : String)
    is
    begin
-      Ada.Text_IO.Put_Line (Text);
       UI.Log.Append (Text);
-      UI.Log_Label.Set_Label (Text);
    end Display_Text;
 
    -----------

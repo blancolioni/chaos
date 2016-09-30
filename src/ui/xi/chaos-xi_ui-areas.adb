@@ -2,12 +2,14 @@ with Ada.Calendar;
 
 with WL.String_Maps;
 
+with Xi.Assets;
 with Xi.Camera;
 with Xi.Color;
 with Xi.Entity;
 with Xi.Frame_Event;
 with Xi.Keyboard;
 with Xi.Main;
+with Xi.Mouse;
 with Xi.Node;
 with Xi.Scene;
 with Xi.Shapes;
@@ -34,9 +36,12 @@ package body Chaos.Xi_UI.Areas is
    type Area_Model_Record is
      new Chaos.Xi_UI.Models.Root_Chaos_Xi_Model with
       record
-         Scene : Xi.Scene.Xi_Scene;
-         Top   : Xi.Node.Xi_Node;
-         Area  : Chaos.Areas.Chaos_Area;
+         Scene     : Xi.Scene.Xi_Scene;
+         Top       : Xi.Node.Xi_Node;
+         Area      : Chaos.Areas.Chaos_Area;
+         Highlight : Xi.Node.Xi_Node;
+         Centre_X  : Xi.Xi_Float;
+         Centre_Y  : Xi.Xi_Float;
       end record;
 
    type Area_Model_Access is access all Area_Model_Record'Class;
@@ -85,6 +90,17 @@ package body Chaos.Xi_UI.Areas is
       Model.Area := Area;
       Model.Scene := Xi.Scene.Create_Scene;
       Model.Top := Model.Scene.Create_Node ("map-top");
+      Model.Highlight := Model.Scene.Create_Node ("highlight");
+
+      declare
+         Entity : constant Xi.Entity.Xi_Entity :=
+                    Xi.Shapes.Square
+                      (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
+      begin
+         Entity.Set_Material (Xi.Assets.Material ("Xi.Blue"));
+         Model.Highlight.Set_Entity (Entity);
+         Model.Highlight.Rotate (40.0, 0.0, 0.0, 1.0);
+      end;
 
       for Tile_Y in 1 .. Area.Tiles_Down loop
          declare
@@ -151,8 +167,11 @@ package body Chaos.Xi_UI.Areas is
             Camera_Y : constant Xi_Float :=
                          Xi_Float (Model.Area.Pixels_Down / 2 - Pixel_Loc.Y);
          begin
+            Model.Centre_X := Camera_X;
+            Model.Centre_Y := Camera_Y;
             Camera.Set_Position (Camera_X, Camera_Y, 1000.0);
             Camera.Look_At (Camera_X, Camera_Y, 0.0);
+            Model.Highlight.Set_Position (Camera_X, Camera_Y, 10.0);
          end;
 
          Camera.Perspective (45.0, 100.0, 2000.0);
@@ -181,7 +200,7 @@ package body Chaos.Xi_UI.Areas is
      (Listener : in out Area_Frame_Listener;
       Event    : Xi.Frame_Event.Xi_Frame_Event)
    is
-      pragma Unreferenced (Event);
+      use Xi;
       use Ada.Calendar;
       Now : constant Time := Clock;
    begin
@@ -194,6 +213,24 @@ package body Chaos.Xi_UI.Areas is
       if Xi.Keyboard.Key_Down (Xi.Keyboard.Key_Esc) then
          Xi.Main.Leave_Main_Loop;
       end if;
+
+      declare
+         X : constant Xi_Float :=
+               Xi.Mouse.Current_Mouse.State.X
+                 - Event.Render_Target.Width / 2.0
+                 + Listener.Model.Centre_X;
+         Y : constant Xi_Float :=
+               Xi.Mouse.Current_Mouse.State.Y
+                 - Event.Render_Target.Height / 2.0
+               + Listener.Model.Centre_Y;
+      begin
+         Listener.Model.Highlight.Set_Position
+           (Xi_Float (Integer (X) / Chaos.Areas.Pixels_Per_Square
+            * Chaos.Areas.Pixels_Per_Square),
+            Xi_Float (Integer (Y) / Chaos.Areas.Pixels_Per_Square
+              * Chaos.Areas.Pixels_Per_Square),
+            1.0);
+      end;
    end Frame_Started;
 
 end Chaos.Xi_UI.Areas;
