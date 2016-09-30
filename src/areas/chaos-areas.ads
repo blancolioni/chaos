@@ -25,6 +25,9 @@ package Chaos.Areas is
 
    type Chaos_Area is access constant Chaos_Area_Record'Class;
 
+   function Pixels_Across (Area : Chaos_Area_Record'Class) return Natural;
+   function Pixels_Down (Area : Chaos_Area_Record'Class) return Natural;
+
    function Squares_Across (Area : Chaos_Area_Record'Class) return Natural;
    function Squares_Down (Area : Chaos_Area_Record'Class) return Natural;
 
@@ -51,6 +54,11 @@ package Chaos.Areas is
      (Area           : Chaos_Area_Record'Class;
       Pixel_Location : Chaos.Locations.Pixel_Location)
       return Chaos.Locations.Square_Location;
+
+   function To_Pixels
+     (Area            : Chaos_Area_Record'Class;
+      Square_Location : Chaos.Locations.Square_Location)
+      return Chaos.Locations.Pixel_Location;
 
    function Script
      (Area : Chaos_Area_Record'class)

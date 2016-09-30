@@ -18,6 +18,10 @@ package body Chaos.Areas is
       return Area.Squares.Element (Index).Actor;
    end Actor;
 
+   ---------------
+   -- Add_Actor --
+   ---------------
+
    procedure Add_Actor
      (Area     : Chaos_Area_Record'Class;
       Actor    : Chaos.Actors.Chaos_Actor)
@@ -159,6 +163,24 @@ package body Chaos.Areas is
       return Area.Squares (Area.To_Square_Index (Location)).Passable;
    end Passable;
 
+   -------------------
+   -- Pixels_Across --
+   -------------------
+
+   function Pixels_Across (Area : Chaos_Area_Record'Class) return Natural is
+   begin
+      return Area.Pixel_Width;
+   end Pixels_Across;
+
+   -----------------
+   -- Pixels_Down --
+   -----------------
+
+   function Pixels_Down (Area : Chaos_Area_Record'Class) return Natural is
+   begin
+      return Area.Pixel_Height;
+   end Pixels_Down;
+
    -------------------------
    -- Scan_Visible_Actors --
    -------------------------
@@ -277,6 +299,23 @@ package body Chaos.Areas is
    begin
       return Area.Pixel_Height / 64;
    end Tiles_Down;
+
+   ---------------
+   -- To_Pixels --
+   ---------------
+
+   function To_Pixels
+     (Area            : Chaos_Area_Record'Class;
+      Square_Location : Chaos.Locations.Square_Location)
+      return Chaos.Locations.Pixel_Location
+   is
+      pragma Unreferenced (Area);
+   begin
+      return ((Square_Location.X - 1) * Pixels_Per_Square
+              + 1 + Pixels_Per_Square / 2,
+              (Square_Location.Y - 1) * Pixels_Per_Square
+              + 1 + Pixels_Per_Square / 2);
+   end To_Pixels;
 
    ---------------
    -- To_Square --
