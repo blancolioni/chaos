@@ -2,8 +2,6 @@ with Chaos.Areas.Db;
 
 package body Chaos.Areas is
 
-   Pixels_Per_Square : constant := 16;
-
    -----------
    -- Actor --
    -----------

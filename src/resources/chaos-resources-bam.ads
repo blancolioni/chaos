@@ -1,4 +1,3 @@
-with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Vectors;
 
 package Chaos.Resources.Bam is
@@ -14,17 +13,17 @@ package Chaos.Resources.Bam is
 
    type Frame_Pixels is array (Word_32 range <>) of Word_8;
 
-   package Frame_Pixel_Vectors is
-     new Ada.Containers.Indefinite_Vectors (Positive, Frame_Pixels);
-
    type Frame_Entry is
       record
          Width, Height      : Word_16;
          Center_X, Center_Y : Word_16;
          Frame_Data_Offset  : Word_32;
          RLE_Compressed     : Boolean;
-         Frame_Data         : Frame_Pixel_Vectors.Vector;
+         Frame_Data         : access Frame_Pixels;
       end record;
+
+   package Frame_Entry_Vectors is
+     new Ada.Containers.Vectors (Positive, Frame_Entry);
 
    type Cycle_Entry is
       record
@@ -36,7 +35,7 @@ package Chaos.Resources.Bam is
      new Ada.Containers.Vectors (Positive, Cycle_Entry);
 
    package Frame_Index_Vectors is
-     new Ada.Containers.Vectors (Positive, Word_16);
+     new Ada.Containers.Vectors (Positive, Positive);
 
    type Bam_Resource is
      new Chaos_Resource with
@@ -48,7 +47,9 @@ package Chaos.Resources.Bam is
          Palette_Offset      : Word_32;
          Frame_Lookup_Offset : Word_32;
          Palette             : Bam_Palette;
+         Frame_Entries       : Frame_Entry_Vectors.Vector;
          Cycle_Entries       : Cycle_Entry_Vectors.Vector;
+         Frame_Lookup        : Frame_Index_Vectors.Vector;
       end record;
 
    overriding function Signature

@@ -14,6 +14,8 @@ with Chaos.Images;
 
 package Chaos.Areas is
 
+   Pixels_Per_Square : constant := 32;
+
    type Chaos_Area_Record is
      new Chaos.Objects.Root_Chaos_Object_Record
      and Chaos.Commands.Command_Environment_Interface with private;
