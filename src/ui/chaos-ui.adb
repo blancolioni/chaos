@@ -1,13 +1,8 @@
+with Chaos.Localisation;
+
 package body Chaos.UI is
 
-   -------------------
-   -- Current_Model --
-   -------------------
-
-   function Current_Model return UI_Model is
-   begin
-      return Local_Current_Model;
-   end Current_Model;
+   Local_Current_UI : Chaos_UI;
 
    ----------------
    -- Current_UI --
@@ -18,16 +13,39 @@ package body Chaos.UI is
       return Local_Current_UI;
    end Current_UI;
 
-   -----------
-   -- Party --
-   -----------
+   ----------------------------
+   -- Display_Localised_Text --
+   ----------------------------
 
-   function Party
-     (Model : Root_Chaos_UI'Class)
-      return Chaos.Players.Party_Type
+   procedure Display_Localised_Text
+     (UI    : in out Root_Chaos_UI'Class;
+      Tag   : String)
    is
    begin
-      return Model.Party;
-   end Party;
+      UI.Display_Text (Chaos.Localisation.Local_Text (Tag));
+   end Display_Localised_Text;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize
+     (UI     : in out Root_Chaos_UI'Class)
+   is
+      pragma Unreferenced (UI);
+   begin
+      null;
+   end Initialize;
+
+   --------------------
+   -- Set_Current_UI --
+   --------------------
+
+   procedure Set_Current_UI
+     (UI : Chaos_UI)
+   is
+   begin
+      Local_Current_UI := UI;
+   end Set_Current_UI;
 
 end Chaos.UI;

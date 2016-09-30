@@ -10,6 +10,7 @@ with Chaos.Expressions;
 
 with Chaos.Actors;
 with Chaos.Commands;
+with Chaos.Images;
 
 package Chaos.Areas is
 
@@ -26,6 +27,18 @@ package Chaos.Areas is
 
    function Squares_Across (Area : Chaos_Area_Record'Class) return Natural;
    function Squares_Down (Area : Chaos_Area_Record'Class) return Natural;
+
+   function Tiles_Across (Area : Chaos_Area_Record'Class) return Natural;
+   function Tiles_Down (Area : Chaos_Area_Record'Class) return Natural;
+
+   function Tile_Index
+     (Area           : Chaos_Area_Record'Class;
+      Tile_X, Tile_Y : Positive)
+      return Positive;
+
+   function Images
+     (Area : Chaos_Area_Record'Class)
+      return Chaos.Images.Chaos_Image_Container;
 
    function Contains_Point
      (Area : Chaos_Area_Record'Class;
@@ -113,6 +126,14 @@ private
    package Square_Vectors is
      new Ada.Containers.Vectors (Positive, Square_Type);
 
+   type Tileset_Map_Entry is
+      record
+         Tile_Index : Natural;
+      end record;
+
+   package Tileset_Map_Entry_Vectors is
+     new Ada.Containers.Vectors (Positive, Tileset_Map_Entry);
+
    type Chaos_Area_Record is
      new Chaos.Objects.Root_Chaos_Object_Record
      and Chaos.Commands.Command_Environment_Interface with
@@ -120,10 +141,12 @@ private
          Pixel_Width  : Natural;
          Pixel_Height : Natural;
          Squares      : Square_Vectors.Vector;
+         Tiles        : Tileset_Map_Entry_Vectors.Vector;
          Actors       : Actor_Vectors.Vector;
          Visibility   : Chaos.Vision.Chaos_Vision;
          Script       : Chaos.Expressions.Chaos_Expression;
          Environment  : Chaos.Expressions.Chaos_Environment;
+         Images       : Chaos.Images.Chaos_Image_Container;
       end record;
 
    overriding function Object_Database

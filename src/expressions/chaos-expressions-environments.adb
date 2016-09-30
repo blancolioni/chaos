@@ -1,7 +1,7 @@
-with Ada.Text_IO;
-
 with Chaos.Expressions.Numbers;
 with Chaos.Expressions.Primitives;
+
+with Chaos.UI;
 
 package body Chaos.Expressions.Environments is
 
@@ -128,7 +128,7 @@ package body Chaos.Expressions.Environments is
    is
       pragma Unreferenced (Environment);
    begin
-      Ada.Text_IO.Put (To_String (Arguments (1)));
+      Chaos.UI.Current_UI.Display_Text (To_String (Arguments (1)));
       return Null_Value;
    end Evaluate_Display_String;
 

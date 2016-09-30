@@ -1,7 +1,7 @@
 with Chaos.Areas;
 with Chaos.Actors.Hostiles;
 
-with Chaos.UI;
+with Chaos.Game;
 
 package body Chaos.Commands.Moves is
 
@@ -124,11 +124,11 @@ package body Chaos.Commands.Moves is
                    Command.Path_To (Location);
    begin
       if Target /= null then
-         Chaos.UI.Current_Model.Creature_Walk
+         Chaos.Game.Current_Game.Actor_Walk
            (Command.Mover, Chaos.Locations.Drop_Last (Path));
          Command.Target := Target;
       else
-         Chaos.UI.Current_Model.Creature_Walk
+         Chaos.Game.Current_Game.Actor_Walk
            (Command.Mover, Path);
          Command.Target := null;
       end if;
@@ -202,7 +202,7 @@ package body Chaos.Commands.Moves is
       use type Chaos.Actors.Chaos_Actor;
    begin
       if Command.Target /= null then
-         Chaos.UI.Current_Model.Start_Dialog
+         Chaos.Game.Current_Game.Start_Dialog
            (Command.Mover, Command.Target);
          Command.Target := null;
       end if;

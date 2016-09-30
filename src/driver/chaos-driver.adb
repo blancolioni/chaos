@@ -1,12 +1,18 @@
 with Ada.Text_IO;
 
+with Chaos.Actors;
+with Chaos.Areas.Import;
+with Chaos.Classes;
 with Chaos.Configuration;
+with Chaos.Creatures.Quick;
 with Chaos.Dice;
 with Chaos.Expressions;
 with Chaos.Expressions.Environments;
 with Chaos.Expressions.Functions;
+with Chaos.Game;
 with Chaos.Localisation;
 with Chaos.Parser;
+with Chaos.Party;
 with Chaos.Vision;
 
 --  with Chaos.Classes;
@@ -23,11 +29,14 @@ with Chaos.Resources.Tlk;
 --  with Chaos.Creatures.Reports;
 
 with Chaos.UI.Text_UI;
+with Chaos.Xi_UI;
 
 with Chaos.Paths;
 
 procedure Chaos.Driver is
    Test_Only : constant Boolean := True;
+   Text_UI : constant Boolean := False;
+
    Expr : constant Chaos.Expressions.Chaos_Expression :=
             Chaos.Vision.To_Expression (Chaos.Vision.Low_Light);
    Roll : constant Chaos.Expressions.Chaos_Expression :=
@@ -74,8 +83,35 @@ begin
    if not Test_Only then
       declare
          UI : constant Chaos.UI.Chaos_UI :=
-                Chaos.UI.Text_UI.Create;
+             (if Text_UI
+              then Chaos.UI.Text_UI.Create
+              else Chaos.Xi_UI.Create);
+   begin
+
+      Chaos.UI.Set_Current_UI (UI);
+
+      declare
+         Protagonist : constant Chaos.Creatures.Chaos_Creature :=
+                         Chaos.Creatures.Quick.Quick_Creature
+                           ("Aramael",
+                            Chaos.Races.Get ("elf"),
+                            Chaos.Classes.Get ("wizard"));
+         Area        : constant Chaos.Areas.Chaos_Area :=
+                         Chaos.Areas.Import.Import_Area
+                           (Chaos.Configuration.Start_Area);
+         Actor       : constant Chaos.Actors.Chaos_Actor :=
+                         Chaos.Actors.Create_Actor
+                           (Protagonist, Area,
+                            Area.To_Square
+                              (Chaos.Configuration.Start_Location));
+         Party       : constant Chaos.Party.Party_Type :=
+                         Chaos.Party.Create_Party;
       begin
+
+         Party.Add_Party_Member (Actor);
+         Chaos.Game.Create_Game (Area, Party);
+      end;
+
          UI.Start;
       end;
    end if;

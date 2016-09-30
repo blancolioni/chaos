@@ -93,6 +93,18 @@ package body Chaos.Areas is
          OK'Access);
    end Find_Path;
 
+   ------------
+   -- Images --
+   ------------
+
+   function Images
+     (Area : Chaos_Area_Record'Class)
+      return Chaos.Images.Chaos_Image_Container
+   is
+   begin
+      return Area.Images;
+   end Images;
+
    ----------------
    -- Neighbours --
    ----------------
@@ -232,6 +244,39 @@ package body Chaos.Areas is
    begin
       return Area.Pixel_Height / Pixels_Per_Square;
    end Squares_Down;
+
+   ----------------
+   -- Tile_Index --
+   ----------------
+
+   function Tile_Index
+     (Area           : Chaos_Area_Record'Class;
+      Tile_X, Tile_Y : Positive)
+      return Positive
+   is
+      Index : constant Positive :=
+                (Tile_Y - 1) * Area.Tiles_Across + Tile_X;
+   begin
+      return Area.Tiles.Element (Index).Tile_Index;
+   end Tile_Index;
+
+   ------------------
+   -- Tiles_Across --
+   ------------------
+
+   function Tiles_Across (Area : Chaos_Area_Record'Class) return Natural is
+   begin
+      return Area.Pixel_Width / 64;
+   end Tiles_Across;
+
+   ----------------
+   -- Tiles_Down --
+   ----------------
+
+   function Tiles_Down (Area : Chaos_Area_Record'Class) return Natural is
+   begin
+      return Area.Pixel_Height / 64;
+   end Tiles_Down;
 
    ---------------
    -- To_Square --

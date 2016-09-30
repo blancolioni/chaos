@@ -1,2 +1,10 @@
 syntax: glob
 *~
+build/obj/*
+build/bin/*
+config - 4e
+config - 5e
+config-dnd
+config/chaos.kit
+config/chaos.tropos
+temp/*

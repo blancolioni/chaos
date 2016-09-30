@@ -1,4 +1,4 @@
-with Chaos.UI;
+with Chaos.Game;
 
 package body Chaos.Commands.Meta_Commands is
 
@@ -77,7 +77,7 @@ package body Chaos.Commands.Meta_Commands is
      (Command  : in out Root_End_Turn_Command)
    is
    begin
-      Chaos.UI.Current_Model.Creature_End_Turn (Command.Turn_Ender);
+      Chaos.Game.Current_Game.Actor_End_Turn (Command.Turn_Ender);
    end Execute;
 
    -------------
@@ -88,7 +88,7 @@ package body Chaos.Commands.Meta_Commands is
      (Command  : in out Root_Wait_Command)
    is
    begin
-      Chaos.UI.Current_Model.Creature_Wait (Command.Waiter);
+      Chaos.Game.Current_Game.Actor_Wait (Command.Waiter);
    end Execute;
 
    ------------------

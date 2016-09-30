@@ -10,11 +10,27 @@ with Chaos.Dialog;
 with Chaos.Classes;
 with Chaos.Races;
 
+with Chaos.Party;
+with Chaos.Game;
+
+with Chaos.Images;
+
 with Chaos.Actors.Visibility;
 
 with Chaos.Expressions;
+with Chaos.Resources.Tis;
 
 package body Chaos.UI.Text_UI is
+
+   type Text_Image_Container is
+     new Chaos.Images.Root_Chaos_Image_Container with null record;
+
+   overriding procedure Import_Tileset
+     (Container : in out Text_Image_Container;
+      Tis       : Chaos.Resources.Tis.Tis_Resource'Class)
+   is null;
+
+   Local_Image_Container : aliased Text_Image_Container;
 
    type Chaos_Text_UI is
      new Root_Chaos_UI with
@@ -29,10 +45,14 @@ package body Chaos.UI.Text_UI is
      (UI : in out Chaos_Text_UI)
    is null;
 
-   overriding procedure Show_Model
+   overriding procedure Display_Text
      (UI : in out Chaos_Text_UI;
-      Model : not null access Root_UI_Model'Class)
-   is null;
+      Text : String);
+
+   overriding function Create_Image_Container
+     (UI : Chaos_Text_UI)
+      return Chaos.Images.Chaos_Image_Container
+   is (Local_Image_Container'Access);
 
    ------------
    -- Create --
@@ -53,10 +73,12 @@ package body Chaos.UI.Text_UI is
                         (Protagonist, Area,
                          Area.To_Square
                            (Chaos.Configuration.Start_Location));
+      Party       : constant Chaos.Party.Party_Type :=
+                      Chaos.Party.Create_Party;
    begin
-      UI.Area := Area;
-      UI.Party.Add_Party_Member (Actor);
+      Party.Add_Party_Member (Actor);
 
+      Chaos.Game.Create_Game (Area, Party);
       declare
          use Chaos.Actors.Visibility;
          Group : Actor_Groups;
@@ -87,7 +109,21 @@ package body Chaos.UI.Text_UI is
       end;
 
       return new Chaos_Text_UI'(UI);
+
    end Create;
+
+   ------------------
+   -- Display_Text --
+   ------------------
+
+   overriding procedure Display_Text
+     (UI   : in out Chaos_Text_UI;
+      Text : String)
+   is
+      pragma Unreferenced (UI);
+   begin
+      Ada.Text_IO.Put (Text);
+   end Display_Text;
 
    -----------
    -- Start --
@@ -97,8 +133,9 @@ package body Chaos.UI.Text_UI is
      (UI : in out Chaos_Text_UI)
    is
    begin
-      Chaos.Expressions.Execute
+      UI.Display_Text ("Starting text interface ...");
         (UI.Area.Script);
+      Chaos.Game.Current_Game.Start;
    end Start;
 
 end Chaos.UI.Text_UI;

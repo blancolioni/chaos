@@ -4,10 +4,10 @@
 --  with Chaos.Commands.Meta_Commands;
 --  with Chaos.Commands.Moves;
 
-package body Chaos.Players is
+package body Chaos.Party is
 
    procedure Add_Party_Member
-     (Party    : in out Root_Party_Type'Class;
+     (Party    : in out Chaos_Party_Record'Class;
       Actor    : Chaos.Actors.Chaos_Actor)
    is
       use type Chaos.Actors.Chaos_Actor;
@@ -26,7 +26,7 @@ package body Chaos.Players is
    -----------
 
    procedure Clear
-     (Party : in out Root_Party_Type'Class)
+     (Party : in out Chaos_Party_Record'Class)
    is
    begin
       for I in Party.Members'Range loop
@@ -65,12 +65,21 @@ package body Chaos.Players is
 --
 --     end Commands;
 
+   ------------------
+   -- Create_Party --
+   ------------------
+
+   function Create_Party return Party_Type is
+   begin
+      return new Chaos_Party_Record;
+   end Create_Party;
+
    ----------------------
    -- Get_Party_Member --
    ----------------------
 
    function Get_Party_Member
-     (Party    : Root_Party_Type'Class;
+     (Party    : Chaos_Party_Record'Class;
       Position : Party_Member_Index)
       return Chaos.Actors.Chaos_Actor
    is
@@ -83,7 +92,7 @@ package body Chaos.Players is
    -------------------------
 
    procedure Remove_Party_Member
-     (Party    : in out Root_Party_Type'Class;
+     (Party    : in out Chaos_Party_Record'Class;
       Actor    : Chaos.Actors.Chaos_Actor)
    is
       use type Chaos.Actors.Chaos_Actor;
@@ -99,4 +108,4 @@ package body Chaos.Players is
         & Actor.Identifier;
    end Remove_Party_Member;
 
-end Chaos.Players;
+end Chaos.Party;

@@ -34,6 +34,7 @@ package body Chaos.Resources.Tis is
             for I in 1 .. Tile.Size loop
                Tis.Get (Tile.Pixels (I));
             end loop;
+            Tis.Tiles.Append (Tile);
          end;
       end loop;
    end Load;
