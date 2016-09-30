@@ -62,36 +62,40 @@ package body Chaos.Xi_UI.Areas is
       Model.Scene := Xi.Scene.Create_Scene;
 
       for Tile_Y in 1 .. Area.Tiles_Down loop
-         for Tile_X in 1 .. Area.Tiles_Down loop
-            declare
-               use Xi;
-               X : constant Xi_Float :=
-                     Xi_Float ((Tile_X - Area.Tiles_Across / 2) * 64 - 32);
-               Y : constant Xi_Float :=
-                     Xi_Float
-                       ((Area.Tiles_Down / 2 - Tile_Y + 1)
-                        * 64 - 32);
-               Name : constant String :=
-                        "tile" & Integer'Image (-Tile_X)
-                      & Integer'Image (-Tile_Y);
-               Node : constant Xi.Node.Xi_Node :=
-                        Model.Scene.Create_Node (Name);
-               Square : constant Xi.Entity.Xi_Entity :=
-                          Xi.Shapes.Square (64.0);
-               Tile_Index : constant Positive :=
-                              Model.Area.Tile_Index (Tile_X, Tile_Y);
-               Image      : constant Xi.Color.Xi_Color_2D_Array :=
-                              Images.Tile (Tile_Index);
-               Texture    : constant Xi.Texture.Xi_Texture :=
-                              Xi.Texture.Create_From_Data
-                                (Name, Image);
-            begin
-               Square.Set_Texture (Texture);
-               Node.Set_Position (X, Y, 0.0);
-               Node.Set_Entity (Square);
+         declare
+            use Xi;
+            Y : constant Xi_Float :=
+                  Xi_Float
+                    ((Area.Tiles_Down / 2 - Tile_Y + 1)
+                     * 64 - 32);
+         begin
+            for Tile_X in 1 .. Area.Tiles_Down loop
+               declare
+                  X          : constant Xi_Float :=
+                                 Xi_Float ((Tile_X - Area.Tiles_Across / 2)
+                                           * 64 - 32);
+                  Name       : constant String :=
+                                 "tile" & Integer'Image (-Tile_X)
+                               & Integer'Image (-Tile_Y);
+                  Node       : constant Xi.Node.Xi_Node :=
+                                 Model.Scene.Create_Node (Name);
+                  Square     : constant Xi.Entity.Xi_Entity :=
+                                 Xi.Shapes.Square (32.0);
+                  Tile_Index : constant Positive :=
+                                 Model.Area.Tile_Index (Tile_X, Tile_Y);
+                  Image      : constant Xi.Color.Xi_Color_2D_Array :=
+                                 Images.Tile (Tile_Index);
+                  Texture    : constant Xi.Texture.Xi_Texture :=
+                                 Xi.Texture.Create_From_Data
+                                   (Name, Image);
+               begin
+                  Square.Set_Texture (Texture);
+                  Node.Set_Position (X, Y, 0.0);
+                  Node.Set_Entity (Square);
 
-            end;
-         end loop;
+               end;
+            end loop;
+         end;
       end loop;
 
       Chaos.Logging.Log
