@@ -1,10 +1,8 @@
 with WL.String_Maps;
 
-with Xi.Assets;
 with Xi.Camera;
 with Xi.Color;
 with Xi.Entity;
-with Xi.Materials.Material;
 with Xi.Node;
 with Xi.Scene;
 with Xi.Shapes;
@@ -63,14 +61,16 @@ package body Chaos.Xi_UI.Areas is
       Model.Area := Area;
       Model.Scene := Xi.Scene.Create_Scene;
 
-      for Tile_Y in 29 .. 31 loop
-         for Tile_X in 39 .. 41 loop
+      for Tile_Y in 1 .. Area.Tiles_Down loop
+         for Tile_X in 1 .. Area.Tiles_Down loop
             declare
                use Xi;
                X : constant Xi_Float :=
                      Xi_Float ((Tile_X - Area.Tiles_Across / 2) * 64 - 32);
                Y : constant Xi_Float :=
-                     Xi_Float ((Tile_Y - Area.Tiles_Down / 2) * 64 - 32);
+                     Xi_Float
+                       ((Area.Tiles_Down / 2 - Tile_Y + 1)
+                        * 64 - 32);
                Name : constant String :=
                         "tile" & Integer'Image (-Tile_X)
                       & Integer'Image (-Tile_Y);
@@ -86,18 +86,10 @@ package body Chaos.Xi_UI.Areas is
                               Xi.Texture.Create_From_Data
                                 (Name, Image);
             begin
-               if True then
-                  Square.Set_Material
-                    (Xi.Assets.Material ("Xi.Blue"));
-               else
-                  Square.Set_Material
-                    (Xi.Materials.Material.Xi_New_With_Texture
-                       (Name, Texture));
-                  --                 Xi.Color.Export.Write_Bitmap
-                  --                   (Image, "temp/" & Name & ".bmp");
-               end if;
+               Square.Set_Texture (Texture);
                Node.Set_Position (X, Y, 0.0);
                Node.Set_Entity (Square);
+
             end;
          end loop;
       end loop;
@@ -112,9 +104,9 @@ package body Chaos.Xi_UI.Areas is
          Camera : constant Xi.Camera.Xi_Camera :=
                     Model.Scene.Active_Camera;
       begin
-         Camera.Set_Position (0.0, 0.0, 500.0);
+         Camera.Set_Position (0.0, 0.0, 1500.0);
          Camera.Look_At (0.0, 0.0, 0.0);
-         Camera.Perspective (45.0, 100.0, 1000.0);
+         Camera.Perspective (45.0, 100.0, 2000.0);
       end;
 
       declare
