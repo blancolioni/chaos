@@ -1,5 +1,3 @@
-with Chaos.Localisation;
-
 package body Chaos.UI is
 
    Local_Current_UI : Chaos_UI;
@@ -23,6 +21,18 @@ package body Chaos.UI is
    is
    begin
       UI.Display_Text (Chaos.Localisation.Local_Text (Tag));
+   end Display_Localised_Text;
+
+   ----------------------------
+   -- Display_Localised_Text --
+   ----------------------------
+
+   procedure Display_Localised_Text
+     (UI    : in out Root_Chaos_UI'Class;
+      Index : Chaos.Localisation.Local_Text_Index)
+   is
+   begin
+      UI.Display_Text (Chaos.Localisation.Indexed_Text (Index));
    end Display_Localised_Text;
 
    ----------------

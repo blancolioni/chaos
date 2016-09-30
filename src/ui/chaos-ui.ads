@@ -1,6 +1,7 @@
 with Chaos.Actors;
 with Chaos.Battles;
 with Chaos.Images;
+with Chaos.Localisation;
 
 package Chaos.UI is
 
@@ -24,6 +25,10 @@ package Chaos.UI is
    procedure Display_Localised_Text
      (UI    : in out Root_Chaos_UI'Class;
       Tag   : String);
+
+   procedure Display_Localised_Text
+     (UI    : in out Root_Chaos_UI'Class;
+      Index : Chaos.Localisation.Local_Text_Index);
 
    procedure Activate
      (UI    : in out Root_Chaos_UI;
