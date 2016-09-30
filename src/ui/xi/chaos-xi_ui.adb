@@ -48,7 +48,7 @@ package body Chaos.Xi_UI is
       Result.Initialize;
       Result.Window :=
         Xi.Main.Current_Renderer.Create_Top_Level_Window;
-      Result.Window.Set_Wireframe (True);
+      Result.Window.Set_Wireframe (False);
       return new Root_Xi_UI'(Result);
    end Create;
 
