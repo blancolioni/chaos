@@ -34,7 +34,7 @@ with Chaos.Xi_UI;
 with Chaos.Paths;
 
 procedure Chaos.Driver is
-   Test_Only : constant Boolean := True;
+   Test_Only : constant Boolean := False;
    Text_UI : constant Boolean := False;
 
    Expr : constant Chaos.Expressions.Chaos_Expression :=
@@ -86,31 +86,31 @@ begin
              (if Text_UI
               then Chaos.UI.Text_UI.Create
               else Chaos.Xi_UI.Create);
-   begin
-
-      Chaos.UI.Set_Current_UI (UI);
-
-      declare
-         Protagonist : constant Chaos.Creatures.Chaos_Creature :=
-                         Chaos.Creatures.Quick.Quick_Creature
-                           ("Aramael",
-                            Chaos.Races.Get ("elf"),
-                            Chaos.Classes.Get ("wizard"));
-         Area        : constant Chaos.Areas.Chaos_Area :=
-                         Chaos.Areas.Import.Import_Area
-                           (Chaos.Configuration.Start_Area);
-         Actor       : constant Chaos.Actors.Chaos_Actor :=
-                         Chaos.Actors.Create_Actor
-                           (Protagonist, Area,
-                            Area.To_Square
-                              (Chaos.Configuration.Start_Location));
-         Party       : constant Chaos.Party.Party_Type :=
-                         Chaos.Party.Create_Party;
       begin
 
-         Party.Add_Party_Member (Actor);
-         Chaos.Game.Create_Game (Area, Party);
-      end;
+         Chaos.UI.Set_Current_UI (UI);
+
+         declare
+            Protagonist : constant Chaos.Creatures.Chaos_Creature :=
+                            Chaos.Creatures.Quick.Quick_Creature
+                              ("Aramael",
+                               Chaos.Races.Get ("elf"),
+                               Chaos.Classes.Get ("wizard"));
+            Area        : constant Chaos.Areas.Chaos_Area :=
+                            Chaos.Areas.Import.Import_Area
+                              (Chaos.Configuration.Start_Area);
+            Actor       : constant Chaos.Actors.Chaos_Actor :=
+                            Chaos.Actors.Create_Actor
+                              (Protagonist, Area,
+                               Area.To_Square
+                                 (Chaos.Configuration.Start_Location));
+            Party       : constant Chaos.Party.Party_Type :=
+                            Chaos.Party.Create_Party;
+         begin
+
+            Party.Add_Party_Member (Actor);
+            Chaos.Game.Create_Game (Area, Party);
+         end;
 
          UI.Start;
       end;

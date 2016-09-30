@@ -1,6 +1,11 @@
+with Ada.Text_IO;
+
 with Chaos.UI;
 
-with Chaos.Expressions.Environments;
+with Chaos.Expressions;
+with Chaos.Parser;
+
+with Chaos.Paths;
 
 package body Chaos.Game is
 
@@ -102,9 +107,12 @@ package body Chaos.Game is
 
    procedure Start (Game : in out Chaos_Game_Record'Class) is
    begin
+      Ada.Text_IO.Put_Line
+        (Chaos.Expressions.To_String
+           (Chaos.Parser.Load_Script
+                (Chaos.Paths.Config_File ("start.script"))));
       Chaos.Expressions.Execute
-        (Chaos.Expressions.Environments.Standard_Environment,
-         Game.Area.Script);
+        (Game.Area.Script);
    end Start;
 
    ------------------

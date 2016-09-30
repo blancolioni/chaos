@@ -134,7 +134,6 @@ package body Chaos.UI.Text_UI is
    is
    begin
       UI.Display_Text ("Starting text interface ...");
-        (UI.Area.Script);
       Chaos.Game.Current_Game.Start;
    end Start;
 
