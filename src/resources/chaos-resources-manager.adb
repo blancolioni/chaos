@@ -3,6 +3,7 @@ with WL.String_Maps;
 with Chaos.Configuration;
 
 with Chaos.Resources.Area;
+with Chaos.Resources.Bam;
 with Chaos.Resources.Bcs;
 with Chaos.Resources.Biff;
 with Chaos.Resources.Cre;
@@ -53,6 +54,8 @@ package body Chaos.Resources.Manager is
       case Res_Type is
          when Area_Resource =>
             return new Chaos.Resources.Area.Area_Resource;
+         when Bam_Resource =>
+            return new Chaos.Resources.Bam.Bam_Resource;
          when Creature_Resource =>
             return new Chaos.Resources.Cre.Cre_Resource;
          when Dialog_Resource =>
