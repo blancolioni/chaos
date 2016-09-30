@@ -1,11 +1,12 @@
 with Chaos.Expressions.Numbers;
 with Chaos.Expressions.Primitives;
 
+with Chaos.Localisation;
+
 with Chaos.UI;
 
 package body Chaos.Expressions.Environments is
 
-   Local_Standard_Environment : Chaos_Environment;
    Local_Global_Environment   : Chaos_Environment;
 
    type Global_Object_Expression is
@@ -58,7 +59,7 @@ package body Chaos.Expressions.Environments is
       if not Standard_Created then
          Create_Standard;
       end if;
-      Insert (Local_Standard_Environment, Name, Value);
+      Insert (Standard_Env, Name, Value);
    end Add_Standard_Value;
 
    ---------------------
@@ -82,16 +83,16 @@ package body Chaos.Expressions.Environments is
          F    : Chaos.Expressions.Primitives.Primitive_Evaluator)
       is
       begin
-         Insert (Local_Standard_Environment, Name,
+         Insert (Standard_Env, Name,
                  Chaos.Expressions.Primitives.Bind_Function
                    (F, Args));
       end Fn;
 
    begin
-      Local_Standard_Environment := New_Environment;
+      Standard_Env := New_Environment;
       Local_Global_Environment := New_Environment;
 
-      Insert (Local_Standard_Environment, "global",
+      Insert (Standard_Env, "global",
               Global_Object);
       Fn ("=", 2, Evaluate_Equal'Access);
       Fn ("+", 2, Evaluate_Add'Access);
@@ -128,7 +129,10 @@ package body Chaos.Expressions.Environments is
    is
       pragma Unreferenced (Environment);
    begin
-      Chaos.UI.Current_UI.Display_Text (To_String (Arguments (1)));
+      Chaos.UI.Current_UI.Display_Localised_Text
+        (Chaos.Localisation.Local_Text_Index
+           (Chaos.Expressions.Numbers.To_Integer
+                (To_Integer (Arguments (1)))));
       return Null_Value;
    end Evaluate_Display_String;
 
@@ -214,7 +218,7 @@ package body Chaos.Expressions.Environments is
       if not Standard_Created then
          Create_Standard;
       end if;
-      return Local_Standard_Environment;
+      return Standard_Env;
    end Standard_Environment;
 
 end Chaos.Expressions.Environments;
