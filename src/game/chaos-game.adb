@@ -49,6 +49,18 @@ package body Chaos.Game is
       null;
    end Actor_Walk;
 
+   ----------
+   -- Area --
+   ----------
+
+   function Area
+     (Game : Chaos_Game_Record'Class)
+      return Chaos.Areas.Chaos_Area
+   is
+   begin
+      return Game.Area;
+   end Area;
+
    -----------------
    -- Create_Game --
    -----------------

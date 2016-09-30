@@ -12,6 +12,10 @@ package Chaos.Game is
      (Game : Chaos_Game_Record'Class)
       return Chaos.Party.Party_Type;
 
+   function Area
+     (Game : Chaos_Game_Record'Class)
+      return Chaos.Areas.Chaos_Area;
+
    procedure Actor_End_Turn
      (Game  : in out Chaos_Game_Record'Class;
       Actor : Chaos.Actors.Chaos_Actor);

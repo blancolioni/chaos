@@ -10,6 +10,8 @@ with Chaos.Expressions.Import;
 
 with Chaos.Areas.Db;
 
+with Chaos.UI;
+
 package body Chaos.Areas.Import is
 
    ---------------------
@@ -37,7 +39,6 @@ package body Chaos.Areas.Import is
                 (Chaos.Resources.Manager.Load_Resource
                    (Reference => Wed.Overlays.Element (1).Tileset_Name,
                     Res_Type  => Chaos.Resources.Tileset_Resource).all);
-      pragma Unreferenced (Tis);
 
       procedure Create (Area : in out Chaos_Area_Record'Class);
 
@@ -63,6 +64,36 @@ package body Chaos.Areas.Import is
                Area.Script := Chaos.Expressions.Import.Import_Script (Script);
             end;
          end if;
+
+         declare
+            Tile_Lookup : Resources.Wed.Tile_Index_Vectors.Vector renames
+                            Wed.Overlays.Element (1).Tile_Indices;
+            Tile_Map : Resources.Wed.Tile_Map_Entry_Vectors.Vector renames
+                         Wed.Overlays.Element (1).Tile_Map;
+         begin
+            for Y in 1 .. Area.Tiles_Down loop
+               for X in 1 .. Area.Tiles_Across loop
+                  declare
+                     Map_Index : constant Positive :=
+                                   X + (Y - 1) * Area.Tiles_Across;
+                     Lookup_Index : constant Natural :=
+                                      Natural
+                                        (Tile_Map.Element
+                                           (Map_Index).Start_Index);
+                     Tile_Index   : constant Natural :=
+                                      Natural
+                                        (Tile_Lookup.Element
+                                           (Lookup_Index + 1));
+                  begin
+                     Area.Tiles.Append ((Tile_Index => Tile_Index + 1));
+                  end;
+               end loop;
+            end loop;
+         end;
+
+         Area.Images :=
+           Chaos.UI.Current_UI.Create_Image_Container;
+         Area.Images.Import_Tileset (Tis);
 
       end Create;
 

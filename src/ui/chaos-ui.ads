@@ -1,5 +1,6 @@
 with Chaos.Actors;
 with Chaos.Battles;
+with Chaos.Images;
 
 package Chaos.UI is
 
@@ -34,9 +35,20 @@ package Chaos.UI is
       Actor : Chaos.Actors.Chaos_Actor)
    is null;
 
+   procedure Initialize
+     (UI     : in out Root_Chaos_UI'Class);
+
+   function Create_Image_Container
+     (UI : Root_Chaos_UI)
+      return Chaos.Images.Chaos_Image_Container
+      is abstract;
+
    type Chaos_UI is access all Root_Chaos_UI'Class;
 
    function Current_UI return Chaos_UI;
+
+   procedure Set_Current_UI
+     (UI : Chaos_UI);
 
 private
 
@@ -47,7 +59,5 @@ private
       record
          null;
       end record;
-
-   Local_Current_UI    : Chaos_UI;
 
 end Chaos.UI;

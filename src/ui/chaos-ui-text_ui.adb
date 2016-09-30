@@ -13,9 +13,23 @@ with Chaos.Races;
 with Chaos.Party;
 with Chaos.Game;
 
+with Chaos.Images;
+
 with Chaos.Actors.Visibility;
 
+with Chaos.Resources.Tis;
+
 package body Chaos.UI.Text_UI is
+
+   type Text_Image_Container is
+     new Chaos.Images.Root_Chaos_Image_Container with null record;
+
+   overriding procedure Import_Tileset
+     (Container : in out Text_Image_Container;
+      Tis       : Chaos.Resources.Tis.Tis_Resource'Class)
+   is null;
+
+   Local_Image_Container : aliased Text_Image_Container;
 
    type Chaos_Text_UI is
      new Root_Chaos_UI with
@@ -33,6 +47,11 @@ package body Chaos.UI.Text_UI is
    overriding procedure Display_Text
      (UI : in out Chaos_Text_UI;
       Text : String);
+
+   overriding function Create_Image_Container
+     (UI : Chaos_Text_UI)
+      return Chaos.Images.Chaos_Image_Container
+   is (Local_Image_Container'Access);
 
    ------------
    -- Create --
@@ -88,8 +107,8 @@ package body Chaos.UI.Text_UI is
          Iterate (Group, Report'Access);
       end;
 
-      Local_Current_UI := new Chaos_Text_UI'(UI);
-      return Local_Current_UI;
+      return new Chaos_Text_UI'(UI);
+
    end Create;
 
    ------------------

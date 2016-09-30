@@ -23,6 +23,7 @@ source_dir = src/ui/gtk
 source_dir = src/ui/gtk/character_gen
 source_dir = src/ui/gtk/main
 source_dir = src/ui/gtk/start
+source_dir = src/ui/xi
 source_dir = src/world
 depend = { project = Tropos version = any }
 depend = { project = Wlib version = any }
@@ -41,3 +42,7 @@ compiler_option = "-gnatwa"
 compiler_option = "-gnatyabcefhiklmnoprstOSuxB"
 compiler_option = "-gnat2012"
 linker_option = "-g"
+linker_option = "-lm"
+linker_option = "-lopengl32"
+linker_option = "-lfreeglut"
+linker_option = "-L./lib"

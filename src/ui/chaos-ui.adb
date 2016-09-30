@@ -2,6 +2,8 @@ with Chaos.Localisation;
 
 package body Chaos.UI is
 
+   Local_Current_UI : Chaos_UI;
+
    ----------------
    -- Current_UI --
    ----------------
@@ -22,5 +24,28 @@ package body Chaos.UI is
    begin
       UI.Display_Text (Chaos.Localisation.Local_Text (Tag));
    end Display_Localised_Text;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize
+     (UI     : in out Root_Chaos_UI'Class)
+   is
+      pragma Unreferenced (UI);
+   begin
+      null;
+   end Initialize;
+
+   --------------------
+   -- Set_Current_UI --
+   --------------------
+
+   procedure Set_Current_UI
+     (UI : Chaos_UI)
+   is
+   begin
+      Local_Current_UI := UI;
+   end Set_Current_UI;
 
 end Chaos.UI;
