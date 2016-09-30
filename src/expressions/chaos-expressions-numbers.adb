@@ -19,6 +19,11 @@ package body Chaos.Expressions.Numbers is
       return Boolean
    is (Expression.Value /= 0);
 
+   overriding function To_Integer
+     (Expression : Number_Expression_Record)
+      return Chaos_Expression
+   is (Create (Expression));
+
    overriding function Equal
      (Left  : Number_Expression_Record;
       Right : Root_Chaos_Expression_Record'Class)
