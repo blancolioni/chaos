@@ -40,9 +40,11 @@ package body Chaos.Resources.Key is
             end if;
          end;
       end loop;
-      raise Constraint_Error with
-        "resource " & String (Reference)
-        & " type " & Res_Type'Img & " not found";
+      Chaos.Logging.Log
+        ("KEY",
+         "resource " & String (Reference)
+         & " type " & Res_Type'Img & " not found");
+      return "";
    end Get_Resource_Location;
 
    ----------

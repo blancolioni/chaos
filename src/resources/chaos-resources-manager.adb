@@ -97,6 +97,10 @@ package body Chaos.Resources.Manager is
             Resource : Resource_Access;
          begin
 
+            if Path = "" then
+               return null;
+            end if;
+
             Resource := Create_Resource (Res_Type);
             if not Biff_Map.Contains (Path) then
                declare
