@@ -11,6 +11,11 @@ private package Chaos.Xi_UI.Models is
       return Xi.Scene.Xi_Scene
       is abstract;
 
+   function Show_Log
+     (Model : Root_Chaos_Xi_Model)
+      return Boolean
+   is (True);
+
 private
 
    type Root_Chaos_Xi_Model is abstract tagged
