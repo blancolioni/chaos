@@ -1,8 +1,13 @@
+with Ada.Calendar;
+
 with WL.String_Maps;
 
 with Xi.Camera;
 with Xi.Color;
 with Xi.Entity;
+with Xi.Frame_Event;
+with Xi.Keyboard;
+with Xi.Main;
 with Xi.Node;
 with Xi.Scene;
 with Xi.Shapes;
@@ -12,6 +17,8 @@ with Chaos.Xi_UI.Images;
 
 with Chaos.Locations;
 with Chaos.Game;
+
+with Chaos.Expressions;
 
 with Chaos.Logging;
 
@@ -32,10 +39,23 @@ package body Chaos.Xi_UI.Areas is
          Area  : Chaos.Areas.Chaos_Area;
       end record;
 
+   type Area_Model_Access is access all Area_Model_Record'Class;
+
    overriding function Scene
      (Model : Area_Model_Record)
       return Xi.Scene.Xi_Scene
    is (Model.Scene);
+
+   type Area_Frame_Listener is
+     new Xi.Frame_Event.Xi_Frame_Listener_Interface with
+      record
+         Last_Script_Execution : Ada.Calendar.Time;
+         Model                 : Area_Model_Access;
+      end record;
+
+   overriding procedure Frame_Started
+     (Listener : in out Area_Frame_Listener;
+      Event    : Xi.Frame_Event.Xi_Frame_Event);
 
    ----------------
    -- Area_Model --
@@ -141,11 +161,39 @@ package body Chaos.Xi_UI.Areas is
       declare
          Result : constant Chaos.Xi_UI.Models.Chaos_Xi_Model :=
                     new Area_Model_Record'(Model);
+         Listener : constant Xi.Frame_Event.Xi_Frame_Listener :=
+                      new Area_Frame_Listener'
+                        (Last_Script_Execution => Ada.Calendar.Clock,
+                         Model                 => Area_Model_Access (Result));
       begin
+         Xi.Main.Add_Frame_Listener (Listener);
          Model_Cache.Insert (Area.Identifier, Result);
          return Result;
       end;
 
    end Area_Model;
+
+   -------------------
+   -- Frame_Started --
+   -------------------
+
+   overriding procedure Frame_Started
+     (Listener : in out Area_Frame_Listener;
+      Event    : Xi.Frame_Event.Xi_Frame_Event)
+   is
+      pragma Unreferenced (Event);
+      use Ada.Calendar;
+      Now : constant Time := Clock;
+   begin
+      if Now - Listener.Last_Script_Execution > 0.1 then
+         Chaos.Expressions.Execute
+           (Listener.Model.Area.Script);
+         Listener.Last_Script_Execution := Now;
+      end if;
+
+      if Xi.Keyboard.Key_Down (Xi.Keyboard.Key_Esc) then
+         Xi.Main.Leave_Main_Loop;
+      end if;
+   end Frame_Started;
 
 end Chaos.Xi_UI.Areas;
