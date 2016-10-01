@@ -105,12 +105,14 @@ package body Chaos.Resources.Cre is
       Cre.Get (Cre.Effect_Count);
       Cre.Get (Cre.Dialog_Ref);
 
-      if False then
+      if True then
          Chaos.Logging.Log
            ("CRE",
             Chaos.Localisation.Indexed_Text
               (Chaos.Localisation.Local_Text_Index
-                   (Natural (Cre.Short_Name))));
+                   (Natural (Cre.Short_Name)))
+            & ": anim-id = "
+            & Word_32'Image (Cre.Animation_Id));
       end if;
 
    end Load;

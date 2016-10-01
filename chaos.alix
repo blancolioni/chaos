@@ -2,6 +2,7 @@ project_name = Chaos
 source_dir = src
 source_dir = src/abilities
 source_dir = src/actors
+source_dir = src/animations
 source_dir = src/areas
 source_dir = src/classes
 source_dir = src/config
@@ -30,6 +31,7 @@ depend = { project = Wlib version = any }
 depend = { project = GCS version = any }
 depend = { project = Lith version = any }
 depend = { project = Memor version = any }
+depend = { project = Xi version = any }
 main_unit = chaos-driver
 exec_name = chaos
 config_dir = config

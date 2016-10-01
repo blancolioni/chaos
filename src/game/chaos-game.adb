@@ -106,13 +106,12 @@ package body Chaos.Game is
    -----------
 
    procedure Start (Game : in out Chaos_Game_Record'Class) is
+      pragma Unreferenced (Game);
    begin
       Ada.Text_IO.Put_Line
         (Chaos.Expressions.To_String
            (Chaos.Parser.Load_Script
                 (Chaos.Paths.Config_File ("start.script"))));
-      Chaos.Expressions.Execute
-        (Game.Area.Script);
    end Start;
 
    ------------------

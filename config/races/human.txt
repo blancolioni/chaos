@@ -1,3 +1,5 @@
+code = H
+
 abilities = {
    str = 1
    con = 1

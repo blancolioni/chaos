@@ -32,6 +32,7 @@ with Chaos.UI.Text_UI;
 with Chaos.Xi_UI;
 
 with Chaos.Paths;
+with Chaos.Infinity_Engine;
 
 procedure Chaos.Driver is
    Test_Only : constant Boolean := False;
@@ -44,6 +45,7 @@ procedure Chaos.Driver is
               (Chaos.Dice.Parse_Die_Roll ("1d6+1"));
    Tlk  : Chaos.Resources.Tlk.Tlk_Resource;
 begin
+   Chaos.Infinity_Engine.Read_Infinity_Config;
    Chaos.Configuration.Read_Configuration;
 
    declare
@@ -72,7 +74,7 @@ begin
       Ada.Text_IO.Put (" ");
    end loop;
    Ada.Text_IO.New_Line;
-   Tlk.Open (Chaos.Configuration.Infinity_Path
+   Tlk.Open (Chaos.Infinity_Engine.Infinity_Path
              & "dialog.tlk");
    Tlk.Load;
    Tlk.Close;
@@ -98,12 +100,12 @@ begin
                                Chaos.Classes.Get ("wizard"));
             Area        : constant Chaos.Areas.Chaos_Area :=
                             Chaos.Areas.Import.Import_Area
-                              (Chaos.Configuration.Start_Area);
+                              (Chaos.Infinity_Engine.Start_Area);
             Actor       : constant Chaos.Actors.Chaos_Actor :=
                             Chaos.Actors.Create_Actor
                               (Protagonist, Area,
                                Area.To_Square
-                                 (Chaos.Configuration.Start_Location));
+                                 (Chaos.Infinity_Engine.Start_Location));
             Party       : constant Chaos.Party.Party_Type :=
                             Chaos.Party.Create_Party;
          begin

@@ -39,6 +39,18 @@ package body Chaos.Creatures is
       return Creature.Alive;
    end Alive;
 
+   ------------------
+   -- Animation_Id --
+   ------------------
+
+   function Animation_Id
+     (Creature : Chaos_Creature_Record'Class)
+      return Natural
+   is
+   begin
+      return Creature.Animation_Id;
+   end Animation_Id;
+
    -----------
    -- Class --
    -----------

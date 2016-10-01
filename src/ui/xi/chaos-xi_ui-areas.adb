@@ -1,4 +1,6 @@
 with Ada.Calendar;
+with Ada.Containers.Vectors;
+with Ada.Text_IO;
 
 with WL.String_Maps;
 
@@ -6,15 +8,19 @@ with Xi.Assets;
 with Xi.Camera;
 with Xi.Color;
 with Xi.Entity;
+with Xi.Float_Images;
 with Xi.Frame_Event;
 with Xi.Keyboard;
 with Xi.Main;
+with Xi.Materials.Material;
+with Xi.Matrices;
 with Xi.Mouse;
 with Xi.Node;
 with Xi.Scene;
 with Xi.Shapes;
 with Xi.Texture;
 
+with Chaos.Xi_UI.Animations;
 with Chaos.Xi_UI.Images;
 
 with Chaos.Locations;
@@ -23,6 +29,10 @@ with Chaos.Game;
 with Chaos.Expressions;
 
 with Chaos.Logging;
+
+with Chaos.Actors;
+
+with Chaos.Animations.Actors;
 
 package body Chaos.Xi_UI.Areas is
 
@@ -33,12 +43,25 @@ package body Chaos.Xi_UI.Areas is
 
    Model_Cache : Area_Model_Maps.Map;
 
+   type Actor_Node is
+      record
+         Actor     : Chaos.Actors.Chaos_Actor;
+         Node      : Xi.Node.Xi_Node;
+         Animation : Chaos.Xi_UI.Animations.Xi_Animation;
+         Frame     : Positive;
+      end record;
+
+   package Actor_Node_Vectors is
+     new Ada.Containers.Vectors
+       (Positive, Actor_Node);
+
    type Area_Model_Record is
      new Chaos.Xi_UI.Models.Root_Chaos_Xi_Model with
       record
          Scene     : Xi.Scene.Xi_Scene;
          Top       : Xi.Node.Xi_Node;
          Area      : Chaos.Areas.Chaos_Area;
+         Actors    : Actor_Node_Vectors.Vector;
          Highlight : Xi.Node.Xi_Node;
          Centre_X  : Xi.Xi_Float;
          Centre_Y  : Xi.Xi_Float;
@@ -51,16 +74,61 @@ package body Chaos.Xi_UI.Areas is
       return Xi.Scene.Xi_Scene
    is (Model.Scene);
 
+   function Create_Actor_Node
+     (Model : Area_Model_Record'Class;
+      Actor : Chaos.Actors.Chaos_Actor)
+      return Actor_Node;
+
+   procedure Animate
+     (Model : Area_Model_Record'Class;
+      Actor : Actor_Node);
+
    type Area_Frame_Listener is
      new Xi.Frame_Event.Xi_Frame_Listener_Interface with
       record
          Last_Script_Execution : Ada.Calendar.Time;
          Model                 : Area_Model_Access;
+         Mouse_X               : Xi.Xi_Float;
+         Mouse_Y               : Xi.Xi_Float;
       end record;
 
    overriding procedure Frame_Started
      (Listener : in out Area_Frame_Listener;
       Event    : Xi.Frame_Event.Xi_Frame_Event);
+
+   -------------
+   -- Animate --
+   -------------
+
+   procedure Animate
+     (Model : Area_Model_Record'Class;
+      Actor : Actor_Node)
+   is
+      use Xi;
+      Actor_Loc : constant Chaos.Locations.Square_Location :=
+                    Actor.Actor.Location;
+      Pixel_Loc : constant Chaos.Locations.Pixel_Location :=
+                    Model.Area.To_Pixels (Actor_Loc);
+      World_Loc : constant Xi.Matrices.Vector_3 :=
+                    (Xi_Float (Pixel_Loc.X - Model.Area.Pixels_Across / 2),
+                     Xi_Float (Model.Area.Pixels_Down / 2 - Pixel_Loc.Y),
+                     10.0);
+      Material  : constant Xi.Materials.Material.Xi_Material :=
+                    Xi.Materials.Material.Xi_New_With_Texture
+                      (Actor.Actor.Creature.Identifier,
+                       Actor.Animation.Texture (Actor.Frame),
+                       Lighting => False);
+   begin
+      Material.Technique (1).Pass (1).Alpha_Discard
+        (Xi.Materials.Equal, Value => 0.0);
+
+      Actor.Node.Set_Position (World_Loc);
+      Actor.Node.Entity.Set_Material (Material);
+      Actor.Node.Scale
+        (Xi_Float (Actor.Animation.Frame_Width (Actor.Frame)),
+         Xi_Float (Actor.Animation.Frame_Height (Actor.Frame)),
+         1.0);
+   end Animate;
 
    ----------------
    -- Area_Model --
@@ -91,6 +159,11 @@ package body Chaos.Xi_UI.Areas is
       Model.Scene := Xi.Scene.Create_Scene;
       Model.Top := Model.Scene.Create_Node ("map-top");
       Model.Highlight := Model.Scene.Create_Node ("highlight");
+
+      for I in 1 .. Model.Area.Actor_Count loop
+         Model.Actors.Append
+           (Create_Actor_Node (Model, Model.Area.Actor (I)));
+      end loop;
 
       declare
          Entity : constant Xi.Entity.Xi_Entity :=
@@ -172,6 +245,11 @@ package body Chaos.Xi_UI.Areas is
             Camera.Set_Position (Camera_X, Camera_Y, 1000.0);
             Camera.Look_At (Camera_X, Camera_Y, 0.0);
             Model.Highlight.Set_Position (Camera_X, Camera_Y, 10.0);
+            Ada.Text_IO.Put_Line
+              ("start: "
+               & Xi.Float_Images.Image (Camera_X)
+               & ", "
+               & Xi.Float_Images.Image (Camera_Y));
          end;
 
          Camera.Perspective (45.0, 100.0, 2000.0);
@@ -183,7 +261,9 @@ package body Chaos.Xi_UI.Areas is
          Listener : constant Xi.Frame_Event.Xi_Frame_Listener :=
                       new Area_Frame_Listener'
                         (Last_Script_Execution => Ada.Calendar.Clock,
-                         Model                 => Area_Model_Access (Result));
+                         Model                 => Area_Model_Access (Result),
+                         Mouse_X               => 0.0,
+                         Mouse_Y               => 0.0);
       begin
          Xi.Main.Add_Frame_Listener (Listener);
          Model_Cache.Insert (Area.Identifier, Result);
@@ -191,6 +271,26 @@ package body Chaos.Xi_UI.Areas is
       end;
 
    end Area_Model;
+
+   -----------------------
+   -- Create_Actor_Node --
+   -----------------------
+
+   function Create_Actor_Node
+     (Model : Area_Model_Record'Class;
+      Actor : Chaos.Actors.Chaos_Actor)
+      return Actor_Node
+   is
+      Result : constant Actor_Node :=
+                 (Actor, Model.Scene.Create_Node (Actor.Identifier),
+                  Chaos.Xi_UI.Animations.Xi_Animation
+                    (Chaos.Animations.Actors.Get_Standing_Animation
+                       (Actor)), 1);
+   begin
+      Result.Node.Set_Entity (Xi.Shapes.Square (0.5));
+      Model.Animate (Result);
+      return Result;
+   end Create_Actor_Node;
 
    -------------------
    -- Frame_Started --
@@ -208,29 +308,68 @@ package body Chaos.Xi_UI.Areas is
          Chaos.Expressions.Execute
            (Listener.Model.Area.Script);
          Listener.Last_Script_Execution := Now;
+--           for I in 1 .. Listener.Model.Actors.Last_Index loop
+--              Listener.Model.Animate (Listener.Model.Actors (I));
+--           end loop;
+
       end if;
 
       if Xi.Keyboard.Key_Down (Xi.Keyboard.Key_Esc) then
          Xi.Main.Leave_Main_Loop;
       end if;
 
-      declare
-         X : constant Xi_Float :=
-               Xi.Mouse.Current_Mouse.State.X
-                 - Event.Render_Target.Width / 2.0
-                 + Listener.Model.Centre_X;
-         Y : constant Xi_Float :=
-               Xi.Mouse.Current_Mouse.State.Y
-                 - Event.Render_Target.Height / 2.0
-               + Listener.Model.Centre_Y;
-      begin
-         Listener.Model.Highlight.Set_Position
-           (Xi_Float (Integer (X) / Chaos.Areas.Pixels_Per_Square
-            * Chaos.Areas.Pixels_Per_Square),
-            Xi_Float (Integer (Y) / Chaos.Areas.Pixels_Per_Square
-              * Chaos.Areas.Pixels_Per_Square),
-            1.0);
-      end;
+      if Xi.Mouse.Current_Mouse.State.X /= Listener.Mouse_X
+        or else Xi.Mouse.Current_Mouse.State.Y /= Listener.Mouse_Y
+      then
+         Listener.Mouse_X := Xi.Mouse.Current_Mouse.State.X;
+         Listener.Mouse_Y := Xi.Mouse.Current_Mouse.State.Y;
+--           declare
+--              use Xi.Matrices, Xi.Float_Arrays;
+--              X              : constant Xi_Float :=
+--                                 Listener.Mouse_X * 2.0
+--                                   / Event.Render_Target.Width - 1.0;
+--              Y              : constant Xi_Float :=
+--                                 Listener.Mouse_Y * 2.0
+--                                   / Event.Render_Target.Height - 1.0;
+--              Camera         : constant Xi.Camera.Xi_Camera :=
+--                                 Listener.Model.Scene.Active_Camera;
+--              Matrix         : constant Matrix_4 :=
+--                                 Camera.Inverse_Transformation_Matrix;
+--              Screen_Pos     : constant Vector_4 :=
+--                                 (if True
+--                                  then (Listener.Mouse_X, Listener.Mouse_Y,
+--                                    0.0, 1.0)
+--                                  else (X, Y, 0.0, 1.0));
+--              World_Position : Vector_4 := Matrix * Screen_Pos;
+--           begin
+--              Ada.Text_IO.Put_Line
+--                ("mouse: " & Xi.Float_Images.Image (Listener.Mouse_X)
+--                 & ", " & Xi.Float_Images.Image (Listener.Mouse_Y)
+--                 & " -> "
+--                 & Xi.Float_Images.Image (X)
+--                 & ", "
+--                 & Xi.Float_Images.Image (Y)
+--                 & " -> "
+--                 & Xi.Float_Images.Image (World_Position (1))
+--                 & ", "
+--                 & Xi.Float_Images.Image (World_Position (2)));
+--
+--              World_Position (3) := 1.0;
+--              Listener.Model.Highlight.Set_Position
+--                (World_Position (1 .. 3));
+--           end;
+         declare
+            X : constant Xi_Float :=
+                  (Listener.Mouse_X - Event.Render_Target.Width / 2.0)
+                  + Listener.Model.Centre_X;
+            Y : constant Xi_Float :=
+                  (Listener.Mouse_Y - Event.Render_Target.Height / 2.0)
+                  + Listener.Model.Centre_Y;
+         begin
+            Listener.Model.Highlight.Set_Position (X, Y, 1.0);
+         end;
+
+      end if;
    end Frame_Started;
 
 end Chaos.Xi_UI.Areas;

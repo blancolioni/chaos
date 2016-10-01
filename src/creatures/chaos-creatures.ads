@@ -119,6 +119,10 @@ package Chaos.Creatures is
      with Pre => Creature.Individual and then Creature.Alive,
      Post => not Creature.Alive;
 
+   function Animation_Id
+     (Creature : Chaos_Creature_Record'Class)
+      return Natural;
+
    type Chaos_Creature is access constant Chaos_Creature_Record'Class;
 
    procedure Update
@@ -138,19 +142,20 @@ private
      and Chaos.Vision.Chaos_Vision_Interface
      and Chaos.Powers.Powered_Interface with
       record
-         Individual : Boolean;
-         Alive      : Boolean;
-         Short_Name : Ada.Strings.Unbounded.Unbounded_String;
-         Long_Name  : Ada.Strings.Unbounded.Unbounded_String;
-         Race       : Chaos.Races.Chaos_Race;
-         Class      : Chaos.Classes.Chaos_Class;
-         Abilities  : Chaos.Abilities.Ability_Scores;
-         Level      : Chaos.Levels.Chaos_Level;
-         HP         : Natural;
-         Powers     : Chaos.Powers.Power_Collection;
-         Alignment  : Chaos.Alignment.Chaos_Alignment;
-         Team       : Chaos.Teams.Chaos_Team;
-         Dialog     : Chaos.Dialog.Chaos_Dialog;
+         Individual   : Boolean;
+         Alive        : Boolean;
+         Short_Name   : Ada.Strings.Unbounded.Unbounded_String;
+         Long_Name    : Ada.Strings.Unbounded.Unbounded_String;
+         Race         : Chaos.Races.Chaos_Race;
+         Class        : Chaos.Classes.Chaos_Class;
+         Abilities    : Chaos.Abilities.Ability_Scores;
+         Level        : Chaos.Levels.Chaos_Level;
+         HP           : Natural;
+         Powers       : Chaos.Powers.Power_Collection;
+         Alignment    : Chaos.Alignment.Chaos_Alignment;
+         Team         : Chaos.Teams.Chaos_Team;
+         Dialog       : Chaos.Dialog.Chaos_Dialog;
+         Animation_Id : Natural := 0;
       end record;
 
    overriding function Object_Database

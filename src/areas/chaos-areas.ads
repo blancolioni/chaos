@@ -66,6 +66,15 @@ package Chaos.Areas is
      (Area : Chaos_Area_Record'class)
       return Chaos.Expressions.Chaos_Expression;
 
+   function Actor_Count
+     (Area     : Chaos_Area_Record'Class)
+      return Natural;
+
+   function Actor
+     (Area  : Chaos_Area_Record'Class;
+      Index : Positive)
+      return Chaos.Actors.Chaos_Actor;
+
    function Actor
      (Area     : Chaos_Area_Record'Class;
       Location : Chaos.Locations.Square_Location)

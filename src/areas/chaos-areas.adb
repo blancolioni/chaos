@@ -16,6 +16,31 @@ package body Chaos.Areas is
       return Area.Squares.Element (Index).Actor;
    end Actor;
 
+   -----------
+   -- Actor --
+   -----------
+
+   function Actor
+     (Area  : Chaos_Area_Record'Class;
+      Index : Positive)
+      return Chaos.Actors.Chaos_Actor
+   is
+   begin
+      return Area.Actors.Element (Index);
+   end Actor;
+
+   -----------------
+   -- Actor_Count --
+   -----------------
+
+   function Actor_Count
+     (Area     : Chaos_Area_Record'Class)
+      return Natural
+   is
+   begin
+      return Area.Actors.Last_Index;
+   end Actor_Count;
+
    ---------------
    -- Add_Actor --
    ---------------
@@ -326,8 +351,8 @@ package body Chaos.Areas is
    is
       pragma Unreferenced (Area);
    begin
-      return (Pixel_Location.X / Pixels_Per_Square,
-              Pixel_Location.Y / Pixels_Per_Square);
+      return ((Pixel_Location.X + Pixels_Per_Square / 2) / Pixels_Per_Square,
+              (Pixel_Location.Y + Pixels_Per_Square / 2) / Pixels_Per_Square);
    end To_Square;
 
    ---------------------

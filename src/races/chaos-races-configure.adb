@@ -32,6 +32,13 @@ package body Chaos.Races.Configure is
       is
       begin
          Race.Initialize (Config.Config_Name);
+
+         declare
+            Code : constant String := Config.Get ("code", Config.Config_Name);
+         begin
+            Race.Code := Code (Code'First);
+         end;
+
          if Config.Contains ("abilities") then
             Race.Abilities :=
               Chaos.Abilities.Configure.Configure_Ability_Changes

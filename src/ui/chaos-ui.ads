@@ -1,11 +1,14 @@
 with Chaos.Actors;
+with Chaos.Animations;
 with Chaos.Battles;
 with Chaos.Images;
 with Chaos.Localisation;
 
 package Chaos.UI is
 
-   type Root_Chaos_UI is abstract new Chaos.Battles.Battle_Manager_Interface
+   type Root_Chaos_UI is abstract new
+     Chaos.Battles.Battle_Manager_Interface
+     and Chaos.Animations.Chaos_Animation_Factory
    with private;
 
    overriding function Active_Battle
@@ -48,6 +51,11 @@ package Chaos.UI is
       return Chaos.Images.Chaos_Image_Container
       is abstract;
 
+   overriding function Create_Animation
+     (UI : Root_Chaos_UI)
+      return Chaos.Animations.Chaos_Animation
+      is abstract;
+
    type Chaos_UI is access all Root_Chaos_UI'Class;
 
    function Current_UI return Chaos_UI;
@@ -60,7 +68,8 @@ private
    type Root_UI_Model is abstract tagged null record;
 
    type Root_Chaos_UI is abstract new
-     Chaos.Battles.Battle_Manager_Interface with
+     Chaos.Battles.Battle_Manager_Interface
+     and Chaos.Animations.Chaos_Animation_Factory with
       record
          null;
       end record;

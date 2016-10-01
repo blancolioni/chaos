@@ -1,6 +1,6 @@
 with WL.String_Maps;
 
-with Chaos.Configuration;
+--  with Chaos.Configuration;
 
 with Chaos.Resources.Area;
 with Chaos.Resources.Bam;
@@ -11,6 +11,8 @@ with Chaos.Resources.Dlg;
 with Chaos.Resources.Key;
 with Chaos.Resources.Tis;
 with Chaos.Resources.Wed;
+
+with Chaos.Infinity_Engine;
 
 package body Chaos.Resources.Manager is
 
@@ -81,8 +83,7 @@ package body Chaos.Resources.Manager is
       return access constant Chaos_Resource'Class
    is
       Key : constant String := To_Key (Reference, Res_Type);
-      Base_Path : constant String :=
-                    Chaos.Configuration.Infinity_Path;
+      Base_Path : constant String := Chaos.Infinity_Engine.Infinity_Path;
    begin
       if not Resource_Map.Contains (Key) then
          if not Got_Keys then

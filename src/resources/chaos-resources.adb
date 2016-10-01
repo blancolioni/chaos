@@ -426,7 +426,7 @@ package body Chaos.Resources is
         (others => Character'Val (0))
       do
          for I in Value'Range loop
-            Reference (I) := Value (I);
+            Reference (I - Value'First + 1) := Value (I);
          end loop;
       end return;
    end To_Reference;

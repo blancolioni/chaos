@@ -22,7 +22,8 @@ package body Chaos.Resources.Bam is
          Bam.Get (Bam.Palette (I).B);
          Bam.Get (Bam.Palette (I).G);
          Bam.Get (Bam.Palette (I).R);
-         Bam.Get (Bam.Palette (I).A);
+         Bam.Palette (I).A := (if I = 0 then 0 else 255);
+         Bam.Skip (1);
       end loop;
 
       Bam.Set_Offset (Bam.Frame_Entry_Offset);
@@ -36,7 +37,7 @@ package body Chaos.Resources.Bam is
             Bam.Get (Frame.Center_Y);
             Bam.Get (Frame.Frame_Data_Offset);
             Frame.RLE_Compressed :=
-              (Frame.Frame_Data_Offset and 2 ** 31) /= 0;
+              (Frame.Frame_Data_Offset and 2 ** 31) = 0;
             Frame.Frame_Data_Offset :=
               Frame.Frame_Data_Offset and 2 ** 31 - 1;
             Bam.Push_Offset (Frame.Frame_Data_Offset);

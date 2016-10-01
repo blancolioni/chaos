@@ -12,6 +12,8 @@ package Chaos.Resources.Bam is
    type Bam_Palette is array (Word_8) of Bam_Colour;
 
    type Frame_Pixels is array (Word_32 range <>) of Word_8;
+   type Frame_Colours is
+     array (Positive range <>, Positive range <>) of Bam_Colour;
 
    type Frame_Entry is
       record

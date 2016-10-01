@@ -40,6 +40,11 @@ package body Chaos.UI.Text_UI is
       return Chaos.Images.Chaos_Image_Container
    is (Local_Image_Container'Access);
 
+   overriding function Create_Animation
+     (UI : Chaos_Text_UI)
+      return Chaos.Animations.Chaos_Animation
+   is (null);
+
    ------------
    -- Create --
    ------------

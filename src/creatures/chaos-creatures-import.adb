@@ -75,6 +75,7 @@ package body Chaos.Creatures.Import is
          Creature.Level :=
            Chaos.Levels.Chaos_Level (Cre.Power_Level);
          Creature.HP := Creature.Max_Hit_Points;
+         Creature.Animation_Id := Natural (Cre.Animation_Id);
 
          Creature.Team := Chaos.Teams.Get ("neutral");
 

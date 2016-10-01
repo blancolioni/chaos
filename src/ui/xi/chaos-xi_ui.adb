@@ -12,10 +12,12 @@ with Xtk.Text.View;
 
 with Chaos.Game;
 with Chaos.Images;
+with Chaos.Animations;
 
 with Chaos.Xi_UI.Models;
 with Chaos.Xi_UI.Areas;
 
+with Chaos.Xi_UI.Animations;
 with Chaos.Xi_UI.Fonts;
 with Chaos.Xi_UI.Images;
 
@@ -48,6 +50,10 @@ package body Chaos.Xi_UI is
      (UI : Root_Xi_UI)
       return Chaos.Images.Chaos_Image_Container;
 
+   overriding function Create_Animation
+     (UI : Root_Xi_UI)
+      return Chaos.Animations.Chaos_Animation;
+
    ------------
    -- Create --
    ------------
@@ -63,6 +69,7 @@ package body Chaos.Xi_UI is
       Result.Window :=
         Xi.Main.Current_Renderer.Create_Top_Level_Window;
       Result.Window.Set_Wireframe (False);
+      Result.Window.Set_Full_Screen (True);
       Result.Font := Chaos.Xi_UI.Fonts.Interface_Font;
       Xtk.Text.View.Xtk_New (Result.Log_View);
       Result.Log := Result.Log_View.Text_Buffer;
@@ -77,6 +84,19 @@ package body Chaos.Xi_UI is
 
       return new Root_Xi_UI'(Result);
    end Create;
+
+   ----------------------
+   -- Create_Animation --
+   ----------------------
+
+   overriding function Create_Animation
+     (UI : Root_Xi_UI)
+      return Chaos.Animations.Chaos_Animation
+   is
+      pragma Unreferenced (UI);
+   begin
+      return new Chaos.Xi_UI.Animations.Xi_Animation_Record;
+   end Create_Animation;
 
    ----------------------------
    -- Create_Image_Container --

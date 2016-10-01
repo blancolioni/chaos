@@ -6,6 +6,8 @@ with Chaos.Abilities;
 with Chaos.Defences;
 with Chaos.Powers;
 
+with Chaos.Animated;
+
 with Chaos.Objects;
 
 package Chaos.Classes is
@@ -16,6 +18,7 @@ package Chaos.Classes is
 
    type Chaos_Class_Record is
      new Chaos.Objects.Root_Localised_Object_Record
+     and Chaos.Animated.Animated_Interface
      and Chaos.Powers.Powered_Interface
    with private;
 
@@ -68,8 +71,10 @@ private
 
    type Chaos_Class_Record is
      new Chaos.Objects.Root_Localised_Object_Record
+     and Chaos.Animated.Animated_Interface
      and Chaos.Powers.Powered_Interface with
       record
+         Animation_Code   : Character;
          Key_Abilities    : Key_Ability_Array;
          Defences         : Chaos.Defences.Defence_Score_Changes :=
                               (others => 0);
@@ -87,6 +92,11 @@ private
    overriding procedure Add_Power
      (Class      : in out Chaos_Class_Record;
       Power      : Chaos.Powers.Chaos_Power);
+
+   overriding function Animation_Code
+     (Class : Chaos_Class_Record)
+      return Character
+   is (Class.Animation_Code);
 
    package Role_Expressions is
      new Chaos.Expressions.Enumerated (Class_Role);

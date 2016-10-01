@@ -1,6 +1,21 @@
+with Ada.Characters.Handling;
+
 with Chaos.Races.Db;
 
 package body Chaos.Races is
+
+   --------------------
+   -- Animation_Code --
+   --------------------
+
+   overriding function Animation_Code
+     (Race : Chaos_Race_Record)
+      return Character
+   is
+      Id : constant String := Race.Identifier;
+   begin
+      return Ada.Characters.Handling.To_Upper (Id (Id'First));
+   end Animation_Code;
 
    ---------
    -- Get --

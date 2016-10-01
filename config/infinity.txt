@@ -1,1 +1,1 @@
-path = "C:/Gog/Baldurs Gate/"
+path = "D:/Gog Games/Baldurs Gate/"

@@ -1,3 +1,5 @@
+code = E
+
 abilities = {
    dex = 2
 }

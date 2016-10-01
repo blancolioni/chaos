@@ -1,6 +1,7 @@
 private with Memor;
 
 with Chaos.Abilities;
+with Chaos.Animated;
 with Chaos.Defences;
 with Chaos.Objects;
 with Chaos.Sizes;
@@ -11,6 +12,7 @@ package Chaos.Races is
 
    type Chaos_Race_Record is
      new Chaos.Objects.Root_Localised_Object_Record
+     and Chaos.Animated.Animated_Interface
      and Chaos.Sizes.Chaos_Size_Interface
      and Chaos.Speed.Chaos_Speed_Interface
      and Chaos.Vision.Chaos_Vision_Interface
@@ -56,10 +58,12 @@ private
 
    type Chaos_Race_Record is
      new Chaos.Objects.Root_Localised_Object_Record
+     and Chaos.Animated.Animated_Interface
      and Chaos.Sizes.Chaos_Size_Interface
      and Chaos.Speed.Chaos_Speed_Interface
      and Chaos.Vision.Chaos_Vision_Interface with
       record
+         Code      : Character;
          Abilities : Chaos.Abilities.Ability_Score_Changes := (others => 0);
          Defences  : Chaos.Defences.Defence_Score_Changes := (others => 0);
          Size      : Chaos.Sizes.Chaos_Size := Chaos.Sizes.Medium;
@@ -70,5 +74,9 @@ private
    overriding function Object_Database
      (Object : Chaos_Race_Record)
       return Memor.Root_Database_Type'Class;
+
+   overriding function Animation_Code
+     (Race : Chaos_Race_Record)
+      return Character;
 
 end Chaos.Races;

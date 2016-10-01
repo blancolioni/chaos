@@ -56,6 +56,7 @@ package body Chaos.UI is
    is
    begin
       Local_Current_UI := UI;
+      Chaos.Animations.Set_Animation_Factory (UI);
    end Set_Current_UI;
 
 end Chaos.UI;

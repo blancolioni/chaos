@@ -84,6 +84,12 @@ package body Chaos.Classes.Configure is
            (Class, Path);
 
          declare
+            Code : constant String := Class.Identifier;
+         begin
+            Class.Animation_Code := Code (Code'First);
+         end;
+
+         declare
             Power_Directory : constant String :=
                                 Compose
                                   (Containing_Directory (Path),
