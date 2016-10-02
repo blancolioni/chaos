@@ -27,6 +27,9 @@ package Chaos.Resources.Bam is
    package Frame_Entry_Vectors is
      new Ada.Containers.Vectors (Positive, Frame_Entry);
 
+   Empty_Frame : constant Frame_Entry :=
+                   (0, 0, 0, 0, 0, False, null);
+
    type Cycle_Entry is
       record
          Frame_Count : Natural;

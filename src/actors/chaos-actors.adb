@@ -58,7 +58,8 @@ package body Chaos.Actors is
      (From_Creature : Chaos.Creatures.Chaos_Creature;
       Area          : not null access constant
         Chaos.Areas.Chaos_Area_Record'Class;
-      Location      : Chaos.Locations.Square_Location)
+      Location      : Chaos.Locations.Square_Location;
+      Orientation   : Actor_Orientation)
       return Chaos_Actor
 
    is
@@ -73,6 +74,7 @@ package body Chaos.Actors is
          Actor.Area := Area;
          Actor.Creature := From_Creature;
          Actor.Location := Location;
+         Actor.Orientation := Orientation;
          Actor.Hit_Points := From_Creature.Current_Hit_Points;
       end Create;
 
@@ -208,6 +210,18 @@ package body Chaos.Actors is
    begin
       return Db.Get_Database;
    end Object_Database;
+
+   -----------------
+   -- Orientation --
+   -----------------
+
+   function Orientation
+     (Actor : Chaos_Actor_Record'Class)
+      return Actor_Orientation
+   is
+   begin
+      return Actor.Orientation;
+   end Orientation;
 
    -------------------
    -- Reset_Actions --

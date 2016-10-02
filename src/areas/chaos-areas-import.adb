@@ -1,3 +1,5 @@
+with WL.Binary_IO;
+
 with Chaos.Resources.Area;
 with Chaos.Resources.Bcs;
 with Chaos.Resources.Tis;
@@ -104,6 +106,7 @@ package body Chaos.Areas.Import is
 
       for Actor_Entry of Are.Actors loop
          declare
+            use type WL.Binary_IO.Word_16;
             Creature : constant Chaos.Creatures.Chaos_Creature :=
                          Chaos.Creatures.Import.Import_Creature
                            (String (Actor_Entry.CRE_File));
@@ -114,7 +117,10 @@ package body Chaos.Areas.Import is
                             Location      =>
                               Area.To_Square
                                 ((Natural (Actor_Entry.Current_X),
-                                 Natural (Actor_Entry.Current_Y))));
+                                 Natural (Actor_Entry.Current_Y))),
+                            Orientation   =>
+                              Chaos.Actors.Actor_Orientation'Val
+                                (Actor_Entry.Orientation / 2));
          begin
             pragma Unreferenced (Actor);
          end;

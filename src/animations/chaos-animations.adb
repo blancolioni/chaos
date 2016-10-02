@@ -125,20 +125,23 @@ package body Chaos.Animations is
                     Chaos.Resources.Bam.Bam_Resource'Class
                       (Res.all);
       begin
-         for I in 1 .. Bam.Cycle_Entries.Last_Index loop
+         for Cycle_Index in 1 .. Bam.Cycle_Entries.Last_Index loop
             declare
-               Frame_Count : constant Natural :=
-                               Bam.Cycle_Entries.Element (I).Frame_Count;
-               First_Frame : constant Positive :=
-                               Bam.Cycle_Entries.Element (I).First_Frame;
+               Cycle : Cycle_Entry renames
+                         Bam.Cycle_Entries.Element (Cycle_Index);
+               Frame_Count : constant Natural := Cycle.Frame_Count;
+               First_Frame : constant Positive := Cycle.First_Frame;
                Animation   : constant Chaos_Animation :=
                                Local_Animation_Factory.Create_Animation;
             begin
                for I in First_Frame .. First_Frame + Frame_Count - 1 loop
                   declare
-                     Frame   : Chaos.Resources.Bam.Frame_Entry renames
-                                 Bam.Frame_Entries.Element
-                                   (Bam.Frame_Lookup.Element (I));
+                     Lookup_Index : constant Positive :=
+                                      Bam.Frame_Lookup.Element (I);
+                     Frame        : constant Chaos.Resources.Bam.Frame_Entry :=
+                                      (if Lookup_Index < 2 ** 16
+                                       then Bam.Frame_Entries (Lookup_Index)
+                                       else Empty_Frame);
                      Height  : constant Natural := Natural (Frame.Height);
                      Width   : constant Natural := Natural (Frame.Width);
                      Colours : Frame_Colours (1 .. Width, 1 .. Height);

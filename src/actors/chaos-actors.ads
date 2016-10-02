@@ -13,6 +13,10 @@ with Chaos.Vision;
 
 package Chaos.Actors is
 
+   type Actor_Orientation is
+     (South, South_West, West, North_West,
+      North, North_East, East, South_East);
+
    type Chaos_Actor_Record is
      new Chaos.Objects.Root_Localised_Object_Record
      and Chaos.Speed.Chaos_Speed_Interface
@@ -41,6 +45,10 @@ package Chaos.Actors is
      (Actor : Chaos_Actor_Record'Class)
      return Chaos.Locations.Square_Location;
 
+   function Orientation
+     (Actor : Chaos_Actor_Record'Class)
+      return Actor_Orientation;
+
    overriding function Vision
      (Actor : Chaos_Actor_Record)
       return Chaos.Vision.Chaos_Vision
@@ -60,7 +68,8 @@ package Chaos.Actors is
      (From_Creature : Chaos.Creatures.Chaos_Creature;
       Area          : not null access constant
         Chaos.Areas.Chaos_Area_Record'Class;
-      Location      : Chaos.Locations.Square_Location)
+      Location      : Chaos.Locations.Square_Location;
+      Orientation   : Actor_Orientation)
       return Chaos_Actor;
 
    function Commands
@@ -126,6 +135,7 @@ private
            Chaos.Areas.Chaos_Area_Record'Class;
          Creature        : Chaos.Creatures.Chaos_Creature;
          Location        : Chaos.Locations.Square_Location;
+         Orientation     : Actor_Orientation;
          Alive           : Boolean := True;
          Move_Action     : Boolean := True;
          Minor_Action    : Boolean := True;

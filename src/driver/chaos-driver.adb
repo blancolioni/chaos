@@ -105,7 +105,8 @@ begin
                             Chaos.Actors.Create_Actor
                               (Protagonist, Area,
                                Area.To_Square
-                                 (Chaos.Infinity_Engine.Start_Location));
+                                 (Chaos.Infinity_Engine.Start_Location),
+                               Chaos.Actors.South);
             Party       : constant Chaos.Party.Party_Type :=
                             Chaos.Party.Create_Party;
          begin
