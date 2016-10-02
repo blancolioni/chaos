@@ -36,6 +36,9 @@ package body Chaos.Creatures.Quick is
          Creature.Level := 1;
          Creature.HP := Creature.Max_Hit_Points;
          Creature.Team := Chaos.Teams.Get ("pc");
+         Creature.Color_Map :=
+           (Metal => 25, Minor => 41, Major => 47,
+            Skin => 12, Leather => 91, Armour => 25, Hair => 91);
       end Create;
 
    begin

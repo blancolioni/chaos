@@ -16,7 +16,7 @@ package Chaos.Resources.Cre is
 
    type Saving_Throw_Array is array (Saving_Throws) of Word_8;
 
-   type Resistances is (Fire, Cold, Electricity, Acis,
+   type Resistances is (Fire, Cold, Electricity, Acid,
                         Magic, Magic_Fire, Magic_Cold,
                         Slashing, Crushing, Piercing, Missile);
 

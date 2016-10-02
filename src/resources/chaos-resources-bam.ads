@@ -4,16 +4,8 @@ package Chaos.Resources.Bam is
 
    use WL.Binary_IO;
 
-   type Bam_Colour is
-      record
-         B, G, R, A : Word_8;
-      end record;
-
-   type Bam_Palette is array (Word_8) of Bam_Colour;
-
    type Frame_Pixels is array (Word_32 range <>) of Word_8;
-   type Frame_Colours is
-     array (Positive range <>, Positive range <>) of Bam_Colour;
+   type Frame_Pixel_Access is access Frame_Pixels;
 
    type Frame_Entry is
       record
@@ -21,7 +13,7 @@ package Chaos.Resources.Bam is
          Center_X, Center_Y : Word_16;
          Frame_Data_Offset  : Word_32;
          RLE_Compressed     : Boolean;
-         Frame_Data         : access Frame_Pixels;
+         Frame_Data         : Frame_Pixel_Access;
       end record;
 
    package Frame_Entry_Vectors is
@@ -51,7 +43,7 @@ package Chaos.Resources.Bam is
          Frame_Entry_Offset  : Word_32;
          Palette_Offset      : Word_32;
          Frame_Lookup_Offset : Word_32;
-         Palette             : Bam_Palette;
+         Palette             : Resource_Palette;
          Frame_Entries       : Frame_Entry_Vectors.Vector;
          Cycle_Entries       : Cycle_Entry_Vectors.Vector;
          Frame_Lookup        : Frame_Index_Vectors.Vector;

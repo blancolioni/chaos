@@ -1,6 +1,3 @@
-with Ada.Containers.Vectors;
-
-with WL.Binary_IO;
 with WL.String_Maps;
 
 with Chaos.Resources.Manager;
@@ -28,11 +25,14 @@ package body Chaos.Animations is
    ---------------
 
    procedure Add_Frame
-     (Animation     : in out Chaos_Animation_Record;
-      Frame         : Chaos.Resources.Bam.Frame_Colours)
+     (Animation          : in out Chaos_Animation_Record;
+      Width, Height      : Natural;
+      Center_X, Center_Y : Natural;
+      Frame              : Chaos.Resources.Bam.Frame_Pixel_Access)
    is
    begin
-      Animation.Frames.Append (Frame);
+      Animation.Frames.Append
+        ((Width, Height, Center_X, Center_Y, Frame));
    end Add_Frame;
 
    -----------
@@ -42,11 +42,37 @@ package body Chaos.Animations is
    function Frame
      (Animation : Chaos_Animation_Record;
       Index     : Positive)
-      return Chaos.Resources.Bam.Frame_Colours
+      return Chaos.Resources.Bam.Frame_Pixel_Access
    is
    begin
-      return Animation.Frames.Element (Index);
+      return Animation.Frames.Element (Index).Pixels;
    end Frame;
+
+   --------------------
+   -- Frame_Center_X --
+   --------------------
+
+   function Frame_Center_X
+     (Animation : Chaos_Animation_Record'Class;
+      Index     : Positive)
+      return Natural
+   is
+   begin
+      return Animation.Frames.Element (Index).Centre_X;
+   end Frame_Center_X;
+
+   --------------------
+   -- Frame_Center_Y --
+   --------------------
+
+   function Frame_Center_Y
+     (Animation : Chaos_Animation_Record'Class;
+      Index     : Positive)
+      return Natural
+   is
+   begin
+      return Animation.Frames.Element (Index).Centre_Y;
+   end Frame_Center_Y;
 
    -----------------
    -- Frame_Count --
@@ -67,7 +93,7 @@ package body Chaos.Animations is
       return Natural
    is
    begin
-      return Animation.Frame (Index)'Length (2);
+      return Animation.Frames.Element (Index).Height;
    end Frame_Height;
 
    -----------------
@@ -80,7 +106,7 @@ package body Chaos.Animations is
       return Natural
    is
    begin
-      return Animation.Frame (Index)'Length (1);
+      return Animation.Frames.Element (Index).Width;
    end Frame_Width;
 
    -------------------
@@ -127,8 +153,8 @@ package body Chaos.Animations is
       begin
          for Cycle_Index in 1 .. Bam.Cycle_Entries.Last_Index loop
             declare
-               Cycle : Cycle_Entry renames
-                         Bam.Cycle_Entries.Element (Cycle_Index);
+               Cycle       : Cycle_Entry renames
+                               Bam.Cycle_Entries.Element (Cycle_Index);
                Frame_Count : constant Natural := Cycle.Frame_Count;
                First_Frame : constant Positive := Cycle.First_Frame;
                Animation   : constant Chaos_Animation :=
@@ -142,22 +168,20 @@ package body Chaos.Animations is
                                       (if Lookup_Index < 2 ** 16
                                        then Bam.Frame_Entries (Lookup_Index)
                                        else Empty_Frame);
-                     Height  : constant Natural := Natural (Frame.Height);
-                     Width   : constant Natural := Natural (Frame.Width);
-                     Colours : Frame_Colours (1 .. Width, 1 .. Height);
+                     Height       : constant Natural := Natural (Frame.Height);
+                     Width        : constant Natural := Natural (Frame.Width);
+                     Center_X     : constant Natural :=
+                                      Natural (Frame.Center_X);
+                     Center_Y     : constant Natural :=
+                                      Natural (Frame.Center_Y);
                   begin
-                     for Y in 1 .. Height loop
-                        for X in 1 .. Width loop
-                           Colours (X, Y) :=
-                             Bam.Palette
-                               (Frame.Frame_Data
-                                  (WL.Binary_IO.Word_32 ((Y - 1) * Width
-                                   + X)));
-                        end loop;
-                     end loop;
-                     Animation.Add_Frame (Colours);
+                     Animation.Add_Frame
+                       (Width, Height, Center_X, Center_Y,
+                        Frame.Frame_Data);
                   end;
                end loop;
+
+               Animation.Palette := Bam.Palette;
 
                Cycles.Append (Animation);
 
@@ -167,6 +191,18 @@ package body Chaos.Animations is
          Animation_Cache.Insert (Code, Cycles);
       end;
    end Import_Animation;
+
+   -------------
+   -- Palette --
+   -------------
+
+   function Palette
+     (Animation : Chaos_Animation_Record'Class)
+      return Chaos.Resources.Resource_Palette
+   is
+   begin
+      return Animation.Palette;
+   end Palette;
 
    ---------------------------
    -- Set_Animation_Factory --

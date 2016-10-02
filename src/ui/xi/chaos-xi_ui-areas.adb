@@ -34,6 +34,7 @@ with Chaos.Logging;
 with Chaos.Actors;
 
 with Chaos.Animations.Actors;
+with Chaos.Creatures.Colors;
 
 package body Chaos.Xi_UI.Areas is
 
@@ -118,7 +119,12 @@ package body Chaos.Xi_UI.Areas is
    begin
       Actor.Node.Set_Position (World_Loc);
       Actor.Node.Entity.Material.Technique (1).Pass (1).Set_Texture
-        (Actor.Animation.Texture (Actor.Frame));
+        (Actor.Animation.Texture
+           (Identifier  => Actor.Actor.Creature.Identifier,
+            Frame_Index => Actor.Frame,
+            Palette     =>
+              Chaos.Creatures.Colors.Creature_Palette
+                (Actor.Actor.Creature)));
       Actor.Frame := Actor.Frame + 1;
       if Actor.Frame > Actor.Animation.Frame_Count then
          Actor.Frame := 1;
@@ -317,6 +323,7 @@ package body Chaos.Xi_UI.Areas is
          Chaos.Expressions.Execute
            (Listener.Model.Area.Script);
          Listener.Last_Script_Execution := Now;
+
          for I in 1 .. Listener.Model.Actors.Last_Index loop
             declare
                Actor : Actor_Node := Listener.Model.Actors (I);

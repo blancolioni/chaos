@@ -18,6 +18,13 @@ package Chaos.Resources is
      (Reference : Resource_Reference)
       return Boolean;
 
+   type Resource_Color is
+      record
+         B, G, R, A : WL.Binary_IO.Word_8;
+      end record;
+
+   type Resource_Palette is array (WL.Binary_IO.Word_8) of Resource_Color;
+
    type Resource_Type is private;
 
    Area_Resource     : constant Resource_Type;

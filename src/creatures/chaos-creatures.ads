@@ -132,6 +132,12 @@ package Chaos.Creatures is
 
 private
 
+   type Creature_Color_Part is
+     (Metal, Minor, Major, Skin, Leather, Armour, Hair);
+
+   type Creature_Color_Map is
+     array (Creature_Color_Part) of Natural;
+
    type Chaos_Creature_Record is
      new Chaos.Objects.Root_Localised_Object_Record
      and Chaos.Abilities.Ability_Interface
@@ -156,6 +162,7 @@ private
          Team         : Chaos.Teams.Chaos_Team;
          Dialog       : Chaos.Dialog.Chaos_Dialog;
          Animation_Id : Natural := 0;
+         Color_Map    : Creature_Color_Map;
       end record;
 
    overriding function Object_Database

@@ -77,6 +77,21 @@ package body Chaos.Creatures.Import is
          Creature.HP := Creature.Max_Hit_Points;
          Creature.Animation_Id := Natural (Cre.Animation_Id);
 
+         Creature.Color_Map (Metal) :=
+           Natural (Cre.Colours (Metal));
+         Creature.Color_Map (Minor) :=
+           Natural (Cre.Colours (Minor));
+         Creature.Color_Map (Major) :=
+           Natural (Cre.Colours (Major));
+         Creature.Color_Map (Skin) :=
+           Natural (Cre.Colours (Skin));
+         Creature.Color_Map (Leather) :=
+           Natural (Cre.Colours (Leather));
+         Creature.Color_Map (Armour) :=
+           Natural (Cre.Colours (Armour));
+         Creature.Color_Map (Hair) :=
+           Natural (Cre.Colours (Hair));
+
          Creature.Team := Chaos.Teams.Get ("neutral");
 
          declare
