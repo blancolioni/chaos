@@ -1,0 +1,10 @@
+ identity: dagger
+ category: simple-melee
+ proficiency: 3
+ damage: 1d4
+ range: 5-10
+ price: 1gp
+ weight: 1
+ group: light-blade
+ properties: [off-hand, light-thrown]
+ 

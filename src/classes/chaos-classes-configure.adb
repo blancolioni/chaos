@@ -32,6 +32,10 @@ package body Chaos.Classes.Configure is
      (Class : in out Chaos_Class_Record'Class;
       Value : Chaos.Expressions.Chaos_Expression);
 
+   procedure Set_Healing_Surges
+     (Class : in out Chaos_Class_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression);
+
    procedure Set_Identity
      (Class : in out Chaos_Class_Record'Class;
       Value : Chaos.Expressions.Chaos_Expression);
@@ -120,6 +124,8 @@ package body Chaos.Classes.Configure is
                               Set_Key_Abilities'Access);
       Class_Settings.Setting ("base-hit-points", Set_Base_Hit_Points'Access);
       Class_Settings.Setting ("defences", Set_Defences'Access);
+      Class_Settings.Setting ("healing-surges-per-day",
+                              Set_Healing_Surges'Access);
       Class_Settings.Setting ("identity", Set_Identity'Access);
       Class_Settings.Setting ("hit-points-per-level",
                               Set_Level_Hit_Points'Access);
@@ -191,6 +197,18 @@ package body Chaos.Classes.Configure is
          end;
       end loop;
    end Set_Defences;
+
+   ------------------------
+   -- Set_Healing_Surges --
+   ------------------------
+
+   procedure Set_Healing_Surges
+     (Class : in out Chaos_Class_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression)
+   is
+   begin
+      Class.Healing_Surges := Chaos.Expressions.Numbers.To_Integer (Value);
+   end Set_Healing_Surges;
 
    ------------------
    -- Set_Identity --

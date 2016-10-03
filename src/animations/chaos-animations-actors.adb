@@ -1,4 +1,3 @@
-with Chaos.Logging;
 with Chaos.Infinity_Engine;
 
 package body Chaos.Animations.Actors is
@@ -26,10 +25,6 @@ package body Chaos.Animations.Actors is
                       & (if Western then "" else "E");
       Index       : constant Positive := 9 + Offset;
    begin
-      Chaos.Logging.Log
-        ("ANIMATION",
-         Actor.Creature.Identifier
-         & ": getting " & Code & Index'Img);
       return Get_Animation (Code, Index);
    end Get_Standing_Animation;
 

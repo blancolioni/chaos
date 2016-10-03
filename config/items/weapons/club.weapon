@@ -1,0 +1,8 @@
+ identity: club
+ category: simple-melee
+ proficiency: 2
+ damage: 1d6
+ price: 1gp
+ weight: 3
+ group: mace
+ 

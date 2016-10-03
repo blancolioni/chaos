@@ -15,6 +15,31 @@ package body Chaos.Creatures is
       return Creature.Abilities (Ability);
    end Ability_Score;
 
+   -------------------
+   -- Active_Weapon --
+   -------------------
+
+   function Active_Weapon
+     (Creature : Chaos_Creature_Record'Class)
+      return Chaos.Items.Weapons.Chaos_Weapon
+   is
+   begin
+      return Chaos.Items.Weapons.Chaos_Weapon
+        (Creature.Equipment (Creature.Active_Weapon_Slot).Item);
+   end Active_Weapon;
+
+   ------------------------
+   -- Active_Weapon_Slot --
+   ------------------------
+
+   function Active_Weapon_Slot
+     (Creature : Chaos_Creature_Record'Class)
+      return Chaos.Equipment.Chaos_Equipment_Slot
+   is
+   begin
+      return Creature.Active_Weapon;
+   end Active_Weapon_Slot;
+
    ---------------
    -- Add_Power --
    ---------------
@@ -173,6 +198,19 @@ package body Chaos.Creatures is
       return Creature.Individual;
    end Individual;
 
+   ---------------
+   -- Inventory --
+   ---------------
+
+   function Inventory
+     (Creature : in out Chaos_Creature_Record'Class;
+      Index    : Inventory_Index)
+      return Chaos.Things.Chaos_Thing
+   is
+   begin
+      return Creature.Inventory (Index);
+   end Inventory;
+
    ----------
    -- Kill --
    ----------
@@ -271,6 +309,18 @@ package body Chaos.Creatures is
    end Race;
 
    ----------------------------
+   -- Set_Active_Weapon_Slot --
+   ----------------------------
+
+   procedure Set_Active_Weapon_Slot
+     (Creature : in out Chaos_Creature_Record'Class;
+      Slot     : Chaos.Equipment.Weapon_Slot)
+   is
+   begin
+      Creature.Active_Weapon := Slot;
+   end Set_Active_Weapon_Slot;
+
+   ----------------------------
    -- Set_Current_Hit_Points --
    ----------------------------
 
@@ -281,6 +331,32 @@ package body Chaos.Creatures is
    begin
       Creature.HP := Hit_Points;
    end Set_Current_Hit_Points;
+
+   -------------------
+   -- Set_Equipment --
+   -------------------
+
+   procedure Set_Equipment
+     (Creature : in out Chaos_Creature_Record'Class;
+      Slot     : Chaos.Equipment.Chaos_Equipment_Slot;
+      Thing    : Chaos.Things.Chaos_Thing)
+   is
+   begin
+      Creature.Equipment (Slot) := Thing;
+   end Set_Equipment;
+
+   -------------------
+   -- Set_Inventory --
+   -------------------
+
+   procedure Set_Inventory
+     (Creature : in out Chaos_Creature_Record'Class;
+      Index    : Inventory_Index;
+      Thing    : Chaos.Things.Chaos_Thing)
+   is
+   begin
+      Creature.Inventory (Index) := Thing;
+   end Set_Inventory;
 
    ----------------
    -- Short_Name --

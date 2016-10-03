@@ -143,7 +143,7 @@ package body Chaos.Actors.Attacks is
       Dex_Bonus : constant Ability_Bonus_Range :=
                     Attacker.Creature.Ability_Bonus (Dex);
       Bonus     : constant Ability_Bonus_Range :=
-                    (if Weapon.Finesse
+                    (if Weapon.Has_Property (Chaos.Items.Weapons.Finesse)
                      then Ability_Bonus_Range'Max (Str_Bonus, Dex_Bonus)
                      else Str_Bonus);
       Proficiency : constant Natural :=

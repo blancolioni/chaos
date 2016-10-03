@@ -10,6 +10,9 @@ with Chaos.Powers.Db;
 with Chaos.Actions;
 
 with Chaos.Expressions.Enumerated;
+with Chaos.Expressions.Maps;
+with Chaos.Expressions.Numbers;
+with Chaos.Expressions.Vectors;
 
 package body Chaos.Powers.Configure is
 
@@ -18,6 +21,12 @@ package body Chaos.Powers.Configure is
 
    package Power_Use_Expressions is
      new Chaos.Expressions.Enumerated (Power_Use_Class);
+
+   package Power_Target_Expressions is
+     new Chaos.Expressions.Enumerated (Power_Attack_Target);
+
+   package Power_Implement_Expressions is
+     new Chaos.Expressions.Enumerated (Power_Implement);
 
    type Configure_Power_Handler is access
      procedure (Power : in out Chaos_Power_Record'Class;
@@ -44,6 +53,10 @@ package body Chaos.Powers.Configure is
      (Power : in out Chaos_Power_Record'Class;
       Value : Chaos.Expressions.Chaos_Expression);
 
+   procedure Set_Hit
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression);
+
    procedure Set_Hit_Damage
      (Power : in out Chaos_Power_Record'Class;
       Value : Chaos.Expressions.Chaos_Expression);
@@ -52,11 +65,27 @@ package body Chaos.Powers.Configure is
      (Power : in out Chaos_Power_Record'Class;
       Value : Chaos.Expressions.Chaos_Expression);
 
+   procedure Set_Implement
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression);
+
+   procedure Set_Miss
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression);
+
    procedure Set_Miss_Damage
      (Power : in out Chaos_Power_Record'Class;
       Value : Chaos.Expressions.Chaos_Expression);
 
    procedure Set_Source
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression);
+
+   procedure Set_Target
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression);
+
+   procedure Set_Target_Size
      (Power : in out Chaos_Power_Record'Class;
       Value : Chaos.Expressions.Chaos_Expression);
 
@@ -124,10 +153,15 @@ package body Chaos.Powers.Configure is
       Setting ("action", Set_Action'Access);
       Setting ("attack", Set_Attack'Access);
       Setting ("defence", Set_Defence'Access);
+      Setting ("hit", Set_Hit'Access);
       Setting ("hit-damage", Set_Hit_Damage'Access);
+      Setting ("miss", Set_Miss'Access);
       Setting ("miss-damage", Set_Miss_Damage'Access);
       Setting ("identity", Set_Identity'Access);
+      Setting ("implement", Set_Implement'Access);
       Setting ("source", Set_Source'Access);
+      Setting ("target", Set_Target'Access);
+      Setting ("target-size", Set_Target_Size'Access);
       Setting ("use", Set_Use'Access);
 
       declare
@@ -178,6 +212,40 @@ package body Chaos.Powers.Configure is
       Power.Defence := Value;
    end Set_Defence;
 
+   -------------
+   -- Set_Hit --
+   -------------
+
+   procedure Set_Hit
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression)
+   is
+      use Chaos.Expressions, Chaos.Expressions.Maps;
+   begin
+      Power.Log ("hit: " & Chaos.Expressions.To_String (Value));
+      if Is_Map (Value) then
+         declare
+            Damage : constant Chaos_Expression :=
+                       Get (Value, "damage");
+            Effects : constant Chaos_Expression :=
+                        Get (Value, "effect");
+         begin
+            if Damage /= Undefined_Value then
+               Set_Hit_Damage (Power, Damage);
+            end if;
+            if Effects /= Undefined_Value then
+               for I in 1 .. Chaos.Expressions.Vectors.Length (Effects) loop
+                  Power.Log ("hit-effect: "
+                             & Chaos.Expressions.To_String
+                               (Chaos.Expressions.Vectors.Get (Effects, I)));
+                  Power.Hit.Append
+                    (Chaos.Expressions.Vectors.Get (Effects, I));
+               end loop;
+            end if;
+         end;
+      end if;
+   end Set_Hit;
+
    --------------------
    -- Set_Hit_Damage --
    --------------------
@@ -187,8 +255,8 @@ package body Chaos.Powers.Configure is
       Value : Chaos.Expressions.Chaos_Expression)
    is
    begin
-      Power.Log ("hit: " & Chaos.Expressions.To_String (Value));
-      Power.Hit.Append ((Chaos.Expressions.Always, Value));
+      Power.Log ("hit-damage: " & Chaos.Expressions.To_String (Value));
+      Power.Hit.Append (Value);
    end Set_Hit_Damage;
 
    ------------------
@@ -205,6 +273,52 @@ package body Chaos.Powers.Configure is
         ("CONFIG", "new power: " & Power.Identifier);
    end Set_Identity;
 
+   -------------------
+   -- Set_Implement --
+   -------------------
+
+   procedure Set_Implement
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression)
+   is
+   begin
+      Power.Implement := Power_Implement_Expressions.To_Enum (Value);
+   end Set_Implement;
+
+   --------------
+   -- Set_Miss --
+   --------------
+
+   procedure Set_Miss
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression)
+   is
+      use Chaos.Expressions, Chaos.Expressions.Maps;
+   begin
+      Power.Log ("miss: " & Chaos.Expressions.To_String (Value));
+      if Is_Map (Value) then
+         declare
+            Damage  : constant Chaos_Expression :=
+                        Get (Value, "damage");
+            Effects : constant Chaos_Expression :=
+                        Get (Value, "effect");
+         begin
+            if Damage /= Undefined_Value then
+               Set_Miss_Damage (Power, Damage);
+            end if;
+            if Effects /= Undefined_Value then
+               for I in 1 .. Chaos.Expressions.Vectors.Length (Effects) loop
+                  Power.Log ("miss-effect: "
+                             & Chaos.Expressions.To_String
+                               (Chaos.Expressions.Vectors.Get (Effects, I)));
+                  Power.Miss.Append
+                    (Chaos.Expressions.Vectors.Get (Effects, I));
+               end loop;
+            end if;
+         end;
+      end if;
+   end Set_Miss;
+
    ---------------------
    -- Set_Miss_Damage --
    ---------------------
@@ -215,7 +329,7 @@ package body Chaos.Powers.Configure is
    is
    begin
       Power.Log ("miss: " & Chaos.Expressions.To_String (Value));
-      Power.Miss.Append ((Chaos.Expressions.Always, Value));
+      Power.Miss.Append (Value);
    end Set_Miss_Damage;
 
    ----------------
@@ -229,6 +343,30 @@ package body Chaos.Powers.Configure is
    begin
       Power.Source := Power_Source_Expressions.To_Enum (Value);
    end Set_Source;
+
+   ----------------
+   -- Set_Target --
+   ----------------
+
+   procedure Set_Target
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression)
+   is
+   begin
+      Power.Target := Power_Target_Expressions.To_Enum (Value);
+   end Set_Target;
+
+   ---------------------
+   -- Set_Target_Size --
+   ---------------------
+
+   procedure Set_Target_Size
+     (Power : in out Chaos_Power_Record'Class;
+      Value : Chaos.Expressions.Chaos_Expression)
+   is
+   begin
+      Power.Target_Size := Chaos.Expressions.Numbers.To_Integer (Value);
+   end Set_Target_Size;
 
    -------------
    -- Set_Use --

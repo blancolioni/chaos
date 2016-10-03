@@ -50,7 +50,7 @@ package body Chaos.Parser is
    function At_Expression return Boolean
    is (Tok = Tok_Left_Paren or else Tok = Tok_Left_Brace
        or else Tok = Tok_Left_Bracket or else Tok = Tok_Identifier
-       or else Tok = Tok_Lambda);
+       or else Tok = Tok_Lambda or else Tok = Tok_If);
 
    function At_Operator return Boolean is
      (Tok <= +(Tok_Asterisk, Tok_Forward_Slash, Tok_Plus, Tok_Minus,

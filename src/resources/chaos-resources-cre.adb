@@ -105,7 +105,7 @@ package body Chaos.Resources.Cre is
       Cre.Get (Cre.Effect_Count);
       Cre.Get (Cre.Dialog_Ref);
 
-      if True then
+      if False then
          Chaos.Logging.Log
            ("CRE",
             Chaos.Localisation.Indexed_Text

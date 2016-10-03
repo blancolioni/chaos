@@ -2,6 +2,7 @@ private with Ada.Strings.Unbounded;
 
 private with Memor;
 
+with Chaos.Coins;
 with Chaos.Abilities;
 with Chaos.Defences;
 with Chaos.Levels;
@@ -15,10 +16,18 @@ with Chaos.Alignment;
 with Chaos.Teams;
 with Chaos.Vision;
 
+with Chaos.Equipment;
+with Chaos.Items.Weapons;
+with Chaos.Things;
+
 with Chaos.Powers;
 with Chaos.Dialog;
 
 package Chaos.Creatures is
+
+   Max_Inventory_Items : constant := 40;
+   type Inventory_Count is range 0 .. Max_Inventory_Items;
+   subtype Inventory_Index is Inventory_Count range 1 .. Inventory_Count'Last;
 
    type Chaos_Creature_Record is
      new Chaos.Objects.Root_Localised_Object_Record
@@ -101,6 +110,34 @@ package Chaos.Creatures is
      with Pre => Creature.Individual,
      Post => Creature.Current_Hit_Points = Hit_Points;
 
+   function Active_Weapon_Slot
+     (Creature : Chaos_Creature_Record'Class)
+      return Chaos.Equipment.Chaos_Equipment_Slot;
+
+   procedure Set_Active_Weapon_Slot
+     (Creature : in out Chaos_Creature_Record'Class;
+      Slot     : Chaos.Equipment.Weapon_Slot);
+
+   function Active_Weapon
+     (Creature : Chaos_Creature_Record'Class)
+      return Chaos.Items.Weapons.Chaos_Weapon;
+
+   procedure Set_Equipment
+     (Creature : in out Chaos_Creature_Record'Class;
+      Slot     : Chaos.Equipment.Chaos_Equipment_Slot;
+      Thing    : Chaos.Things.Chaos_Thing)
+     with Pre => Thing.Equipment_Slot_OK (Slot);
+
+   procedure Set_Inventory
+     (Creature : in out Chaos_Creature_Record'Class;
+      Index    : Inventory_Index;
+      Thing    : Chaos.Things.Chaos_Thing);
+
+   function Inventory
+     (Creature : in out Chaos_Creature_Record'Class;
+      Index    : Inventory_Index)
+      return Chaos.Things.Chaos_Thing;
+
    function Has_Dialog
      (Creature : Chaos_Creature_Record'Class)
       return Boolean;
@@ -138,6 +175,12 @@ private
    type Creature_Color_Map is
      array (Creature_Color_Part) of Natural;
 
+   type Creature_Equipment is
+     array (Chaos.Equipment.Chaos_Equipment_Slot) of Chaos.Things.Chaos_Thing;
+
+   type Inventory_Item_Array is
+     array (Inventory_Index) of Chaos.Things.Chaos_Thing;
+
    type Chaos_Creature_Record is
      new Chaos.Objects.Root_Localised_Object_Record
      and Chaos.Abilities.Ability_Interface
@@ -148,21 +191,26 @@ private
      and Chaos.Vision.Chaos_Vision_Interface
      and Chaos.Powers.Powered_Interface with
       record
-         Individual   : Boolean;
-         Alive        : Boolean;
-         Short_Name   : Ada.Strings.Unbounded.Unbounded_String;
-         Long_Name    : Ada.Strings.Unbounded.Unbounded_String;
-         Race         : Chaos.Races.Chaos_Race;
-         Class        : Chaos.Classes.Chaos_Class;
-         Abilities    : Chaos.Abilities.Ability_Scores;
-         Level        : Chaos.Levels.Chaos_Level;
-         HP           : Natural;
-         Powers       : Chaos.Powers.Power_Collection;
-         Alignment    : Chaos.Alignment.Chaos_Alignment;
-         Team         : Chaos.Teams.Chaos_Team;
-         Dialog       : Chaos.Dialog.Chaos_Dialog;
-         Animation_Id : Natural := 0;
-         Color_Map    : Creature_Color_Map;
+         Individual    : Boolean;
+         Alive         : Boolean;
+         Short_Name    : Ada.Strings.Unbounded.Unbounded_String;
+         Long_Name     : Ada.Strings.Unbounded.Unbounded_String;
+         Race          : Chaos.Races.Chaos_Race;
+         Class         : Chaos.Classes.Chaos_Class;
+         Abilities     : Chaos.Abilities.Ability_Scores;
+         Level         : Chaos.Levels.Chaos_Level;
+         HP            : Natural;
+         Powers        : Chaos.Powers.Power_Collection;
+         Alignment     : Chaos.Alignment.Chaos_Alignment;
+         Team          : Chaos.Teams.Chaos_Team;
+         Dialog        : Chaos.Dialog.Chaos_Dialog;
+         Animation_Id  : Natural := 0;
+         Color_Map     : Creature_Color_Map;
+         Cash          : Chaos.Coins.Coins_Type;
+         Equipment     : Creature_Equipment := (others => null);
+         Inventory     : Inventory_Item_Array := (others => null);
+         Active_Weapon : Chaos.Equipment.Weapon_Slot :=
+                           Chaos.Equipment.Weapon_1;
       end record;
 
    overriding function Object_Database

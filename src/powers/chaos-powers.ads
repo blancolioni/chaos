@@ -22,6 +22,8 @@ package Chaos.Powers is
    type Power_Attack_Target is (One_Creature,
                                 Blast, Burst, Wall);
 
+   type Power_Implement is (None, Weapon, Arcane);
+
    type Power_Damage_Type is
      (Normal,
       Acid, Cold, Fire, Force, Lightning,
@@ -99,14 +101,10 @@ package Chaos.Powers is
 
 private
 
-   type Power_Effect is
-      record
-         Condition : Chaos.Expressions.Chaos_Expression;
-         Effect    : Chaos.Expressions.Chaos_Expression;
-      end record;
-
    package Power_Effect_Vectors is
-     new Ada.Containers.Vectors (Positive, Power_Effect);
+     new Ada.Containers.Vectors
+       (Positive, Chaos.Expressions.Chaos_Expression,
+        Chaos.Expressions."=");
 
    type Chaos_Power_Record is
      new Chaos.Objects.Root_Localised_Object_Record with
@@ -114,8 +112,10 @@ private
          Class       : Power_Class;
          Source      : Power_Source;
          Use_Class   : Power_Use_Class;
+         Implement   : Power_Implement;
          Action      : Chaos.Actions.Chaos_Action;
          Target      : Power_Attack_Target;
+         Target_Size : Natural := 1;
          Short_Range : Natural := 1;
          Long_Range  : Natural := 1;
          Attack      : Chaos.Expressions.Chaos_Expression;

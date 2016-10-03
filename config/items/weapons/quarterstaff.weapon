@@ -1,0 +1,8 @@
+ identity: quarterstaff
+ category: simple-melee
+ proficiency: 2
+ damage: 1d8
+ price: 5gp
+ weight: 4
+ group: staff
+ two-handed: yes

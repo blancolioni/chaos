@@ -38,7 +38,14 @@ package body Chaos.Creatures.Quick is
          Creature.Team := Chaos.Teams.Get ("pc");
          Creature.Color_Map :=
            (Metal => 25, Minor => 41, Major => 47,
-            Skin => 12, Leather => 91, Armour => 25, Hair => 91);
+            Skin  => 12, Leather => 91, Armour => 25, Hair => 91);
+         Creature.Cash := Chaos.Coins.GP (100);
+         Creature.Set_Equipment
+           (Chaos.Equipment.Weapon_1,
+            Chaos.Things.Create
+              (Chaos.Items.Weapons.Get ("quarterstaff")));
+
+         Creature.Set_Active_Weapon_Slot (Chaos.Equipment.Weapon_1);
       end Create;
 
    begin

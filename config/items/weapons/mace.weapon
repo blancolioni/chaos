@@ -1,0 +1,9 @@
+ identity: mace
+ category: simple-melee
+ proficiency: 2
+ damage: 1d8
+ price: 5gp
+ weight: 6
+ group: mace
+ properties: versatile
+ 

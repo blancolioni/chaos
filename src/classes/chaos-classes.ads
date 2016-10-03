@@ -82,6 +82,7 @@ private
          Power_Source     : Class_Power_Source;
          Base_Hit_Points  : Natural;
          Level_Hit_Points : Natural;
+         Healing_Surges   : Natural;
          Powers           : Chaos.Powers.Power_Collection;
       end record;
 

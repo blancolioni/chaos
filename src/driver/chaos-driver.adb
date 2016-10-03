@@ -97,7 +97,7 @@ begin
                             Chaos.Creatures.Quick.Quick_Creature
                               ("Aramael",
                                Chaos.Races.Get ("elf"),
-                               Chaos.Classes.Get ("wizard"));
+                               Chaos.Classes.Get ("fighter"));
             Area        : constant Chaos.Areas.Chaos_Area :=
                             Chaos.Areas.Import.Import_Area
                               (Chaos.Infinity_Engine.Start_Area);

@@ -1,4 +1,5 @@
 with Chaos.Classes.Configure;
+with Chaos.Items.Weapons.Configure;
 with Chaos.Powers.Configure;
 with Chaos.Races.Configure;
 with Chaos.Teams.Configure;
@@ -12,6 +13,7 @@ package body Chaos.Configuration is
    procedure Read_Configuration is
    begin
       Chaos.Teams.Configure.Read_Config;
+      Chaos.Items.Weapons.Configure.Read_Config;
       Chaos.Powers.Configure.Read_Config;
       Chaos.Races.Configure.Read_Config;
       Chaos.Classes.Configure.Read_Config;
