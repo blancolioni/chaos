@@ -240,6 +240,15 @@ package body Chaos.Xi_UI.Areas is
                             & Pixel_Loc.X'Img & Pixel_Loc.Y'Img);
 
          declare
+            Check : constant Chaos.Locations.Square_Location :=
+                      Model.Area.To_Square (Pixel_Loc);
+         begin
+            Chaos.Logging.Log ("XI",
+                               "check square location:"
+                               & Check.X'Img & Check.Y'Img);
+         end;
+
+         declare
             Camera_X : constant Xi_Float :=
                          Xi_Float (Pixel_Loc.X
                                    - Model.Area.Pixels_Across / 2);
@@ -380,16 +389,24 @@ package body Chaos.Xi_UI.Areas is
 --                (World_Position (1 .. 3));
 --           end;
          declare
+            Area : constant Chaos.Areas.Chaos_Area := Listener.Model.Area;
             X : constant Xi_Float :=
                   (Listener.Mouse_X - Event.Render_Target.Width / 2.0)
                   + Listener.Model.Centre_X;
             Y : constant Xi_Float :=
                   (Listener.Mouse_Y - Event.Render_Target.Height / 2.0)
                   + Listener.Model.Centre_Y;
+            Square : constant Chaos.Locations.Square_Location :=
+                       Area.To_Square
+                         ((Integer (X) + Area.Pixels_Across / 2,
+                          Integer (Y) + Area.Pixels_Down / 2));
+            Pixel  : constant Chaos.Locations.Pixel_Location :=
+                       Listener.Model.Area.To_Pixels (Square);
          begin
-            if False then
-               Listener.Model.Highlight.Set_Position (X, Y, 1.0);
-            end if;
+            Listener.Model.Highlight.Set_Position
+              (Xi_Float (Pixel.X - Listener.Model.Area.Pixels_Across / 2),
+               Xi_Float (Pixel.Y - Listener.Model.Area.Pixels_Down / 2),
+               1.0);
          end;
 
       end if;

@@ -157,15 +157,17 @@ private
      new Chaos.Objects.Root_Chaos_Object_Record
      and Chaos.Commands.Command_Environment_Interface with
       record
-         Pixel_Width  : Natural;
-         Pixel_Height : Natural;
-         Squares      : Square_Vectors.Vector;
-         Tiles        : Tileset_Map_Entry_Vectors.Vector;
-         Actors       : Actor_Vectors.Vector;
-         Visibility   : Chaos.Vision.Chaos_Vision;
-         Script       : Chaos.Expressions.Chaos_Expression;
-         Environment  : Chaos.Expressions.Chaos_Environment;
-         Images       : Chaos.Images.Chaos_Image_Container;
+         Pixel_Width    : Natural;
+         Pixel_Height   : Natural;
+         Squares_Across : Natural;
+         Squares_Down   : Natural;
+         Squares        : Square_Vectors.Vector;
+         Tiles          : Tileset_Map_Entry_Vectors.Vector;
+         Actors         : Actor_Vectors.Vector;
+         Visibility     : Chaos.Vision.Chaos_Vision;
+         Script         : Chaos.Expressions.Chaos_Expression;
+         Environment    : Chaos.Expressions.Chaos_Environment;
+         Images         : Chaos.Images.Chaos_Image_Container;
       end record;
 
    overriding function Object_Database

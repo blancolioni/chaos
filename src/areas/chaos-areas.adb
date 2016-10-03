@@ -1,3 +1,5 @@
+with Ada.Numerics.Elementary_Functions;
+
 with Chaos.Areas.Db;
 
 package body Chaos.Areas is
@@ -75,10 +77,17 @@ package body Chaos.Areas is
       Identity                  : String;
       Pixel_Width, Pixel_Height : Natural)
    is
+      use Ada.Numerics.Elementary_Functions;
+      Diagonal : constant Float :=
+                   Sqrt (Float (Pixel_Width / Pixels_Per_Square) ** 2
+                         + Float (Pixel_Height / Pixels_Per_Square) ** 2);
    begin
       Area.Initialize (Identity);
       Area.Pixel_Width := Pixel_Width;
       Area.Pixel_Height := Pixel_Height;
+      Area.Squares_Across := Natural (Diagonal + 1.0);
+      Area.Squares_Down := Natural (Diagonal + 1.0);
+
       for Y in 1 .. Area.Squares_Down loop
          for X in 1 .. Area.Squares_Across loop
             Area.Squares.Append ((null, True, True));
@@ -278,7 +287,7 @@ package body Chaos.Areas is
 
    function Squares_Across (Area : Chaos_Area_Record'Class) return Natural is
    begin
-      return Area.Pixel_Width / Pixels_Per_Square;
+      return Area.Squares_Across;
    end Squares_Across;
 
    ------------------
@@ -287,7 +296,7 @@ package body Chaos.Areas is
 
    function Squares_Down (Area : Chaos_Area_Record'Class) return Natural is
    begin
-      return Area.Pixel_Height / Pixels_Per_Square;
+      return Area.Squares_Down;
    end Squares_Down;
 
    ----------------
@@ -332,12 +341,24 @@ package body Chaos.Areas is
       Square_Location : Chaos.Locations.Square_Location)
       return Chaos.Locations.Pixel_Location
    is
-      pragma Unreferenced (Area);
+      use Ada.Numerics.Elementary_Functions;
+      Root_2  : constant Float := Sqrt (2.0) / 2.0;
+      Square_X : constant Float :=
+                   Float (Square_Location.X - Area.Squares_Across / 2);
+      Square_Y : constant Float :=
+                   Float (Square_Location.Y - Area.Squares_Down / 2);
+      Rot_X    : constant Float :=
+                   Square_X * Root_2 + Square_Y * Root_2;
+      Rot_Y    : constant Float :=
+                   Square_Y * Root_2 - Square_X * Root_2;
+      Pixel_X  : constant Natural :=
+                   Integer (Rot_X * Float (Pixels_Per_Square))
+                   + Area.Pixel_Width / 2;
+      Pixel_Y  : constant Natural :=
+                   Integer (Rot_Y * Float (Pixels_Per_Square))
+                   + Area.Pixel_Height / 2;
    begin
-      return ((Square_Location.X - 1) * Pixels_Per_Square
-              + 1 + Pixels_Per_Square / 2,
-              (Square_Location.Y - 1) * Pixels_Per_Square
-              + 1 + Pixels_Per_Square / 2);
+      return (Pixel_X, Pixel_Y);
    end To_Pixels;
 
    ---------------
@@ -349,10 +370,26 @@ package body Chaos.Areas is
       Pixel_Location : Chaos.Locations.Pixel_Location)
       return Chaos.Locations.Square_Location
    is
-      pragma Unreferenced (Area);
+      use Ada.Numerics.Elementary_Functions;
+      Root_2  : constant Float := Sqrt (2.0) / 2.0;
+      Pixel_X : constant Float :=
+                  Float (Pixel_Location.X - Area.Pixels_Across / 2);
+      Pixel_Y : constant Float :=
+                  Float (Pixel_Location.Y - Area.Pixels_Down / 2);
+      Rot_X   : constant Float :=
+                  Pixel_X * Root_2 - Pixel_Y * Root_2;
+      Rot_Y   : constant Float :=
+                  Pixel_Y * Root_2 + Pixel_X * Root_2;
+      Square_X : constant Natural :=
+                   (Integer (Rot_X))
+                   / Pixels_Per_Square
+                     + Area.Squares_Across / 2;
+      Square_Y : constant Natural :=
+                   (Integer (Rot_Y))
+                   / Pixels_Per_Square
+                     + Area.Squares_Down / 2;
    begin
-      return ((Pixel_Location.X + Pixels_Per_Square / 2) / Pixels_Per_Square,
-              (Pixel_Location.Y + Pixels_Per_Square / 2) / Pixels_Per_Square);
+      return (Square_X, Square_Y);
    end To_Square;
 
    ---------------------
