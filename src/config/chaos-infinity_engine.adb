@@ -1,3 +1,6 @@
+with Ada.IO_Exceptions;
+with Ada.Text_IO;
+
 with Tropos.Reader;
 with Chaos.Paths;
 
@@ -39,7 +42,14 @@ package body Chaos.Infinity_Engine is
    begin
       Infinity_Config :=
         Tropos.Reader.Read_Config
-          (Chaos.Paths.Config_File ("infinity.txt"));
+          (Chaos.Paths.Config_File ("infinity/infinity.txt"));
+   exception
+      when Ada.IO_Exceptions.Status_Error =>
+         Ada.Text_IO.Put_Line
+           (Ada.Text_IO.Standard_Error,
+            "Cannot find infinity engine config in "
+            & Chaos.Paths.Config_File ("infinity/infinity.txt"));
+            raise;
    end Read_Infinity_Config;
 
    ----------------
