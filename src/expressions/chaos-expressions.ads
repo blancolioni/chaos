@@ -48,6 +48,11 @@ package Chaos.Expressions is
       Environment : Chaos_Environment)
       return Chaos_Expression;
 
+   function Apply
+     (Expression : Chaos_Expression;
+      Argument   : Chaos_Expression)
+      return Chaos_Expression;
+
    procedure Execute
      (Expression  : Chaos_Expression);
 
@@ -202,6 +207,33 @@ private
       Environment : Chaos_Environment)
       return Chaos_Expression
    is (Chaos_Expression (Expression_Handles.Create (Expression)));
+
+   type Application_Expression is
+     new Root_Chaos_Expression_Record with
+      record
+         Fun : Chaos_Expression;
+         Arg : Chaos_Expression;
+      end record;
+
+   overriding function Evaluate
+     (Expression  : Application_Expression;
+      Environment : Chaos_Environment)
+      return Chaos_Expression;
+
+   overriding function To_Boolean
+     (Expression  : Application_Expression)
+      return Boolean
+   is (True);
+
+   overriding function Apply
+     (Expression  : Application_Expression;
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
+      return Chaos_Expression;
+
+   overriding function To_String
+     (Expression  : Application_Expression)
+      return String;
 
    Standard_Env : Chaos_Environment;
 

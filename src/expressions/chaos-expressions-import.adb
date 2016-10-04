@@ -4,7 +4,6 @@ with Ada.Text_IO;
 with WL.Binary_IO;                     use WL.Binary_IO;
 
 with Chaos.Expressions.Conditional;
-with Chaos.Expressions.Functions;
 with Chaos.Expressions.Identifiers;
 with Chaos.Expressions.Numbers;
 with Chaos.Expressions.Sequences;
@@ -162,8 +161,8 @@ package body Chaos.Expressions.Import is
                First := False;
             else
                Result :=
-                 Chaos.Expressions.Functions.Apply
-                   (Chaos.Expressions.Functions.Apply
+                 Chaos.Expressions.Apply
+                   (Chaos.Expressions.Apply
                       (Chaos.Expressions.Identifiers.To_Expression ("and"),
                        Result),
                     TR);
@@ -301,7 +300,7 @@ package body Chaos.Expressions.Import is
                Chaos.Expressions.Vectors.Append
                  (Args, Responses (I));
             end loop;
-            return Chaos.Expressions.Functions.Apply
+            return Chaos.Expressions.Apply
               (Result, Args);
          end;
       end if;

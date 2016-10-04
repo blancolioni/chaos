@@ -1,3 +1,5 @@
+--  with Ada.Text_IO;
+
 package body Chaos.Expressions is
 
    type Primitive_Constant_Expression is
@@ -39,6 +41,37 @@ package body Chaos.Expressions is
       end if;
       return Local_Always_Value;
    end Always;
+
+   -----------
+   -- Apply --
+   -----------
+
+   overriding function Apply
+     (Expression  : Application_Expression;
+      Argument    : Chaos_Expression;
+      Environment : Chaos_Environment)
+      return Chaos_Expression
+   is
+      pragma Unreferenced (Environment);
+   begin
+      return Apply (Create (Expression), Argument);
+   end Apply;
+
+   -----------
+   -- Apply --
+   -----------
+
+   function Apply
+     (Expression : Chaos_Expression;
+      Argument   : Chaos_Expression)
+      return Chaos_Expression
+   is
+      Rec : Application_Expression;
+   begin
+      Rec.Fun := Expression;
+      Rec.Arg := Argument;
+      return Create (Rec);
+   end Apply;
 
    --------------
    -- Contains --
@@ -100,6 +133,23 @@ package body Chaos.Expressions is
    begin
       return Find (Get (Evaluate (Expression, Environment)).Local_Environment,
                    Name);
+   end Evaluate;
+
+   --------------
+   -- Evaluate --
+   --------------
+
+   overriding function Evaluate
+     (Expression  : Application_Expression;
+      Environment : Chaos_Environment)
+      return Chaos_Expression
+   is
+      Fun : constant Chaos_Expression :=
+              Evaluate (Expression.Fun, Environment);
+      Arg : constant Chaos_Expression :=
+              Evaluate (Expression.Arg, Environment);
+   begin
+      return Get (Fun).Apply (Arg, Environment);
    end Evaluate;
 
    -------------
@@ -344,7 +394,8 @@ package body Chaos.Expressions is
       Env        : constant Chaos_Environment :=
                      Expr_Class.Local_Environment;
    begin
-      return Evaluate (Create (Expr_Class), "to_integer", Env);
+      return Evaluate
+        (Apply (Find (Env, "to_integer"), Create (Expr_Class)));
    end To_Integer;
 
    ---------------
@@ -360,6 +411,24 @@ package body Chaos.Expressions is
          return "null";
       else
          return Get (Expression).To_String;
+      end if;
+   end To_String;
+
+   ---------------
+   -- To_String --
+   ---------------
+
+   overriding function To_String
+     (Expression  : Application_Expression)
+      return String
+   is
+      Left  : constant String := To_String (Expression.Fun);
+      Right : constant String := To_String (Expression.Arg);
+   begin
+      if Get (Expression.Arg) in Application_Expression'Class then
+         return Left & " (" & Right & ")";
+      else
+         return Left & " " & Right;
       end if;
    end To_String;
 

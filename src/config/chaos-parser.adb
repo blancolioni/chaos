@@ -396,7 +396,7 @@ package body Chaos.Parser is
       E : Chaos.Expressions.Chaos_Expression := Parse_Atomic_Expression;
    begin
       while Tok_Indent > Indent and then At_Expression loop
-         E := Chaos.Expressions.Functions.Apply (E, Parse_Atomic_Expression);
+         E := Chaos.Expressions.Apply (E, Parse_Atomic_Expression);
       end loop;
       return E;
    end Parse_Function_Call_Expression;
@@ -468,8 +468,8 @@ package body Chaos.Parser is
                    (Result, Right, Chaos.Expressions.Null_Value);
             else
                Result :=
-                 Chaos.Expressions.Functions.Apply
-                   (Chaos.Expressions.Functions.Apply
+                 Chaos.Expressions.Apply
+                   (Chaos.Expressions.Apply
                       (Chaos.Expressions.Identifiers.To_Expression (Name),
                        Result),
                     Right);
