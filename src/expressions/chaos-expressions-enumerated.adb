@@ -12,6 +12,23 @@ package body Chaos.Expressions.Enumerated is
      (Expression  : Enum_Expression_Record)
       return String;
 
+   ------------------------
+   -- Add_To_Environment --
+   ------------------------
+
+   procedure Add_To_Environment
+     (Target : in out Chaos_Environment)
+   is
+   begin
+      for Value in Enum loop
+         declare
+            E : constant Chaos_Expression := To_Expression (Value);
+         begin
+            Insert (Target, To_String (E), E);
+         end;
+      end loop;
+   end Add_To_Environment;
+
    -------------
    -- Is_Enum --
    -------------
