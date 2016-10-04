@@ -1,7 +1,5 @@
 with Ada.Characters.Handling;
 
-with WL.String_Maps;
-
 with Chaos.Localisation;
 with Chaos.Logging;
 
@@ -10,12 +8,6 @@ with Chaos.Expressions.Environments;
 with Chaos.Expressions.Text;
 
 package body Chaos.Objects is
-
-   package Method_Table_Maps is
-     new WL.String_Maps (Chaos.Expressions.Chaos_Environment,
-                         Chaos.Expressions."=");
-
-   Method_Tables : Method_Table_Maps.Map;
 
    function To_String
      (Object : Chaos_Object)
@@ -31,14 +23,6 @@ package body Chaos.Objects is
        (Class_Data_Type => Chaos_Object,
         To_String       => To_String,
         Get_Environment => Get_Environment);
-
-   function Method_Get_Identifier
-     (Environment : Chaos.Expressions.Chaos_Environment;
-      Arguments   : Chaos.Expressions.Array_Of_Expressions)
-      return Chaos.Expressions.Chaos_Expression
-   is (Chaos.Expressions.Text.To_Expression
-       (Chaos_Object_Expressions.To_Class
-        (Arguments (Arguments'First)).Identifier));
 
    ----------------
    -- Add_Method --
@@ -75,8 +59,9 @@ package body Chaos.Objects is
       Table  : in out Chaos.Expressions.Chaos_Environment)
    is
    begin
-      Object.Add_Method (Table, "identifier", 0,
-                         Method_Get_Identifier'Access);
+      Chaos.Expressions.Insert
+        (Table, "identifier",
+         Chaos.Expressions.Text.To_Expression (Object.Identifier));
    end Create_Method_Table;
 
    ------------------
@@ -100,19 +85,11 @@ package body Chaos.Objects is
      (Object : Chaos_Object)
       return Chaos.Expressions.Chaos_Environment
    is
-      Key : constant String :=
-              Object.Object_Database.Database_Class_Name;
+      Env : Chaos.Expressions.Chaos_Environment :=
+              Chaos.Expressions.Environments.New_Environment;
    begin
-      if not Method_Tables.Contains (Key) then
-         declare
-            Env : Chaos.Expressions.Chaos_Environment :=
-                    Chaos.Expressions.Environments.New_Environment;
-         begin
-            Object.Create_Method_Table (Env);
-            Method_Tables.Insert (Key, Env);
-         end;
-      end if;
-      return Method_Tables.Element (Key);
+      Object.Create_Method_Table (Env);
+      return Env;
    end Get_Environment;
 
    ----------------
