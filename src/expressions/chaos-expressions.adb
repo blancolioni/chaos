@@ -261,6 +261,23 @@ package body Chaos.Expressions is
       Env.Tables.Delete_First;
    end Pop_Table;
 
+   --------------------------
+   -- Prepend_Environmenet --
+   --------------------------
+
+   function Prepend_Environmenet
+     (Head, Tail : Chaos_Environment)
+      return Chaos_Environment
+   is
+   begin
+      return Result : Chaos_Environment := Tail do
+         for Tbl of Head.Tables loop
+            Result.Tables.Insert
+              (Result.Tables.First, Tbl);
+         end loop;
+      end return;
+   end Prepend_Environmenet;
+
    ----------------
    -- Push_Table --
    ----------------

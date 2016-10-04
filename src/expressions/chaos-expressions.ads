@@ -11,6 +11,10 @@ package Chaos.Expressions is
      (Base : Chaos_Environment)
       return Chaos_Environment;
 
+   function Prepend_Environmenet
+     (Head, Tail : Chaos_Environment)
+      return Chaos_Environment;
+
    type Chaos_Expression is private;
 
    type Array_Of_Expressions is

@@ -84,6 +84,19 @@ package body Chaos.Actors is
       return Result;
    end Create_Actor;
 
+   -------------------------
+   -- Create_Method_Table --
+   -------------------------
+
+   overriding procedure Create_Method_Table
+     (Actor  : Chaos_Actor_Record;
+      Table  : in out Chaos.Expressions.Chaos_Environment)
+   is
+   begin
+      Actor.Creature.Insert_Abilities (Table);
+      Actor.Creature.Insert_Defences (Table);
+   end Create_Method_Table;
+
    --------------
    -- Creature --
    --------------

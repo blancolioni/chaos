@@ -140,6 +140,18 @@ package body Chaos.Objects is
         Ada.Strings.Unbounded.To_Unbounded_String (Identity);
    end Initialize;
 
+   -----------------------
+   -- Local_Environment --
+   -----------------------
+
+   function Local_Environment
+     (Object : access constant Root_Chaos_Object_Record'Class)
+      return Chaos.Expressions.Chaos_Environment
+   is
+   begin
+      return Get_Environment (Chaos_Object (Object));
+   end Local_Environment;
+
    ---------
    -- Log --
    ---------

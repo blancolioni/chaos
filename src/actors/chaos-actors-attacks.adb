@@ -1,6 +1,8 @@
 with Chaos.Abilities;
 with Chaos.Defences;
 
+with Chaos.Powers.Attacks;
+
 with Chaos.Dice;
 
 with Chaos.UI.Logging;
@@ -85,8 +87,12 @@ package body Chaos.Actors.Attacks is
       Power         : Chaos.Powers.Chaos_Power)
    is
    begin
-      Chaos.Actors.Db.Update (Attacker.Reference, Use_Standard_Action'Access);
-      Power.Attack (Attacker, Defender);
+--    Chaos.Actors.Db.Update (Attacker.Reference, Use_Standard_Action'Access);
+
+      Chaos.Powers.Attacks.Attack
+        (Attacker, Defender, Power);
+
+--        Power.Attack (Attacker, Defender);
 
 --
 --        Use_Standard_Action (Attacker);

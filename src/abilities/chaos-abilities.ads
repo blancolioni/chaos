@@ -1,3 +1,5 @@
+with Chaos.Expressions;
+
 package Chaos.Abilities is
 
    type Ability is (Str, Con, Dex, Int, Wis, Cha);
@@ -26,5 +28,9 @@ package Chaos.Abilities is
       Item : Ability)
       return Ability_Bonus_Range
    is (Ability_Bonus_Range (Integer (Able.Ability_Score (Item)) / 2 - 5));
+
+   procedure Insert_Abilities
+     (Able : Ability_Interface'Class;
+      Env  : in out Chaos.Expressions.Chaos_Environment);
 
 end Chaos.Abilities;
