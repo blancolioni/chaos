@@ -2,6 +2,8 @@ private with Ada.Containers.Vectors;
 
 private with Memor;
 
+private with Chaos.Expressions.Enumerated;
+
 limited with Chaos.Actors;
 
 with Chaos.Expressions;
@@ -135,5 +137,30 @@ private
       record
          Powers : Power_Vectors.Vector;
       end record;
+
+   package Power_Source_Expressions is
+     new Chaos.Expressions.Enumerated (Power_Source);
+
+   package Power_Use_Expressions is
+     new Chaos.Expressions.Enumerated (Power_Use_Class);
+
+   package Power_Target_Expressions is
+     new Chaos.Expressions.Enumerated (Power_Attack_Target);
+
+   package Power_Implement_Expressions is
+     new Chaos.Expressions.Enumerated (Power_Implement);
+
+   package Power_Damage_Type_Expressions is
+     new Chaos.Expressions.Enumerated (Power_Damage_Type);
+
+   function Is_Power_Damage_Type
+     (E : Chaos.Expressions.Chaos_Expression)
+      return Boolean
+   is (Power_Damage_Type_Expressions.Is_Enum (E));
+
+   function Get_Power_Damage_Type
+     (E : Chaos.Expressions.Chaos_Expression)
+      return Power_Damage_Type
+   is (Power_Damage_Type_Expressions.To_Enum (E));
 
 end Chaos.Powers;

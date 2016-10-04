@@ -9,24 +9,12 @@ with Chaos.Powers.Db;
 
 with Chaos.Actions;
 
-with Chaos.Expressions.Enumerated;
+with Chaos.Expressions.Environments;
 with Chaos.Expressions.Maps;
 with Chaos.Expressions.Numbers;
 with Chaos.Expressions.Vectors;
 
 package body Chaos.Powers.Configure is
-
-   package Power_Source_Expressions is
-     new Chaos.Expressions.Enumerated (Power_Source);
-
-   package Power_Use_Expressions is
-     new Chaos.Expressions.Enumerated (Power_Use_Class);
-
-   package Power_Target_Expressions is
-     new Chaos.Expressions.Enumerated (Power_Attack_Target);
-
-   package Power_Implement_Expressions is
-     new Chaos.Expressions.Enumerated (Power_Implement);
 
    type Configure_Power_Handler is access
      procedure (Power : in out Chaos_Power_Record'Class;
@@ -150,6 +138,9 @@ package body Chaos.Powers.Configure is
    procedure Read_Config is
 
    begin
+      Chaos.Expressions.Environments.Add_Standard_Elaboration
+        (Power_Damage_Type_Expressions.Add_To_Environment'Access);
+
       Setting ("action", Set_Action'Access);
       Setting ("attack", Set_Attack'Access);
       Setting ("defence", Set_Defence'Access);
