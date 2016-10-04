@@ -1,0 +1,5 @@
+x-attacks-y-with-z = "{1} attacks {2} using {3}"
+attack-roll = "attack {1} vs defence {2}; roll = {3}"
+attack-miss = "miss"
+attack-hit = "Hit!"
+attack-critical = "CRITICAL HIT"

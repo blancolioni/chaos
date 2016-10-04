@@ -1,5 +1,6 @@
 with Chaos.Actors;
 with Chaos.Dice;
+with Chaos.Localisation;
 
 with Chaos.Expressions.Environments;
 with Chaos.Expressions.Numbers;
@@ -45,21 +46,30 @@ package body Chaos.Powers.Attacks is
              (Power.Defence, Defender.Local_Environment));
 
       declare
+         use Chaos.Localisation;
          Hit : constant Boolean := Attack_Value + Roll >= Defence_Value;
          Critical : constant Boolean := Roll = 20
            and then Attack_Value + 20 > Defence_Value;
       begin
          Chaos.UI.Current_UI.Display_Text
-           (Actor.Short_Name & " attacls " & Defender.Short_Name
-            & " using " & Power.Display_Name
-            & ": attack" & Attack_Value'Img & " vs defence"
-            & Defence_Value'Img & "; roll =" & Roll'Img
+           (Local_Text
+              ("x-attacks-y-with-z",
+               Actor.Short_Name,
+               Defender.Short_Name,
+               Power.Display_Name)
             & ": "
-            & (if Critical
-              then "critical hit"
-              elsif Hit
-              then "hit"
-              else "miss"));
+            & Local_Text
+              ("attack-roll",
+               Attack_Value'Img,
+               Defence_Value'Img,
+               Roll'Img)
+              & ": "
+            & Local_Text
+              ((if Critical
+               then "attack-critical"
+               elsif Hit
+               then "attack-hit"
+               else "attack-miss")));
       end;
 
    end Attack;
