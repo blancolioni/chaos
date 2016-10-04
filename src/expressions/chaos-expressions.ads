@@ -8,10 +8,13 @@ package Chaos.Expressions is
    type Chaos_Environment is private;
 
    function New_Environment
+      return Chaos_Environment;
+
+   function New_Environment
      (Base : Chaos_Environment)
       return Chaos_Environment;
 
-   function Prepend_Environmenet
+   function Prepend_Environment
      (Head, Tail : Chaos_Environment)
       return Chaos_Environment;
 

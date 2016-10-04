@@ -33,4 +33,8 @@ package Chaos.Abilities is
      (Able : Ability_Interface'Class;
       Env  : in out Chaos.Expressions.Chaos_Environment);
 
+   function Ability_Modifiers
+     (Able : Ability_Interface'Class)
+      return Chaos.Expressions.Chaos_Environment;
+
 end Chaos.Abilities;

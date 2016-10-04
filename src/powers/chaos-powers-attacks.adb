@@ -19,7 +19,7 @@ package body Chaos.Powers.Attacks is
       Power     : Chaos.Powers.Chaos_Power)
    is
       Environment : Chaos.Expressions.Chaos_Environment :=
-                      Chaos.Expressions.Prepend_Environmenet
+                      Chaos.Expressions.Prepend_Environment
                         (Actor.Local_Environment,
                          Chaos.Expressions.Environments.Standard_Environment);
 
@@ -36,9 +36,16 @@ package body Chaos.Powers.Attacks is
       Chaos.Expressions.Insert
         (Environment, "power", Power.To_Expression);
 
-      Attack_Value :=
-        Chaos.Expressions.Numbers.To_Integer
-          (Chaos.Expressions.Evaluate (Power.Attack, Environment));
+      declare
+         Attack_Environment : constant Chaos.Expressions.Chaos_Environment :=
+                                Chaos.Expressions.Prepend_Environment
+                                  (Actor.Creature.Ability_Modifiers,
+                                   Environment);
+      begin
+         Attack_Value :=
+           Chaos.Expressions.Numbers.To_Integer
+             (Chaos.Expressions.Evaluate (Power.Attack, Attack_Environment));
+      end;
 
       Defence_Value :=
         Chaos.Expressions.Numbers.To_Integer

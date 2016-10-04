@@ -2,7 +2,7 @@ identity: basic-melee-attack
 action: standard
 source: martial
 implement: weapon
-attack: str-mod
+attack: str
 defence: ac
 use: at-will
 target: one-creature

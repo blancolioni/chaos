@@ -210,6 +210,19 @@ package body Chaos.Expressions is
    ---------------------
 
    function New_Environment
+     return Chaos_Environment
+   is
+   begin
+      return Environment : Chaos_Environment do
+         Push_Table (Environment);
+      end return;
+   end New_Environment;
+
+   ---------------------
+   -- New_Environment --
+   ---------------------
+
+   function New_Environment
      (Base : Chaos_Environment)
       return Chaos_Environment
    is
@@ -265,18 +278,18 @@ package body Chaos.Expressions is
    -- Prepend_Environmenet --
    --------------------------
 
-   function Prepend_Environmenet
+   function Prepend_Environment
      (Head, Tail : Chaos_Environment)
       return Chaos_Environment
    is
    begin
       return Result : Chaos_Environment := Tail do
-         for Tbl of Head.Tables loop
+         for Tbl of reverse Head.Tables loop
             Result.Tables.Insert
               (Result.Tables.First, Tbl);
          end loop;
       end return;
-   end Prepend_Environmenet;
+   end Prepend_Environment;
 
    ----------------
    -- Push_Table --

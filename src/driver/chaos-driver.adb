@@ -112,8 +112,11 @@ begin
                                   (98, 100),
                                   Chaos.Actors.North);
          begin
-            Chaos.Powers.Attacks.Attack
-              (Actor, Shank_Actor, Chaos.Powers.Get ("basic-melee-attack"));
+            for I in 1 .. 3 loop
+               Chaos.Powers.Attacks.Attack
+                 (Actor, Shank_Actor,
+                  Chaos.Powers.Get ("basic-melee-attack"));
+            end loop;
          end;
 
          UI.Stop;
