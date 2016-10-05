@@ -389,24 +389,35 @@ package body Chaos.Xi_UI.Areas is
 --                (World_Position (1 .. 3));
 --           end;
          declare
+            use type Chaos.Actors.Chaos_Actor;
             Area : constant Chaos.Areas.Chaos_Area := Listener.Model.Area;
             X : constant Xi_Float :=
                   (Listener.Mouse_X - Event.Render_Target.Width / 2.0)
-                  + Listener.Model.Centre_X;
+                  + Listener.Model.Centre_X
+                  + Xi_Float (Area.Pixels_Across / 2);
             Y : constant Xi_Float :=
-                  (Listener.Mouse_Y - Event.Render_Target.Height / 2.0)
-                  + Listener.Model.Centre_Y;
+                  Xi_Float (Area.Pixels_Down) -
+                  ((Listener.Mouse_Y - Event.Render_Target.Height / 2.0)
+                   + Listener.Model.Centre_Y
+                   + Xi_Float (Area.Pixels_Down / 2));
             Square : constant Chaos.Locations.Square_Location :=
                        Area.To_Square
-                         ((Integer (X) + Area.Pixels_Across / 2,
-                          Integer (Y) + Area.Pixels_Down / 2));
+                         ((Integer (X),
+                          Integer (Y)));
             Pixel  : constant Chaos.Locations.Pixel_Location :=
                        Listener.Model.Area.To_Pixels (Square);
+            Actor  : constant Chaos.Actors.Chaos_Actor :=
+                       Area.Actor (Square);
          begin
+
             Listener.Model.Highlight.Set_Position
               (Xi_Float (Pixel.X - Listener.Model.Area.Pixels_Across / 2),
-               Xi_Float (Pixel.Y - Listener.Model.Area.Pixels_Down / 2),
+               Xi_Float (Listener.Model.Area.Pixels_Down / 2 - Pixel.Y),
                1.0);
+
+            if Actor /= null then
+               Actor.Log (Actor.Long_Name);
+            end if;
          end;
 
       end if;
