@@ -6,5 +6,5 @@ attack: str
 defence: ac
 use: at-will
 target: one-creature
-hit-damage: weapon + str.bonus + (level > 20 => weapon)
-miss-damage: if weapon.two-handed then str.bonus else str.bonus / 2
+hit-damage: weapon + str-mod + (level > 20 => weapon)
+miss-damage: if weapon.two-handed then str-mod else str-mod / 2
