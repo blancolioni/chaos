@@ -1,4 +1,5 @@
 with Chaos.Creatures.Db;
+with Chaos.Creatures.Reports;
 
 with Chaos.Classes.Create;
 
@@ -48,8 +49,10 @@ package body Chaos.Creatures.Quick is
          Creature.Set_Active_Weapon_Slot (Chaos.Equipment.Weapon_1);
       end Create;
 
+      Creature : constant Chaos_Creature := Db.Create (Create'Access);
    begin
-      return Db.Create (Create'Access);
+      Chaos.Creatures.Reports.Report (Creature);
+      return Creature;
    end Quick_Creature;
 
 end Chaos.Creatures.Quick;
