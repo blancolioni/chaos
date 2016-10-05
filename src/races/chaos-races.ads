@@ -30,6 +30,11 @@ package Chaos.Races is
      (Race : Chaos_Race_Record)
       return Chaos.Vision.Chaos_Vision;
 
+   function Ability_Bonus
+     (Race    : Chaos_Race_Record;
+      Ability : Chaos.Abilities.Ability)
+      return Chaos.Abilities.Ability_Score_Change;
+
    type Chaos_Race is access constant Chaos_Race_Record'Class;
 
    function Get (Identifier : String) return Chaos_Race;

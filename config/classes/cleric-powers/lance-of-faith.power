@@ -1,0 +1,14 @@
+identity: lance-of-faith
+action: standard
+source: divine
+implement: divine
+attack: wis
+defence: refl
+use: at-will
+target: one-creature
+hit: { damage: [radiant, 1d8 + wis-mod + (level > 20 => 1d8)],
+       add-token: { target: visible-ally,
+                    ends: after-next-attack,
+                    attack-bonus: 2,
+                    attack-target: defender }
+     }

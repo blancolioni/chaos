@@ -4,6 +4,19 @@ with Chaos.Races.Db;
 
 package body Chaos.Races is
 
+   -------------------
+   -- Ability_Bonus --
+   -------------------
+
+   function Ability_Bonus
+     (Race    : Chaos_Race_Record;
+      Ability : Chaos.Abilities.Ability)
+      return Chaos.Abilities.Ability_Score_Change
+   is
+   begin
+      return Race.Abilities (Ability);
+   end Ability_Bonus;
+
    --------------------
    -- Animation_Code --
    --------------------

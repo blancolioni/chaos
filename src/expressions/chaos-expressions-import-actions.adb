@@ -1,4 +1,3 @@
-with Chaos.Expressions.Functions;
 with Chaos.Expressions.Identifiers;
 with Chaos.Expressions.Numbers;
 
@@ -31,7 +30,7 @@ package body Chaos.Expressions.Import.Actions is
    begin
       case Action_Id is
          when Display_String_Action =>
-            return Chaos.Expressions.Functions.Apply
+            return Chaos.Expressions.Apply
               (Chaos.Expressions.Identifiers.To_Expression ("display-string"),
                Chaos.Expressions.Numbers.To_Expression (Integer_1));
          when Increment_Chapter_Action =>

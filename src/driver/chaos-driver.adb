@@ -4,6 +4,7 @@ with Chaos.Actors;
 with Chaos.Areas.Import;
 with Chaos.Classes;
 with Chaos.Configuration;
+with Chaos.Creatures.Import;
 with Chaos.Creatures.Quick;
 with Chaos.Dice;
 with Chaos.Expressions;
@@ -13,6 +14,7 @@ with Chaos.Game;
 with Chaos.Localisation;
 with Chaos.Parser;
 with Chaos.Party;
+with Chaos.Powers.Attacks;
 with Chaos.Vision;
 
 --  with Chaos.Classes;
@@ -35,7 +37,7 @@ with Chaos.Paths;
 with Chaos.Infinity_Engine;
 
 procedure Chaos.Driver is
-   Test_Only : constant Boolean := False;
+   Test_Only : constant Boolean := True;
    Text_UI : constant Boolean := False;
 
    Expr : constant Chaos.Expressions.Chaos_Expression :=
@@ -79,10 +81,47 @@ begin
    Tlk.Load;
    Tlk.Close;
 
-   Ada.Text_IO.Put_Line
-     ("2000: " & Chaos.Localisation.Indexed_Text (2000));
+   if Test_Only then
+      declare
+         UI : constant Chaos.UI.Chaos_UI :=
+                Chaos.UI.Text_UI.Create;
+      begin
+         Chaos.UI.Set_Current_UI (UI);
 
-   if not Test_Only then
+         declare
+            Protagonist    : constant Chaos.Creatures.Chaos_Creature :=
+                               Chaos.Creatures.Quick.Quick_Creature
+                                 ("Aramael",
+                                  Chaos.Races.Get ("elf"),
+                                  Chaos.Classes.Get ("fighter"));
+            Area           : constant Chaos.Areas.Chaos_Area :=
+                               Chaos.Areas.Import.Import_Area
+                                 (Chaos.Infinity_Engine.Start_Area);
+            Actor          : constant Chaos.Actors.Chaos_Actor :=
+                               Chaos.Actors.Create_Actor
+                                 (Protagonist, Area,
+                                  Area.To_Square
+                                    (Chaos.Infinity_Engine.Start_Location),
+                                  Chaos.Actors.South);
+            Shank_Creature : constant Chaos.Creatures.Chaos_Creature :=
+                               Chaos.Creatures.Import.Import_Creature
+                                 ("SHANK");
+            Shank_Actor    : constant Chaos.Actors.Chaos_Actor :=
+                               Chaos.Actors.Create_Actor
+                                 (Shank_Creature, Area,
+                                  (98, 100),
+                                  Chaos.Actors.North);
+         begin
+            for I in 1 .. 3 loop
+               Chaos.Powers.Attacks.Attack
+                 (Actor, Shank_Actor,
+                  Chaos.Powers.Get ("basic-melee-attack"));
+            end loop;
+         end;
+
+         UI.Stop;
+      end;
+   else
       declare
          UI : constant Chaos.UI.Chaos_UI :=
              (if Text_UI
@@ -110,7 +149,6 @@ begin
             Party       : constant Chaos.Party.Party_Type :=
                             Chaos.Party.Create_Party;
          begin
-
             Party.Add_Party_Member (Actor);
             Chaos.Game.Create_Game (Area, Party);
          end;
@@ -118,5 +156,8 @@ begin
          UI.Start;
       end;
    end if;
+
+   Ada.Text_IO.Put_Line
+     ("2000: " & Chaos.Localisation.Indexed_Text (2000));
 
 end Chaos.Driver;

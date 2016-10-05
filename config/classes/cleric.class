@@ -1,0 +1,8 @@
+identity: cleric;
+role: leader;
+power-source: divine;
+abilities: [wis, str, cha, dex, con, int];
+defences: {will: 2};
+base-hit-points: 7
+hit-points-per-level: 5
+healing-surges-per-day: 7

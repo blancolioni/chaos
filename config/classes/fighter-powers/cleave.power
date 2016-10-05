@@ -6,7 +6,7 @@ attack: str
 defence: ac
 use: at-will
 target: one-creature
-hit: { damage: weapon + str.bonus + (level > 20 => weapon),
+hit: { damage: weapon + str-mod + (level > 20 => weapon),
        effect: choose-creature (\ x => adjacent (x) and hostile (x))
-                               (\ x => x.take-damage (str.bonus))
+                               (\ x => x.take-damage (str-mod))
      }

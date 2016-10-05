@@ -31,9 +31,17 @@ package Chaos.Objects is
      (Object : access constant Root_Chaos_Object_Record'Class)
       return Chaos.Expressions.Chaos_Expression;
 
+   function Local_Environment
+     (Object : access constant Root_Chaos_Object_Record'Class)
+      return Chaos.Expressions.Chaos_Environment;
+
    procedure Log
      (Object  : Root_Chaos_Object_Record'Class;
       Message : String);
+
+   procedure Create_Method_Table
+     (Object : Root_Chaos_Object_Record;
+      Table  : in out Chaos.Expressions.Chaos_Environment);
 
    type Root_Localised_Object_Record is
      abstract limited new Root_Chaos_Object_Record with private;
@@ -50,10 +58,6 @@ private
       record
          Identity : Ada.Strings.Unbounded.Unbounded_String;
       end record;
-
-   procedure Create_Method_Table
-     (Object : Root_Chaos_Object_Record;
-      Table  : in out Chaos.Expressions.Chaos_Environment);
 
    procedure Add_Method
      (Object         : Root_Chaos_Object_Record'Class;

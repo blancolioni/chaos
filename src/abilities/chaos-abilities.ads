@@ -1,3 +1,5 @@
+with Chaos.Expressions;
+
 package Chaos.Abilities is
 
    type Ability is (Str, Con, Dex, Int, Wis, Cha);
@@ -13,6 +15,10 @@ package Chaos.Abilities is
    type Ability_Score_Changes is
      array (Ability) of Ability_Score_Change;
 
+   procedure Apply
+     (Score  : in out Ability_Score_Range;
+      Change : Ability_Score_Change);
+
    type Ability_Interface is limited interface;
 
    function Ability_Score
@@ -26,5 +32,13 @@ package Chaos.Abilities is
       Item : Ability)
       return Ability_Bonus_Range
    is (Ability_Bonus_Range (Integer (Able.Ability_Score (Item)) / 2 - 5));
+
+   procedure Insert_Abilities
+     (Able : Ability_Interface'Class;
+      Env  : in out Chaos.Expressions.Chaos_Environment);
+
+   function Ability_Modifiers
+     (Able : Ability_Interface'Class)
+      return Chaos.Expressions.Chaos_Environment;
 
 end Chaos.Abilities;

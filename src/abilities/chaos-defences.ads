@@ -1,3 +1,5 @@
+with Chaos.Expressions;
+
 package Chaos.Defences is
 
    type Defence is (Fort, Refl, Will, AC);
@@ -19,5 +21,9 @@ package Chaos.Defences is
       Item     : Defence)
       return Defence_Score_Range
       is abstract;
+
+   procedure Insert_Defences
+     (Defender : Defence_Interface'Class;
+      Env      : in out Chaos.Expressions.Chaos_Environment);
 
 end Chaos.Defences;

@@ -1,14 +1,10 @@
 code = E
 
 abilities = {
-   dex = 2
-}
-
-defences = {
-  will = 1
+   dex = 2 wis = 2
 }
 
 size = medium
-speed = 6
+speed = 7
 vision = low_light
 origin = fey

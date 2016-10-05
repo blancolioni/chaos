@@ -47,6 +47,21 @@ package body Chaos.Expressions.Environments is
       Arguments   : Array_Of_Expressions)
       return Chaos_Expression;
 
+   ------------------------------
+   -- Add_Standard_Elaboration --
+   ------------------------------
+
+   procedure Add_Standard_Elaboration
+     (Elaborate : not null access
+        procedure (Env : in out Chaos_Environment))
+   is
+   begin
+      if not Standard_Created then
+         Create_Standard;
+      end if;
+      Elaborate (Standard_Env);
+   end Add_Standard_Elaboration;
+
    ------------------------
    -- Add_Standard_Value --
    ------------------------
@@ -111,9 +126,11 @@ package body Chaos.Expressions.Environments is
    is
       pragma Unreferenced (Environment);
       X : constant Integer :=
-            Chaos.Expressions.Numbers.To_Integer (Arguments (1));
+            Chaos.Expressions.Numbers.To_Integer
+              (To_Integer (Arguments (1)));
       Y : constant Integer :=
-            Chaos.Expressions.Numbers.To_Integer (Arguments (2));
+            Chaos.Expressions.Numbers.To_Integer
+              (To_Integer (Arguments (2)));
    begin
       return Chaos.Expressions.Numbers.To_Expression (X + Y);
    end Evaluate_Add;

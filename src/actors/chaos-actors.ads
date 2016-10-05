@@ -1,4 +1,5 @@
 private with Memor;
+private with Chaos.Expressions;
 
 limited with Chaos.Areas;
 
@@ -146,5 +147,9 @@ private
    overriding function Object_Database
      (Object : Chaos_Actor_Record)
       return Memor.Root_Database_Type'Class;
+
+   overriding procedure Create_Method_Table
+     (Actor  : Chaos_Actor_Record;
+      Table  : in out Chaos.Expressions.Chaos_Environment);
 
 end Chaos.Actors;

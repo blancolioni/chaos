@@ -52,13 +52,17 @@ package body Chaos.Dice is
    begin
       Chaos.Expressions.Insert
         (VT, "roll",
-         Chaos.Expressions.Primitives.Bind_Function
-           (Primitive_Roll_Dice'Access, 1));
+         Chaos.Expressions.Primitives.Bind_Property
+           (Primitive_Roll_Dice'Access));
       Chaos.Expressions.Insert
         (VT, "to_integer",
-         Chaos.Expressions.Primitives.Bind_Function
-           (Primitive_Roll_Dice'Access, 1));
+         Chaos.Expressions.Primitives.Bind_Property
+           (Primitive_Roll_Dice'Access));
    end Create_VT;
+
+   -----------------
+   -- Is_Die_Roll --
+   -----------------
 
    function Is_Die_Roll
      (Text : String)

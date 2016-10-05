@@ -6,4 +6,4 @@ attack: str + 2
 defence: ac
 use: at-will
 target: one-creature
-hit-damage: weapon + str.bonus + (level > 20 => weapon)
+hit-damage: weapon + str-mod + (level > 20 => weapon)

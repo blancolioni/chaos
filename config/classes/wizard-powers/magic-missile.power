@@ -1,0 +1,9 @@
+identity: magic-missile
+action: standard
+source: arcane
+implement: arcane
+attack: int
+defence: refl
+use: at-will
+target: one-creature
+hit-damage: [force, 2d4 + int-mod + (level > 20 => 2d4)]

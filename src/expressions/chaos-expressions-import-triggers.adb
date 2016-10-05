@@ -1,4 +1,3 @@
-with Chaos.Expressions.Functions;
 with Chaos.Expressions.Identifiers;
 
 with Chaos.Parser;
@@ -46,7 +45,7 @@ package body Chaos.Expressions.Import.Triggers is
 
       if Flags mod 2 = 1 then
          Result :=
-           Chaos.Expressions.Functions.Apply
+           Apply
              (Chaos.Expressions.Identifiers.To_Expression ("not"),
               Result);
       end if;

@@ -1,0 +1,5 @@
+x-attacks-y-with-z = "{1} vecht tegen {2} met gebruik van {3}"
+attack-roll = "voor {1} vs defensie {2}; {3} gerolld"
+attack-miss = "niet goed"
+attack-hit = "wel goed"
+attack-critical = "supervetgoed"

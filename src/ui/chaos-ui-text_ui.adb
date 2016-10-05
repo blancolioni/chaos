@@ -64,7 +64,7 @@ package body Chaos.UI.Text_UI is
    is
       pragma Unreferenced (UI);
    begin
-      Ada.Text_IO.Put (Text);
+      Ada.Text_IO.Put_Line (Text);
    end Display_Text;
 
    -----------

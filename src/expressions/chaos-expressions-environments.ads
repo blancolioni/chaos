@@ -17,4 +17,8 @@ package Chaos.Expressions.Environments is
      (Name  : String;
       Value : Chaos_Expression);
 
+   procedure Add_Standard_Elaboration
+     (Elaborate : not null access
+        procedure (Env : in out Chaos_Environment));
+
 end Chaos.Expressions.Environments;
