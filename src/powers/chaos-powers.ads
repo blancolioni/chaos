@@ -24,7 +24,7 @@ package Chaos.Powers is
    type Power_Attack_Target is (One_Creature,
                                 Blast, Burst, Wall);
 
-   type Power_Implement is (None, Weapon, Arcane);
+   type Power_Implement is (None, Weapon, Arcane, Divine);
 
    type Power_Damage_Type is
      (Normal,
