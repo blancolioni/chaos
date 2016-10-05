@@ -37,7 +37,7 @@ with Chaos.Paths;
 with Chaos.Infinity_Engine;
 
 procedure Chaos.Driver is
-   Test_Only : constant Boolean := True;
+   Test_Only : constant Boolean := False;
    Text_UI : constant Boolean := False;
 
    Expr : constant Chaos.Expressions.Chaos_Expression :=
@@ -92,8 +92,8 @@ begin
             Protagonist    : constant Chaos.Creatures.Chaos_Creature :=
                                Chaos.Creatures.Quick.Quick_Creature
                                  ("Aramael",
-                                  Chaos.Races.Get ("elf"),
-                                  Chaos.Classes.Get ("fighter"));
+                                  Chaos.Races.Get ("eladrin"),
+                                  Chaos.Classes.Get ("wizard"));
             Area           : constant Chaos.Areas.Chaos_Area :=
                                Chaos.Areas.Import.Import_Area
                                  (Chaos.Infinity_Engine.Start_Area);
@@ -115,7 +115,7 @@ begin
             for I in 1 .. 3 loop
                Chaos.Powers.Attacks.Attack
                  (Actor, Shank_Actor,
-                  Chaos.Powers.Get ("basic-melee-attack"));
+                  Chaos.Powers.Get ("magic-missile"));
             end loop;
          end;
 
@@ -135,8 +135,8 @@ begin
             Protagonist : constant Chaos.Creatures.Chaos_Creature :=
                             Chaos.Creatures.Quick.Quick_Creature
                               ("Aramael",
-                               Chaos.Races.Get ("elf"),
-                               Chaos.Classes.Get ("fighter"));
+                               Chaos.Races.Get ("eladrin"),
+                               Chaos.Classes.Get ("wizard"));
             Area        : constant Chaos.Areas.Chaos_Area :=
                             Chaos.Areas.Import.Import_Area
                               (Chaos.Infinity_Engine.Start_Area);
