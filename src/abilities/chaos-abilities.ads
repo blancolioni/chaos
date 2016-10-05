@@ -15,6 +15,10 @@ package Chaos.Abilities is
    type Ability_Score_Changes is
      array (Ability) of Ability_Score_Change;
 
+   procedure Apply
+     (Score  : in out Ability_Score_Range;
+      Change : Ability_Score_Change);
+
    type Ability_Interface is limited interface;
 
    function Ability_Score

@@ -34,6 +34,11 @@ package body Chaos.Creatures.Quick is
          Creature.Class := Class;
          Creature.Abilities :=
            Chaos.Classes.Create.Default_Abilities (Class);
+         for Ability in Creature.Abilities'Range loop
+            Chaos.Abilities.Apply (Creature.Abilities (Ability),
+                                   Creature.Race.Ability_Bonus (Ability));
+         end loop;
+
          Creature.Level := 1;
          Creature.HP := Creature.Max_Hit_Points;
          Creature.Team := Chaos.Teams.Get ("pc");

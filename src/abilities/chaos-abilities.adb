@@ -23,6 +23,25 @@ package body Chaos.Abilities is
       end return;
    end Ability_Modifiers;
 
+   -----------
+   -- Apply --
+   -----------
+
+   procedure Apply
+     (Score  : in out Ability_Score_Range;
+      Change : Ability_Score_Change)
+   is
+      New_Score : constant Integer := Integer (Score) + Integer (Change);
+   begin
+      if New_Score < Integer (Ability_Score_Range'First) then
+         Score := Ability_Score_Range'First;
+      elsif New_Score > Integer (Ability_Score_Range'Last) then
+         Score := Ability_Score_Range'Last;
+      else
+         Score := Ability_Score_Range (New_Score);
+      end if;
+   end Apply;
+
    ----------------------
    -- Insert_Abilities --
    ----------------------
