@@ -1,0 +1,10 @@
+code = E
+
+abilities = {
+   dex = 2 int = 2
+}
+
+size = medium
+speed = 6
+vision = low_light
+origin = fey
