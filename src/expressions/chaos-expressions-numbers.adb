@@ -80,7 +80,9 @@ package body Chaos.Expressions.Numbers is
       return Integer
    is
    begin
-      if Is_Number (Expression) then
+      if Is_Null (Expression) then
+         return 0;
+      elsif Is_Number (Expression) then
          return Number_Expression_Record (Get (Expression)).Value;
       else
          return Integer'Value (To_String (Expression));

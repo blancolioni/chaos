@@ -378,7 +378,11 @@ package body Chaos.Expressions is
       return Chaos_Expression
    is
    begin
-      return Get (Expression).To_Integer;
+      if Is_Null (Expression) then
+         return Expression;
+      else
+         return Get (Expression).To_Integer;
+      end if;
    end To_Integer;
 
    ----------------
