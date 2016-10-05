@@ -15,6 +15,11 @@ package Chaos.Party is
       Position : Party_Member_Index)
       return Chaos.Actors.Chaos_Actor;
 
+   function Is_Party_Member
+     (Party    : Chaos_Party_Record'Class;
+      Actor    : Chaos.Actors.Chaos_Actor)
+      return Boolean;
+
    procedure Add_Party_Member
      (Party    : in out Chaos_Party_Record'Class;
       Actor    : Chaos.Actors.Chaos_Actor);

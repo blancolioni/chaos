@@ -74,9 +74,28 @@ package body Chaos.Party is
       return new Chaos_Party_Record;
    end Create_Party;
 
-   ----------------------
-   -- Get_Party_Member --
-   ----------------------
+   ---------------------
+   -- Is_Party_Member --
+   ---------------------
+
+   function Is_Party_Member
+     (Party    : Chaos_Party_Record'Class;
+      Actor    : Chaos.Actors.Chaos_Actor)
+      return Boolean
+   is
+      use type Chaos.Actors.Chaos_Actor;
+   begin
+      for I in Party.Members'Range loop
+         if Party.Members (I) = Actor then
+            return True;
+         end if;
+      end loop;
+      return False;
+   end Is_Party_Member;
+
+   ------------------
+   -- Party_Member --
+   ------------------
 
    function Party_Member
      (Party    : Chaos_Party_Record'Class;
