@@ -152,7 +152,7 @@ package body Chaos.Xi_UI.Areas is
             Actor.Walking := True;
             Actor.Destination :=
               Chaos.Locations.First_Square (Actor.Actor.Path);
-            Actor.Steps := 10;
+            Actor.Steps := 6;
             Actor.Current_Step := 1;
          else
             declare
@@ -178,6 +178,7 @@ package body Chaos.Xi_UI.Areas is
                   Actor.Current_Step := 1;
                else
                   Actor.Walking := False;
+                  Chaos.Game.Current_Game.Arrive (Actor.Actor);
                end if;
             end if;
          end if;
@@ -548,6 +549,19 @@ package body Chaos.Xi_UI.Areas is
               (Mouse_Square);
          end if;
       end;
+
+      if Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('1')) then
+         Chaos.Game.Current_Game.Select_Option (1);
+      elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('2')) then
+         Chaos.Game.Current_Game.Select_Option (2);
+      elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('3')) then
+         Chaos.Game.Current_Game.Select_Option (3);
+      elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('4')) then
+         Chaos.Game.Current_Game.Select_Option (4);
+      elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('5')) then
+         Chaos.Game.Current_Game.Select_Option (5);
+      end if;
+
    end Frame_Started;
 
    ---------------------

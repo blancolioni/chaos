@@ -7,7 +7,7 @@ with Chaos.Party;
 package Chaos.Game is
 
    type Interaction_Type is
-     (Default, Talk, Attack, Steal, Disarm, Turn);
+     (Default, Talk, Attack, Steal, Disarm, Manipulate);
 
    type Chaos_Game_Record is tagged private;
 
@@ -37,11 +37,19 @@ package Chaos.Game is
       Talker   : Chaos.Actors.Chaos_Actor;
       Listener : Chaos.Actors.Chaos_Actor);
 
+   procedure Select_Option
+     (Game   : in out Chaos_Game_Record'Class;
+      Option : Positive);
+
    procedure Interact
      (Game        : in out Chaos_Game_Record'Class;
       Actor       : Chaos.Actors.Chaos_Actor;
       Target      : Chaos.Actors.Chaos_Actor;
       Interaction : Interaction_Type := Default);
+
+   procedure Arrive
+     (Game        : in out Chaos_Game_Record'Class;
+      Actor       : Chaos.Actors.Chaos_Actor);
 
    procedure Start (Game : in out Chaos_Game_Record'Class);
 
@@ -59,8 +67,13 @@ private
       record
          Area         : Chaos.Areas.Chaos_Area;
          Party        : Chaos.Party.Party_Type;
+         Interaction  : Interaction_Type;
+         Target       : Chaos.Actors.Chaos_Actor;
          Dialog       : Chaos.Dialog.Chaos_Dialog;
          Dialog_State : Chaos.Dialog.Dialog_Cursor;
       end record;
+
+   procedure Show_Dialog_State
+     (Game : in out Chaos_Game_Record'Class);
 
 end Chaos.Game;

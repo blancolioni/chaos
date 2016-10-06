@@ -66,6 +66,31 @@ package body Chaos.Game is
       return Game.Area;
    end Area;
 
+   ------------
+   -- Arrive --
+   ------------
+
+   procedure Arrive
+     (Game        : in out Chaos_Game_Record'Class;
+      Actor       : Chaos.Actors.Chaos_Actor)
+   is
+   begin
+      case Game.Interaction is
+         when Default =>
+            Game.Start_Dialog (Actor, Game.Target);
+         when Talk =>
+            Game.Start_Dialog (Actor, Game.Target);
+         when Attack =>
+            null;
+         when Steal =>
+            null;
+         when Disarm =>
+            null;
+         when Manipulate =>
+            null;
+      end case;
+   end Arrive;
+
    -----------------
    -- Create_Game --
    -----------------
@@ -99,8 +124,6 @@ package body Chaos.Game is
       Target      : Chaos.Actors.Chaos_Actor;
       Interaction : Interaction_Type := Default)
    is
-      pragma Unreferenced (Interaction);
-
       procedure Move
         (Mover : in out Chaos.Actors.Chaos_Actor_Record'Class);
 
@@ -126,8 +149,8 @@ package body Chaos.Game is
       end Move;
 
    begin
-      Ada.Text_IO.Put_Line
-        (Actor.Short_Name & " talks to " & Target.Short_Name);
+      Game.Interaction := Interaction;
+      Game.Target := Target;
       Actor.Update (Move'Access);
    end Interact;
 
@@ -142,6 +165,46 @@ package body Chaos.Game is
    begin
       return Game.Party;
    end Party;
+
+   -------------------
+   -- Select_Option --
+   -------------------
+
+   procedure Select_Option
+     (Game   : in out Chaos_Game_Record'Class;
+      Option : Positive)
+   is
+      use Chaos.Dialog;
+   begin
+      if Game.Dialog /= null
+        and then Option <= Choice_Count (Game.Dialog_State)
+      then
+         Choose (Game.Dialog_State, Option);
+         Game.Show_Dialog_State;
+      end if;
+   end Select_Option;
+
+   -----------------------
+   -- Show_Dialog_State --
+   -----------------------
+
+   procedure Show_Dialog_State
+     (Game : in out Chaos_Game_Record'Class)
+   is
+      UI : constant Chaos.UI.Chaos_UI :=
+             Chaos.UI.Current_UI;
+   begin
+      UI.Display_Text (Chaos.Dialog.Text (Game.Dialog_State));
+      if Chaos.Dialog.Choice_Count (Game.Dialog_State) = 0 then
+         Game.Dialog := null;
+      else
+         for I in 1 .. Chaos.Dialog.Choice_Count (Game.Dialog_State) loop
+            UI.Display_Text
+              (Positive'Image (I) & ". "
+               & Chaos.Dialog.Choice_Text (Game.Dialog_State, I));
+         end loop;
+      end if;
+   end Show_Dialog_State;
 
    -----------
    -- Start --
@@ -181,6 +244,8 @@ package body Chaos.Game is
 
       Game.Dialog := Dialog;
       Game.Dialog_State := Dialog.Start;
+
+      Game.Show_Dialog_State;
 
    end Start_Dialog;
 
