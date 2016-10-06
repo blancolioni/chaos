@@ -2,6 +2,7 @@ with WL.Binary_IO;
 
 with Chaos.Resources.Area;
 with Chaos.Resources.Bcs;
+with Chaos.Resources.Bmp;
 with Chaos.Resources.Tis;
 with Chaos.Resources.Wed;
 
@@ -15,6 +16,35 @@ with Chaos.Areas.Db;
 with Chaos.UI;
 
 package body Chaos.Areas.Import is
+
+   type Search_Map_Index is
+     (Obstacle, Sand, Wood_1, Wood_2, Stone, Grass_1,
+      Water_Passable_1, Stone_Hard,
+      Transparent_Obstacle, Wood_3,
+      Impassable_Wall, Water_Passable_2, Water_Impassable,
+      Roof, Worldmap_Exit, Grass_2);
+
+   Transparent : constant array (Search_Map_Index) of Boolean :=
+                   (Obstacle => False, Impassable_Wall => False,
+                    others   => True);
+
+   Passable : constant array (Search_Map_Index) of Boolean :=
+                (Obstacle             => False,
+                 Sand                 => True,
+                 Wood_1               => True,
+                 Wood_2               => True,
+                 Stone                => True,
+                 Grass_1              => True,
+                 Water_Passable_1     => True,
+                 Stone_Hard           => True,
+                 Transparent_Obstacle => False,
+                 Wood_3               => True,
+                 Impassable_Wall      => False,
+                 Water_Passable_2     => True,
+                 Water_Impassable     => False,
+                 Roof                 => False,
+                 Worldmap_Exit        => True,
+                 Grass_2              => True);
 
    ---------------------
    -- Import_Area --
@@ -41,6 +71,12 @@ package body Chaos.Areas.Import is
                 (Chaos.Resources.Manager.Load_Resource
                    (Reference => Wed.Overlays.Element (1).Tileset_Name,
                     Res_Type  => Chaos.Resources.Tileset_Resource).all);
+
+      SR : Chaos.Resources.Bmp.Bmp_Resource'Class renames
+             Chaos.Resources.Bmp.Bmp_Resource'Class
+               (Chaos.Resources.Manager.Load_Resource
+                  (Reference => Chaos.Resources.To_Reference (Name & "SR"),
+                   Res_Type  => Chaos.Resources.Bmp_Resource).all);
 
       procedure Create (Area : in out Chaos_Area_Record'Class);
 
@@ -92,6 +128,33 @@ package body Chaos.Areas.Import is
                end loop;
             end loop;
          end;
+
+         for Square_Index in 1 .. Area.Squares.Last_Index loop
+            declare
+               Square_Loc : constant Chaos.Locations.Square_Location :=
+                              Area.To_Square_Location (Square_Index);
+               Pixel_Loc  : constant Chaos.Locations.Pixel_Location :=
+                              Area.To_Pixels (Square_Loc);
+            begin
+               if Pixel_Loc.X in 0 .. Area.Pixel_Width - 1
+                 and then Pixel_Loc.Y in 0 .. Area.Pixel_Height - 1
+               then
+                  declare
+                     Bmp_X : constant Natural :=
+                               Pixel_Loc.X * SR.Width / Area.Pixel_Width;
+                     Bmp_Y : constant Natural :=
+                               Pixel_Loc.Y * SR.Height / Area.Pixel_Height;
+                     Feature : constant Search_Map_Index :=
+                                 Search_Map_Index'Val
+                                   (SR.Color_Index (Bmp_X, Bmp_Y));
+                     Square  : Square_Type renames Area.Squares (Square_Index);
+                  begin
+                     Square.Transparent := Transparent (Feature);
+                     Square.Passable := Passable (Feature);
+                  end;
+               end if;
+            end;
+         end loop;
 
          Area.Images :=
            Chaos.UI.Current_UI.Create_Image_Container;

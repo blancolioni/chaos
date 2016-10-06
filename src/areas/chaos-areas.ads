@@ -52,6 +52,11 @@ package Chaos.Areas is
    is (X in 0 .. Area.Squares_Across - 1
        and then Y in 0 .. Area.Squares_Down - 1);
 
+   function Valid_Square
+     (Area            : Chaos_Area_Record'Class;
+      Square_Location : Chaos.Locations.Square_Location)
+      return Boolean;
+
    function To_Square
      (Area           : Chaos_Area_Record'Class;
       Pixel_Location : Chaos.Locations.Pixel_Location)
@@ -182,5 +187,10 @@ private
      (Area     : Chaos_Area_Record'Class;
       Location : Chaos.Locations.Square_Location)
       return Positive;
+
+   function To_Square_Location
+     (Area         : Chaos_Area_Record'Class;
+      Square_Index : Positive)
+      return Chaos.Locations.Square_Location;
 
 end Chaos.Areas;

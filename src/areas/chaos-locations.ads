@@ -8,7 +8,7 @@ package Chaos.Locations is
 
    type Pixel_Location is
       record
-         X, Y : Natural;
+         X, Y : Integer;
       end record;
 
    type Square_Location is

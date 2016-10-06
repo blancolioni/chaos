@@ -81,6 +81,10 @@ package body Chaos.Areas is
       Diagonal : constant Float :=
                    Sqrt (Float (Pixel_Width / Pixels_Per_Square) ** 2
                          + Float (Pixel_Height / Pixels_Per_Square) ** 2);
+      Init_Square : constant Square_Type :=
+                      (Actor       => null,
+                       Passable    => False,
+                       Transparent => False);
    begin
       Area.Initialize (Identity);
       Area.Pixel_Width := Pixel_Width;
@@ -90,7 +94,7 @@ package body Chaos.Areas is
 
       for Y in 1 .. Area.Squares_Down loop
          for X in 1 .. Area.Squares_Across loop
-            Area.Squares.Append ((null, True, True));
+            Area.Squares.Append (Init_Square);
          end loop;
       end loop;
    end Create;
@@ -405,6 +409,20 @@ package body Chaos.Areas is
       return Location.X + Area.Squares_Across * Location.Y + 1;
    end To_Square_Index;
 
+   ------------------------
+   -- To_Square_Location --
+   ------------------------
+
+   function To_Square_Location
+     (Area         : Chaos_Area_Record'Class;
+      Square_Index : Positive)
+      return Chaos.Locations.Square_Location
+   is
+   begin
+      return ((Square_Index - 1) mod Area.Squares_Across,
+              (Square_Index - 1) / Area.Squares_Across);
+   end To_Square_Location;
+
    -----------------
    -- Transparent --
    -----------------
@@ -417,6 +435,22 @@ package body Chaos.Areas is
    begin
       return Area.Squares (Area.To_Square_Index (Location)).Transparent;
    end Transparent;
+
+   ------------------
+   -- Valid_Square --
+   ------------------
+
+   function Valid_Square
+     (Area            : Chaos_Area_Record'Class;
+      Square_Location : Chaos.Locations.Square_Location)
+      return Boolean
+   is
+      Pix : constant Chaos.Locations.Pixel_Location :=
+              Area.To_Pixels (Square_Location);
+   begin
+      return Pix.X in 0 .. Area.Pixel_Width - 1
+        and then Pix.Y in 0 .. Area.Pixel_Height - 1;
+   end Valid_Square;
 
    -------------
    -- Visible --

@@ -6,6 +6,7 @@ with Chaos.Resources.Area;
 with Chaos.Resources.Bam;
 with Chaos.Resources.Bcs;
 with Chaos.Resources.Biff;
+with Chaos.Resources.Bmp;
 with Chaos.Resources.Cre;
 with Chaos.Resources.Dlg;
 with Chaos.Resources.Key;
@@ -58,6 +59,8 @@ package body Chaos.Resources.Manager is
             return new Chaos.Resources.Area.Area_Resource;
          when Bam_Resource =>
             return new Chaos.Resources.Bam.Bam_Resource;
+         when Bmp_Resource =>
+            return new Chaos.Resources.Bmp.Bmp_Resource;
          when Creature_Resource =>
             return new Chaos.Resources.Cre.Cre_Resource;
          when Dialog_Resource =>

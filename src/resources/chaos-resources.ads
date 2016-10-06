@@ -28,6 +28,7 @@ package Chaos.Resources is
    type Resource_Type is private;
 
    Area_Resource     : constant Resource_Type;
+   Bmp_Resource      : constant Resource_Type;
    Bam_Resource      : constant Resource_Type;
    Creature_Resource : constant Resource_Type;
    Dialog_Resource   : constant Resource_Type;
@@ -79,6 +80,7 @@ private
 
    type Resource_Type is new Word_16;
 
+   Bmp_Resource      : constant Resource_Type := 16#0001#;
    Bam_Resource      : constant Resource_Type := 16#03E8#;
    Wed_Resource      : constant Resource_Type := 16#03E9#;
    Tileset_Resource  : constant Resource_Type := 16#03EB#;
