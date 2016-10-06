@@ -40,6 +40,11 @@ with Chaos.Creatures.Colors;
 
 package body Chaos.Xi_UI.Areas is
 
+   Scripts_Delay      : constant Duration := 0.2;
+   Animation_Delay    : constant Duration := 0.1;
+   Walk_Delay         : constant Duration := 0.02;
+   Inter_Square_Steps : constant := 20;
+
    Base_Material : array (Chaos.Teams.Chaos_Attitude) of
      Xi.Materials.Material.Xi_Material;
 
@@ -56,17 +61,19 @@ package body Chaos.Xi_UI.Areas is
 
    type Actor_Node is
       record
-         Area         : Chaos.Areas.Chaos_Area;
-         Actor        : Chaos.Actors.Chaos_Actor;
-         Node         : Xi.Node.Xi_Node;
-         Base         : Xi.Node.Xi_Node;
-         Material     : Xi.Materials.Material.Xi_Material;
-         Animation    : Chaos.Xi_UI.Animations.Xi_Animation;
-         Frame        : Positive;
-         Walking      : Boolean;
-         Destination  : Chaos.Locations.Square_Location;
-         Steps        : Natural;
-         Current_Step : Natural;
+         Area              : Chaos.Areas.Chaos_Area;
+         Actor             : Chaos.Actors.Chaos_Actor;
+         Last_Frame_Update : Ada.Calendar.Time;
+         Last_Walk_Update  : Ada.Calendar.Time;
+         Node              : Xi.Node.Xi_Node;
+         Base              : Xi.Node.Xi_Node;
+         Material          : Xi.Materials.Material.Xi_Material;
+         Animation         : Chaos.Xi_UI.Animations.Xi_Animation;
+         Frame             : Positive;
+         Walking           : Boolean;
+         Destination       : Chaos.Locations.Square_Location;
+         Steps             : Natural;
+         Current_Step      : Natural;
       end record;
 
    package Actor_Node_Vectors is
@@ -114,9 +121,11 @@ package body Chaos.Xi_UI.Areas is
      new Xi.Frame_Event.Xi_Frame_Listener_Interface with
       record
          Last_Script_Execution : Ada.Calendar.Time;
+         Last_Walk_Execution   : Ada.Calendar.Time;
          Model                 : Area_Model_Access;
          Mouse_X               : Xi.Xi_Float;
          Mouse_Y               : Xi.Xi_Float;
+         Key                   : Character;
       end record;
 
    overriding procedure Frame_Started
@@ -131,6 +140,7 @@ package body Chaos.Xi_UI.Areas is
      (Model : Area_Model_Record'Class;
       Actor : in out Actor_Node)
    is
+      use Ada.Calendar;
       use Xi;
       use type Chaos.Xi_UI.Animations.Xi_Animation;
       Actor_Loc : constant Chaos.Locations.Square_Location :=
@@ -146,13 +156,15 @@ package body Chaos.Xi_UI.Areas is
                     Chaos.Xi_UI.Animations.Xi_Animation
                       (Chaos.Animations.Actors.Get_Animation
                          (Actor.Actor));
+      Now : constant Ada.Calendar.Time :=
+              Ada.Calendar.Clock;
    begin
       if Actor.Actor.Has_Path then
          if not Actor.Walking then
             Actor.Walking := True;
             Actor.Destination :=
               Chaos.Locations.First_Square (Actor.Actor.Path);
-            Actor.Steps := 6;
+            Actor.Steps := Inter_Square_Steps;
             Actor.Current_Step := 1;
          else
             declare
@@ -168,17 +180,20 @@ package body Chaos.Xi_UI.Areas is
                Base_Loc (2) := Base_Loc (2)
                  - Xi_Float (Finish.Y - Start.Y)
                  * Xi_Float (Actor.Current_Step) / Xi_Float (Actor.Steps);
-               Actor.Current_Step := Actor.Current_Step + 1;
             end;
 
-            if Actor.Current_Step > Actor.Steps then
-               Actor.Actor.Update
-                 (Chaos.Actors.Move_Path_Square'Access);
-               if Actor.Actor.Has_Path then
-                  Actor.Current_Step := 1;
-               else
-                  Actor.Walking := False;
-                  Chaos.Game.Current_Game.Arrive (Actor.Actor);
+            if Now - Actor.Last_Walk_Update >= Walk_Delay then
+               Actor.Last_Walk_Update := Now;
+               Actor.Current_Step := Actor.Current_Step + 1;
+               if Actor.Current_Step > Actor.Steps then
+                  Actor.Actor.Update
+                    (Chaos.Actors.Move_Path_Square'Access);
+                  if Actor.Actor.Has_Path then
+                     Actor.Current_Step := 1;
+                  else
+                     Actor.Walking := False;
+                     Chaos.Game.Current_Game.Arrive (Actor.Actor);
+                  end if;
                end if;
             end if;
          end if;
@@ -188,22 +203,28 @@ package body Chaos.Xi_UI.Areas is
          Actor.Animation := New_Anim;
          Actor.Frame := 1;
       end if;
+
       World_Loc := Base_Loc;
       World_Loc (2) := World_Loc (2) + 20.0;
       World_Loc (3) := 5.0;
       Actor.Node.Set_Position (World_Loc);
-      Actor.Node.Entity.Material.Technique (1).Pass (1).Set_Texture
-        (Actor.Animation.Texture
-           (Identifier  => Actor.Actor.Creature.Identifier,
-            Frame_Index => Actor.Frame,
-            Palette     =>
-              Chaos.Creatures.Colors.Creature_Palette
-                (Actor.Actor.Creature)));
       Actor.Base.Set_Position (Base_Loc);
-      Actor.Frame := Actor.Frame + 1;
-      if Actor.Frame > Actor.Animation.Frame_Count then
-         Actor.Frame := 1;
+
+      if Now - Actor.Last_Frame_Update >= Animation_Delay then
+         Actor.Last_Frame_Update := Now;
+         Actor.Frame := Actor.Frame + 1;
+         if Actor.Frame > Actor.Animation.Frame_Count then
+            Actor.Frame := 1;
+         end if;
+         Actor.Node.Entity.Material.Technique (1).Pass (1).Set_Texture
+           (Actor.Animation.Texture
+              (Identifier  => Actor.Actor.Creature.Identifier,
+               Frame_Index => Actor.Frame,
+               Palette     =>
+                 Chaos.Creatures.Colors.Creature_Palette
+                   (Actor.Actor.Creature)));
       end if;
+
       Actor.Node.Scale
         (Xi_Float (Actor.Animation.Frame_Width (Actor.Frame)),
          Xi_Float (Actor.Animation.Frame_Height (Actor.Frame)),
@@ -357,9 +378,11 @@ package body Chaos.Xi_UI.Areas is
          Listener : constant Xi.Frame_Event.Xi_Frame_Listener :=
                       new Area_Frame_Listener'
                         (Last_Script_Execution => Ada.Calendar.Clock,
+                         Last_Walk_Execution   => Ada.Calendar.Clock,
                          Model                 => Area_Model_Access (Result),
                          Mouse_X               => 0.0,
-                         Mouse_Y               => 0.0);
+                         Mouse_Y               => 0.0,
+                         Key                   => Character'Val (0));
       begin
          Xi.Main.Add_Frame_Listener (Listener);
          Model_Cache.Insert (Area.Identifier, Result);
@@ -380,6 +403,8 @@ package body Chaos.Xi_UI.Areas is
       Result : Actor_Node :=
                  (Area         => Model.Area,
                   Actor        => Actor,
+                  Last_Frame_Update => Ada.Calendar.Clock,
+                  Last_Walk_Update => Ada.Calendar.Clock,
                   Node         =>
                     Model.Actor_Top.Create_Child (Actor.Identifier),
                   Base         => Model.Base_Top.Create_Child
@@ -397,7 +422,13 @@ package body Chaos.Xi_UI.Areas is
       Pass   : constant Xi.Materials.Pass.Xi_Material_Pass :=
                  Result.Material.Technique (1).Pass (1);
    begin
-      Pass.Set_Texture (Result.Animation.Texture (1));
+      Pass.Set_Texture
+        (Result.Animation.Texture
+           (Identifier  => Actor.Creature.Identifier,
+            Frame_Index => 1,
+            Palette     =>
+              Chaos.Creatures.Colors.Creature_Palette
+                (Actor.Creature)));
       Pass.Alpha_Discard
         (Xi.Materials.Equal, Value => 0.0);
 
@@ -463,7 +494,36 @@ package body Chaos.Xi_UI.Areas is
       Got_Mouse_Square : Boolean := False;
       Mouse_Square : Chaos.Locations.Square_Location;
 
+      function Check_Number_Pressed (Number : Natural) return Boolean;
+
+      function Check_Key_Pressed (Ch : Character) return Boolean;
+
       procedure Check_Mouse_Square;
+
+      -----------------------
+      -- Check_Key_Pressed --
+      -----------------------
+
+      function Check_Key_Pressed (Ch : Character) return Boolean is
+      begin
+         if Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key (Ch)) then
+            if Listener.Key = Ch then
+               return False;
+            else
+               Listener.Key := Ch;
+               return True;
+            end if;
+         else
+            if Listener.Key = Ch then
+               Listener.Key := Character'Val (0);
+            end if;
+            return False;
+         end if;
+      end Check_Key_Pressed;
+
+      ------------------------
+      -- Check_Mouse_Square --
+      ------------------------
 
       procedure Check_Mouse_Square is
          use type Chaos.Actors.Chaos_Actor;
@@ -497,22 +557,31 @@ package body Chaos.Xi_UI.Areas is
          end if;
       end Check_Mouse_Square;
 
+      --------------------------
+      -- Check_Number_Pressed --
+      --------------------------
+
+      function Check_Number_Pressed (Number : Natural) return Boolean is
+      begin
+         return Check_Key_Pressed (Character'Val (Number + 48));
+      end Check_Number_Pressed;
+
    begin
-      if Now - Listener.Last_Script_Execution > 0.1 then
+      if Now - Listener.Last_Script_Execution > Scripts_Delay then
          Chaos.Expressions.Execute
            (Listener.Model.Area.Script);
          Listener.Last_Script_Execution := Now;
 
-         for I in 1 .. Listener.Model.Actors.Last_Index loop
-            declare
-               Actor : Actor_Node := Listener.Model.Actors (I);
-            begin
-               Listener.Model.Animate (Actor);
-               Listener.Model.Actors (I) := Actor;
-            end;
-         end loop;
-
       end if;
+
+      for I in 1 .. Listener.Model.Actors.Last_Index loop
+         declare
+            Actor : Actor_Node := Listener.Model.Actors (I);
+         begin
+            Listener.Model.Animate (Actor);
+            Listener.Model.Actors (I) := Actor;
+         end;
+      end loop;
 
       if Xi.Keyboard.Key_Down (Xi.Keyboard.Key_Esc) then
          Xi.Main.Leave_Main_Loop;
@@ -550,17 +619,24 @@ package body Chaos.Xi_UI.Areas is
          end if;
       end;
 
-      if Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('1')) then
-         Chaos.Game.Current_Game.Select_Option (1);
-      elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('2')) then
-         Chaos.Game.Current_Game.Select_Option (2);
-      elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('3')) then
-         Chaos.Game.Current_Game.Select_Option (3);
-      elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('4')) then
-         Chaos.Game.Current_Game.Select_Option (4);
-      elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('5')) then
-         Chaos.Game.Current_Game.Select_Option (5);
-      end if;
+      for I in 1 .. 5 loop
+         if Check_Number_Pressed (I) then
+            Chaos.Game.Current_Game.Select_Option (I);
+            exit;
+         end if;
+      end loop;
+
+--        if Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('1')) then
+--           Chaos.Game.Current_Game.Select_Option (1);
+--        elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('2')) then
+--           Chaos.Game.Current_Game.Select_Option (2);
+--        elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('3')) then
+--           Chaos.Game.Current_Game.Select_Option (3);
+--        elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('4')) then
+--           Chaos.Game.Current_Game.Select_Option (4);
+--        elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('5')) then
+--           Chaos.Game.Current_Game.Select_Option (5);
+--        end if;
 
    end Frame_Started;
 
