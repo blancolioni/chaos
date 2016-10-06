@@ -20,10 +20,17 @@ package Chaos.UI is
 
    procedure Stop (UI : in out Root_Chaos_UI) is abstract;
 
-   procedure Display_Text
-     (UI    : in out Root_Chaos_UI;
-      Text  : String)
+   procedure Put
+     (UI       : in out Root_Chaos_UI;
+      Text     : String)
    is abstract;
+
+   procedure Put_Line
+     (UI       : in out Root_Chaos_UI'Class;
+      Text     : String);
+
+   procedure New_Line
+     (UI : in out Root_Chaos_UI'Class);
 
    procedure Display_Localised_Text
      (UI    : in out Root_Chaos_UI'Class;

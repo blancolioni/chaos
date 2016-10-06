@@ -1,5 +1,3 @@
-with Ada.Text_IO;
-
 with GL;
 
 with Xi.Font;
@@ -44,7 +42,7 @@ package body Chaos.Xi_UI is
    overriding procedure Stop
      (UI : in out Root_Xi_UI);
 
-   overriding procedure Display_Text
+   overriding procedure Put
      (UI   : in out Root_Xi_UI;
       Text : String);
 
@@ -117,14 +115,13 @@ package body Chaos.Xi_UI is
    -- Display_Text --
    ------------------
 
-   overriding procedure Display_Text
+   overriding procedure Put
      (UI   : in out Root_Xi_UI;
       Text : String)
    is
    begin
       UI.Log.Append (Text);
-      Ada.Text_IO.Put_Line (Text);
-   end Display_Text;
+   end Put;
 
    -----------
    -- Start --

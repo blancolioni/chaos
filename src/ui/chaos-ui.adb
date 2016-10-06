@@ -20,7 +20,7 @@ package body Chaos.UI is
       Tag   : String)
    is
    begin
-      UI.Display_Text (Chaos.Localisation.Local_Text (Tag));
+      UI.Put (Chaos.Localisation.Local_Text (Tag));
    end Display_Localised_Text;
 
    ----------------------------
@@ -32,7 +32,7 @@ package body Chaos.UI is
       Index : Chaos.Localisation.Local_Text_Index)
    is
    begin
-      UI.Display_Text (Chaos.Localisation.Indexed_Text (Index));
+      UI.Put (Chaos.Localisation.Indexed_Text (Index));
    end Display_Localised_Text;
 
    ----------------
@@ -46,6 +46,30 @@ package body Chaos.UI is
    begin
       null;
    end Initialize;
+
+   --------------
+   -- New_Line --
+   --------------
+
+   procedure New_Line
+     (UI       : in out Root_Chaos_UI'Class)
+   is
+   begin
+      UI.Put ((1 => Character'Val (10)));
+   end New_Line;
+
+   --------------
+   -- Put_Line --
+   --------------
+
+   procedure Put_Line
+     (UI       : in out Root_Chaos_UI'Class;
+      Text     : String)
+   is
+   begin
+      UI.Put (Text);
+      UI.New_Line;
+   end Put_Line;
 
    --------------------
    -- Set_Current_UI --

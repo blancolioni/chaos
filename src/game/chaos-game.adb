@@ -194,12 +194,12 @@ package body Chaos.Game is
       UI : constant Chaos.UI.Chaos_UI :=
              Chaos.UI.Current_UI;
    begin
-      UI.Display_Text (Chaos.Dialog.Text (Game.Dialog_State));
+      UI.Put_Line (Chaos.Dialog.Text (Game.Dialog_State));
       if Chaos.Dialog.Choice_Count (Game.Dialog_State) = 0 then
          Game.Dialog := null;
       else
          for I in 1 .. Chaos.Dialog.Choice_Count (Game.Dialog_State) loop
-            UI.Display_Text
+            UI.Put_Line
               (Positive'Image (I) & ". "
                & Chaos.Dialog.Choice_Text (Game.Dialog_State, I));
          end loop;

@@ -70,7 +70,7 @@ package body Chaos.Powers.Attacks is
                else
                   D := Integer'Max (To_Integer (E), 1);
                   if Damage_Type /= Normal then
-                     Chaos.UI.Current_UI.Display_Text
+                     Chaos.UI.Current_UI.Put_Line
                        (Local_Text
                           ("takes-damage-type",
                            Defender.Short_Name, D'Img,
@@ -86,7 +86,7 @@ package body Chaos.Powers.Attacks is
       end loop;
 
       if Normal_Damage > 0 then
-         Chaos.UI.Current_UI.Display_Text
+         Chaos.UI.Current_UI.Put_Line
            (Local_Text
               ("takes-damage",
                Defender.Short_Name, Normal_Damage'Img));
@@ -144,7 +144,7 @@ package body Chaos.Powers.Attacks is
          Critical : constant Boolean := Roll = 20
            and then Attack_Value + 20 > Defence_Value;
       begin
-         Chaos.UI.Current_UI.Display_Text
+         Chaos.UI.Current_UI.Put_Line
            (Local_Text
               ("x-attacks-y-with-z",
                Actor.Short_Name,

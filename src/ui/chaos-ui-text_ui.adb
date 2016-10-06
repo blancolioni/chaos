@@ -31,7 +31,7 @@ package body Chaos.UI.Text_UI is
      (UI : in out Chaos_Text_UI)
    is null;
 
-   overriding procedure Display_Text
+   overriding procedure Put
      (UI : in out Chaos_Text_UI;
       Text : String);
 
@@ -54,18 +54,18 @@ package body Chaos.UI.Text_UI is
       return new Chaos_Text_UI;
    end Create;
 
-   ------------------
-   -- Display_Text --
-   ------------------
+   ---------
+   -- Put --
+   ---------
 
-   overriding procedure Display_Text
+   overriding procedure Put
      (UI   : in out Chaos_Text_UI;
       Text : String)
    is
       pragma Unreferenced (UI);
    begin
-      Ada.Text_IO.Put_Line (Text);
-   end Display_Text;
+      Ada.Text_IO.Put (Text);
+   end Put;
 
    -----------
    -- Start --
@@ -75,7 +75,7 @@ package body Chaos.UI.Text_UI is
      (UI : in out Chaos_Text_UI)
    is
    begin
-      UI.Display_Text ("Starting text interface ...");
+      UI.Put_Line ("Starting text interface ...");
       Chaos.Game.Current_Game.Start;
    end Start;
 
