@@ -245,6 +245,11 @@ package body Chaos.Actors is
    begin
       Actor.Location := Chaos.Locations.First_Square (Actor.Path);
       Actor.Path := Chaos.Locations.Drop_First (Actor.Path);
+      if Actor.Has_Path then
+         Actor.Orientation :=
+           Chaos.Locations.Get_Direction
+             (Actor.Location, Actor.First_Path_Square);
+      end if;
    end Move_Path_Square;
 
    ---------------------
