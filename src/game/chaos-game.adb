@@ -229,6 +229,39 @@ package body Chaos.Game is
       Listener : Chaos.Actors.Chaos_Actor)
    is
       Dialog : Chaos.Dialog.Chaos_Dialog;
+
+      procedure Update_Listener_Orientation
+        (Actor : in out Chaos.Actors.Chaos_Actor_Record'Class);
+
+      procedure Update_Talker_Orientation
+        (Actor : in out Chaos.Actors.Chaos_Actor_Record'Class);
+
+      ---------------------------------
+      -- Update_Listener_Orientation --
+      ---------------------------------
+
+      procedure Update_Listener_Orientation
+        (Actor : in out Chaos.Actors.Chaos_Actor_Record'Class)
+      is
+      begin
+         Actor.Set_Orientation
+           (Chaos.Locations.Get_Direction
+              (Actor.Location, Talker.Location));
+      end Update_Listener_Orientation;
+
+      -------------------------------
+      -- Update_Talker_Orientation --
+      -------------------------------
+
+      procedure Update_Talker_Orientation
+        (Actor : in out Chaos.Actors.Chaos_Actor_Record'Class)
+      is
+      begin
+         Actor.Set_Orientation
+           (Chaos.Locations.Get_Direction
+              (Actor.Location, Listener.Location));
+      end Update_Talker_Orientation;
+
    begin
       if Talker.Creature.Has_Dialog then
          Dialog := Talker.Creature.Dialog;
@@ -244,6 +277,9 @@ package body Chaos.Game is
 
       Game.Dialog := Dialog;
       Game.Dialog_State := Dialog.Start;
+
+      Talker.Update (Update_Talker_Orientation'Access);
+      Listener.Update (Update_Listener_Orientation'Access);
 
       Game.Show_Dialog_State;
 
