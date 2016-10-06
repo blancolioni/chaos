@@ -218,13 +218,13 @@ package body Chaos.Locations is
             if DY > 0 then
                return East;
             else
-               return West;
+               return North;
             end if;
          else
             if DY > 0 then
                return South;
             else
-               return North;
+               return West;
             end if;
          end if;
       end if;
