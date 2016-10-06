@@ -1,3 +1,5 @@
+with Ada.Text_IO;
+
 with GL;
 
 with Xi.Font;
@@ -121,6 +123,7 @@ package body Chaos.Xi_UI is
    is
    begin
       UI.Log.Append (Text);
+      Ada.Text_IO.Put_Line (Text);
    end Display_Text;
 
    -----------
