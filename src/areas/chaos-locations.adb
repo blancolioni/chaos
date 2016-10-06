@@ -199,30 +199,32 @@ package body Chaos.Locations is
       DX : constant Integer := To.X - From.X;
       DY : constant Integer := To.Y - From.Y;
    begin
+      --  directions look funny because squares are
+      --  rotated 45 degrees from pixels (and actor orientations)
       if abs DX > 2 * abs DY then
          if DX > 0 then
-            return East;
+            return North_East;
          else
-            return West;
+            return South_West;
          end if;
       elsif abs DY > 2 * abs DX then
          if DY > 0 then
-            return South;
+            return South_East;
          else
-            return North;
+            return North_West;
          end if;
       else
          if DX > 0 then
             if DY > 0 then
-               return North_East;
+               return East;
             else
-               return South_East;
+               return West;
             end if;
          else
             if DY > 0 then
-               return North_West;
+               return South;
             else
-               return South_West;
+               return North;
             end if;
          end if;
       end if;
