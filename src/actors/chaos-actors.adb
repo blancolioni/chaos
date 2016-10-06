@@ -59,7 +59,7 @@ package body Chaos.Actors is
       Area          : not null access constant
         Chaos.Areas.Chaos_Area_Record'Class;
       Location      : Chaos.Locations.Square_Location;
-      Orientation   : Actor_Orientation)
+      Orientation   : Chaos.Locations.Orientation)
       return Chaos_Actor
 
    is
@@ -121,6 +121,18 @@ package body Chaos.Actors is
       return Actor.Hit_Points;
    end Current_Hit_Points;
 
+   -----------------------
+   -- First_Path_Square --
+   -----------------------
+
+   function First_Path_Square
+     (Actor : Chaos_Actor_Record'Class)
+      return Chaos.Locations.Square_Location
+   is
+   begin
+      return Chaos.Locations.First_Square (Actor.Path);
+   end First_Path_Square;
+
    ----------------------
    -- Has_Minor_Action --
    ----------------------
@@ -144,6 +156,18 @@ package body Chaos.Actors is
    begin
       return Actor.Move_Action or else Actor.Standard_Action;
    end Has_Move_Action;
+
+   --------------
+   -- Has_Path --
+   --------------
+
+   function Has_Path
+     (Actor : Chaos_Actor_Record'Class)
+      return Boolean
+   is
+   begin
+      return Chaos.Locations.Length (Actor.Path) > 0;
+   end Has_Path;
 
    -------------------------
    -- Has_Standard_Action --
@@ -211,6 +235,18 @@ package body Chaos.Actors is
       return 1;
    end Maximum_Shift;
 
+   ----------------------
+   -- Move_Path_Square --
+   ----------------------
+
+   procedure Move_Path_Square
+     (Actor : in out Chaos_Actor_Record'Class)
+   is
+   begin
+      Actor.Location := Chaos.Locations.First_Square (Actor.Path);
+      Actor.Path := Chaos.Locations.Drop_First (Actor.Path);
+   end Move_Path_Square;
+
    ---------------------
    -- Object_Database --
    ---------------------
@@ -230,11 +266,23 @@ package body Chaos.Actors is
 
    function Orientation
      (Actor : Chaos_Actor_Record'Class)
-      return Actor_Orientation
+      return Chaos.Locations.Orientation
    is
    begin
       return Actor.Orientation;
    end Orientation;
+
+   ----------
+   -- Path --
+   ----------
+
+   function Path
+     (Actor : Chaos_Actor_Record'Class)
+      return Chaos.Locations.Square_Path
+   is
+   begin
+      return Actor.Path;
+   end Path;
 
    -------------------
    -- Reset_Actions --
@@ -246,6 +294,42 @@ package body Chaos.Actors is
       Actor.Minor_Action := True;
       Actor.Standard_Action := True;
    end Reset_Actions;
+
+   ------------------
+   -- Set_Location --
+   ------------------
+
+   procedure Set_Location
+     (Actor    : in out Chaos_Actor_Record'Class;
+      Location : Chaos.Locations.Square_Location)
+   is
+   begin
+      Actor.Location := Location;
+   end Set_Location;
+
+   ---------------------
+   -- Set_Orientation --
+   ---------------------
+
+   procedure Set_Orientation
+     (Actor       : in out Chaos_Actor_Record'Class;
+      Orientation : Chaos.Locations.Orientation)
+   is
+   begin
+      Actor.Orientation := Orientation;
+   end Set_Orientation;
+
+   --------------
+   -- Set_Path --
+   --------------
+
+   procedure Set_Path
+     (Actor : in out Chaos_Actor_Record'Class;
+      Path  : Chaos.Locations.Square_Path)
+   is
+   begin
+      Actor.Path := Path;
+   end Set_Path;
 
    -----------
    -- Speed --
@@ -309,6 +393,19 @@ package body Chaos.Actors is
          end;
       end if;
    end Take_Damage;
+
+   ------------
+   -- Update --
+   ------------
+
+   procedure Update
+     (Actor   : Chaos_Actor_Record'Class;
+      Updater : not null access
+        procedure (Updated : in out Chaos_Actor_Record'Class))
+   is
+   begin
+      Db.Update (Actor.Reference, Updater);
+   end Update;
 
    ----------------------
    -- Use_Minor_Action --

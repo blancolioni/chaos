@@ -12,6 +12,7 @@ with Chaos.Expressions.Environments;
 with Chaos.Expressions.Functions;
 with Chaos.Game;
 with Chaos.Localisation;
+with Chaos.Locations;
 with Chaos.Parser;
 with Chaos.Party;
 with Chaos.Powers.Attacks;
@@ -102,7 +103,7 @@ begin
                                  (Protagonist, Area,
                                   Area.To_Square
                                     (Chaos.Infinity_Engine.Start_Location),
-                                  Chaos.Actors.South);
+                                  Chaos.Locations.South);
             Shank_Creature : constant Chaos.Creatures.Chaos_Creature :=
                                Chaos.Creatures.Import.Import_Creature
                                  ("SHANK");
@@ -110,7 +111,7 @@ begin
                                Chaos.Actors.Create_Actor
                                  (Shank_Creature, Area,
                                   (98, 100),
-                                  Chaos.Actors.North);
+                                  Chaos.Locations.North);
          begin
             for I in 1 .. 3 loop
                Chaos.Powers.Attacks.Attack
@@ -145,7 +146,7 @@ begin
                               (Protagonist, Area,
                                Area.To_Square
                                  (Chaos.Infinity_Engine.Start_Location),
-                               Chaos.Actors.South);
+                               Chaos.Locations.South);
             Party       : constant Chaos.Party.Party_Type :=
                             Chaos.Party.Create_Party;
          begin

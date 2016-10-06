@@ -2,7 +2,7 @@ with Chaos.Actors;
 
 package Chaos.Animations.Actors is
 
-   function Get_Standing_Animation
+   function Get_Animation
      (Actor : Chaos.Actors.Chaos_Actor)
       return Chaos_Animation;
 

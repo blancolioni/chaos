@@ -14,10 +14,6 @@ with Chaos.Vision;
 
 package Chaos.Actors is
 
-   type Actor_Orientation is
-     (South, South_West, West, North_West,
-      North, North_East, East, South_East);
-
    type Chaos_Actor_Record is
      new Chaos.Objects.Root_Localised_Object_Record
      and Chaos.Speed.Chaos_Speed_Interface
@@ -46,9 +42,39 @@ package Chaos.Actors is
      (Actor : Chaos_Actor_Record'Class)
      return Chaos.Locations.Square_Location;
 
+   procedure Set_Location
+     (Actor    : in out Chaos_Actor_Record'Class;
+      Location : Chaos.Locations.Square_Location);
+
+   function Has_Path
+     (Actor : Chaos_Actor_Record'Class)
+      return Boolean;
+
+   function Path
+     (Actor : Chaos_Actor_Record'Class)
+      return Chaos.Locations.Square_Path
+     with Pre => Actor.Has_Path;
+
+   procedure Set_Path
+     (Actor : in out Chaos_Actor_Record'Class;
+      Path  : Chaos.Locations.Square_Path);
+
+   function First_Path_Square
+     (Actor : Chaos_Actor_Record'Class)
+      return Chaos.Locations.Square_Location
+     with Pre => Actor.Has_Path;
+
+   procedure Move_Path_Square
+     (Actor : in out Chaos_Actor_Record'Class)
+     with Pre => Actor.Has_Path;
+
    function Orientation
      (Actor : Chaos_Actor_Record'Class)
-      return Actor_Orientation;
+      return Chaos.Locations.Orientation;
+
+   procedure Set_Orientation
+     (Actor       : in out Chaos_Actor_Record'Class;
+      Orientation : Chaos.Locations.Orientation);
 
    overriding function Vision
      (Actor : Chaos_Actor_Record)
@@ -70,7 +96,7 @@ package Chaos.Actors is
       Area          : not null access constant
         Chaos.Areas.Chaos_Area_Record'Class;
       Location      : Chaos.Locations.Square_Location;
-      Orientation   : Actor_Orientation)
+      Orientation   : Chaos.Locations.Orientation)
       return Chaos_Actor;
 
    function Commands
@@ -125,6 +151,11 @@ package Chaos.Actors is
      with Pre => Actor.Creature.Alive,
      Post => not Actor.Creature.Individual or else not Actor.Creature.Alive;
 
+   procedure Update
+     (Actor : Chaos_Actor_Record'Class;
+      Updater : not null access
+        procedure (Updated : in out Chaos_Actor_Record'Class));
+
 private
 
    type Chaos_Actor_Record is
@@ -136,7 +167,8 @@ private
            Chaos.Areas.Chaos_Area_Record'Class;
          Creature        : Chaos.Creatures.Chaos_Creature;
          Location        : Chaos.Locations.Square_Location;
-         Orientation     : Actor_Orientation;
+         Orientation     : Chaos.Locations.Orientation;
+         Path            : Chaos.Locations.Square_Path;
          Alive           : Boolean := True;
          Move_Action     : Boolean := True;
          Minor_Action    : Boolean := True;

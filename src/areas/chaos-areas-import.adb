@@ -119,7 +119,7 @@ package body Chaos.Areas.Import is
                                 ((Natural (Actor_Entry.Current_X),
                                  Natural (Actor_Entry.Current_Y))),
                             Orientation   =>
-                              Chaos.Actors.Actor_Orientation'Val
+                              Chaos.Locations.Orientation'Val
                                 (Actor_Entry.Orientation / 2));
          begin
             pragma Unreferenced (Actor);

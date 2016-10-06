@@ -2,6 +2,10 @@ private with Ada.Containers.Vectors;
 
 package Chaos.Locations is
 
+   type Orientation is
+     (South, South_West, West, North_West,
+      North, North_East, East, South_East);
+
    type Pixel_Location is
       record
          X, Y : Natural;
@@ -11,6 +15,14 @@ package Chaos.Locations is
       record
          X, Y : Natural;
       end record;
+
+   function Get_Direction
+     (From, To : Square_Location)
+      return Orientation;
+
+   function Adjacent
+     (Square_1, Square_2 : Square_Location)
+      return Boolean;
 
    type Square_Path is private;
 
@@ -37,7 +49,15 @@ package Chaos.Locations is
       Index : Positive)
       return Square_Location;
 
+   function First_Square
+     (Path : Square_Path)
+      return Square_Location;
+
    function Drop_Last
+     (Path : Square_Path)
+      return Square_Path;
+
+   function Drop_First
      (Path : Square_Path)
       return Square_Path;
 

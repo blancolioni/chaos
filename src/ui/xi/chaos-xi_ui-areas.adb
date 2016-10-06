@@ -56,12 +56,17 @@ package body Chaos.Xi_UI.Areas is
 
    type Actor_Node is
       record
-         Actor     : Chaos.Actors.Chaos_Actor;
-         Node      : Xi.Node.Xi_Node;
-         Base      : Xi.Node.Xi_Node;
-         Material  : Xi.Materials.Material.Xi_Material;
-         Animation : Chaos.Xi_UI.Animations.Xi_Animation;
-         Frame     : Positive;
+         Area         : Chaos.Areas.Chaos_Area;
+         Actor        : Chaos.Actors.Chaos_Actor;
+         Node         : Xi.Node.Xi_Node;
+         Base         : Xi.Node.Xi_Node;
+         Material     : Xi.Materials.Material.Xi_Material;
+         Animation    : Chaos.Xi_UI.Animations.Xi_Animation;
+         Frame        : Positive;
+         Walking      : Boolean;
+         Destination  : Chaos.Locations.Square_Location;
+         Steps        : Natural;
+         Current_Step : Natural;
       end record;
 
    package Actor_Node_Vectors is
@@ -71,16 +76,18 @@ package body Chaos.Xi_UI.Areas is
    type Area_Model_Record is
      new Chaos.Xi_UI.Models.Root_Chaos_Xi_Model with
       record
-         Scene     : Xi.Scene.Xi_Scene;
-         Top       : Xi.Node.Xi_Node;
-         Map_Top   : Xi.Node.Xi_Node;
-         Actor_Top : Xi.Node.Xi_Node;
-         Base_Top  : Xi.Node.Xi_Node;
-         Area      : Chaos.Areas.Chaos_Area;
-         Actors    : Actor_Node_Vectors.Vector;
-         Highlight : Xi.Node.Xi_Node;
-         Centre_X  : Xi.Xi_Float;
-         Centre_Y  : Xi.Xi_Float;
+         Scene      : Xi.Scene.Xi_Scene;
+         Top        : Xi.Node.Xi_Node;
+         Map_Top    : Xi.Node.Xi_Node;
+         Actor_Top  : Xi.Node.Xi_Node;
+         Base_Top   : Xi.Node.Xi_Node;
+         Area       : Chaos.Areas.Chaos_Area;
+         Actor      : Chaos.Actors.Chaos_Actor;
+         Actors     : Actor_Node_Vectors.Vector;
+         Highlight  : Xi.Node.Xi_Node;
+         Centre_X   : Xi.Xi_Float;
+         Centre_Y   : Xi.Xi_Float;
+         Left_Click : Boolean := False;
       end record;
 
    type Area_Model_Access is access all Area_Model_Record'Class;
@@ -98,6 +105,10 @@ package body Chaos.Xi_UI.Areas is
    procedure Animate
      (Model : Area_Model_Record'Class;
       Actor : in out Actor_Node);
+
+   procedure On_Square_Click
+     (Model  : in out Area_Model_Record'Class;
+      Square : Chaos.Locations.Square_Location);
 
    type Area_Frame_Listener is
      new Xi.Frame_Event.Xi_Frame_Listener_Interface with
@@ -121,16 +132,63 @@ package body Chaos.Xi_UI.Areas is
       Actor : in out Actor_Node)
    is
       use Xi;
+      use type Chaos.Xi_UI.Animations.Xi_Animation;
       Actor_Loc : constant Chaos.Locations.Square_Location :=
                     Actor.Actor.Location;
       Pixel_Loc : constant Chaos.Locations.Pixel_Location :=
                     Model.Area.To_Pixels (Actor_Loc);
-      Base_Loc  : constant Xi.Matrices.Vector_3 :=
+      Base_Loc  : Xi.Matrices.Vector_3 :=
                     (Xi_Float (Pixel_Loc.X - Model.Area.Pixels_Across / 2),
                      Xi_Float (Model.Area.Pixels_Down / 2 - Pixel_Loc.Y),
                      1.0);
-      World_Loc : Xi.Matrices.Vector_3 := Base_Loc;
+      World_Loc : Xi.Matrices.Vector_3;
+      New_Anim  : constant Chaos.Xi_UI.Animations.Xi_Animation :=
+                    Chaos.Xi_UI.Animations.Xi_Animation
+                      (Chaos.Animations.Actors.Get_Animation
+                         (Actor.Actor));
    begin
+      if Actor.Actor.Has_Path then
+         if not Actor.Walking then
+            Actor.Walking := True;
+            Actor.Destination :=
+              Chaos.Locations.First_Square (Actor.Actor.Path);
+            Actor.Steps := 10;
+            Actor.Current_Step := 1;
+         else
+            declare
+               Start  : constant Chaos.Locations.Pixel_Location :=
+                          Actor.Area.To_Pixels (Actor.Actor.Location);
+               Finish : constant Chaos.Locations.Pixel_Location :=
+                          Actor.Area.To_Pixels
+                            (Actor.Actor.First_Path_Square);
+            begin
+               Base_Loc (1) := Base_Loc (1)
+                 + Xi_Float (Finish.X - Start.X)
+                 * Xi_Float (Actor.Current_Step) / Xi_Float (Actor.Steps);
+               Base_Loc (2) := Base_Loc (2)
+                 - Xi_Float (Finish.Y - Start.Y)
+                 * Xi_Float (Actor.Current_Step) / Xi_Float (Actor.Steps);
+               Actor.Current_Step := Actor.Current_Step + 1;
+            end;
+
+            if Actor.Current_Step > Actor.Steps then
+               Actor.Actor.Update
+                 (Chaos.Actors.Move_Path_Square'Access);
+               if Actor.Actor.Has_Path then
+                  Actor.Current_Step := 1;
+               else
+                  Actor.Walking := False;
+               end if;
+            end if;
+         end if;
+      end if;
+
+      if New_Anim /= Actor.Animation then
+         Actor.Animation := New_Anim;
+         Actor.Frame := 1;
+      end if;
+      World_Loc := Base_Loc;
+      World_Loc (2) := World_Loc (2) + 20.0;
       World_Loc (3) := 5.0;
       Actor.Node.Set_Position (World_Loc);
       Actor.Node.Entity.Material.Technique (1).Pass (1).Set_Texture
@@ -149,6 +207,7 @@ package body Chaos.Xi_UI.Areas is
         (Xi_Float (Actor.Animation.Frame_Width (Actor.Frame)),
          Xi_Float (Actor.Animation.Frame_Height (Actor.Frame)),
          1.0);
+
    end Animate;
 
    ----------------
@@ -177,6 +236,7 @@ package body Chaos.Xi_UI.Areas is
          & Natural'Image (Area.Tiles_Down));
 
       Model.Area := Area;
+      Model.Actor := Chaos.Game.Current_Game.Party.Party_Member (1);
       Model.Scene := Xi.Scene.Create_Scene;
       Model.Top := Model.Scene.Create_Node ("top");
       Model.Map_Top := Model.Top.Create_Child ("map-top");
@@ -317,16 +377,22 @@ package body Chaos.Xi_UI.Areas is
       return Actor_Node
    is
       Result : Actor_Node :=
-                 (Actor     => Actor,
-                  Node      => Model.Actor_Top.Create_Child (Actor.Identifier),
-                  Base      => Model.Base_Top.Create_Child
+                 (Area         => Model.Area,
+                  Actor        => Actor,
+                  Node         =>
+                    Model.Actor_Top.Create_Child (Actor.Identifier),
+                  Base         => Model.Base_Top.Create_Child
                     (Actor.Identifier & "-base"),
-                  Material  => Xi.Materials.Material.Xi_New_With_Defaults,
-                  Animation =>
+                  Material     => Xi.Materials.Material.Xi_New_With_Defaults,
+                  Animation    =>
                     Chaos.Xi_UI.Animations.Xi_Animation
-                      (Chaos.Animations.Actors.Get_Standing_Animation
+                      (Chaos.Animations.Actors.Get_Animation
                            (Actor)),
-                  Frame     => 1);
+                  Frame        => 1,
+                  Walking      => False,
+                  Destination  => Actor.Location,
+                  Steps        => 0,
+                  Current_Step => 0);
       Pass   : constant Xi.Materials.Pass.Xi_Material_Pass :=
                  Result.Material.Technique (1).Pass (1);
    begin
@@ -370,7 +436,7 @@ package body Chaos.Xi_UI.Areas is
       use all type Chaos.Teams.Chaos_Attitude;
       Color : constant Xi.Color.Xi_Color :=
                 (case Attitude is
-                    when Party    => (0.0, 0.8, 0.0, 1.0),
+                    when Party    => (0.2, 0.5, 0.2, 1.0),
                     when Friendly => (0.0, 0.6, 0.0, 1.0),
                     when Neutral  => (0.0, 0.7, 0.7, 1.0),
                     when Hostile  => (0.8, 0.0, 0.0, 1.0));
@@ -392,6 +458,44 @@ package body Chaos.Xi_UI.Areas is
       use Xi;
       use Ada.Calendar;
       Now : constant Time := Clock;
+
+      Got_Mouse_Square : Boolean := False;
+      Mouse_Square : Chaos.Locations.Square_Location;
+
+      procedure Check_Mouse_Square;
+
+      procedure Check_Mouse_Square is
+         use type Chaos.Actors.Chaos_Actor;
+      begin
+         if not Got_Mouse_Square then
+            Listener.Mouse_X := Xi.Mouse.Current_Mouse.State.X;
+            Listener.Mouse_Y := Xi.Mouse.Current_Mouse.State.Y;
+
+            declare
+               Area   : constant Chaos.Areas.Chaos_Area :=
+                          Listener.Model.Area;
+               X      : constant Xi_Float :=
+                          (Listener.Mouse_X - Event.Render_Target.Width / 2.0)
+                          + Listener.Model.Centre_X
+                          + Xi_Float (Area.Pixels_Across / 2);
+               Y      : constant Xi_Float :=
+                          Xi_Float (Area.Pixels_Down) -
+                          ((Listener.Mouse_Y
+                           - Event.Render_Target.Height / 2.0)
+                           + Listener.Model.Centre_Y
+                           + Xi_Float (Area.Pixels_Down / 2));
+               Square : constant Chaos.Locations.Square_Location :=
+                          Area.To_Square
+                            ((Integer (X),
+                             Integer (Y)));
+            begin
+               Mouse_Square := Square;
+            end;
+
+            Got_Mouse_Square := True;
+         end if;
+      end Check_Mouse_Square;
+
    begin
       if Now - Listener.Last_Script_Execution > 0.1 then
          Chaos.Expressions.Execute
@@ -416,76 +520,59 @@ package body Chaos.Xi_UI.Areas is
       if Xi.Mouse.Current_Mouse.State.X /= Listener.Mouse_X
         or else Xi.Mouse.Current_Mouse.State.Y /= Listener.Mouse_Y
       then
-         Listener.Mouse_X := Xi.Mouse.Current_Mouse.State.X;
-         Listener.Mouse_Y := Xi.Mouse.Current_Mouse.State.Y;
-         --           declare
-         --              use Xi.Matrices, Xi.Float_Arrays;
-         --              X              : constant Xi_Float :=
-         --                                 Listener.Mouse_X * 2.0
-         --                                  / Event.Render_Target.Width - 1.0;
-         --              Y              : constant Xi_Float :=
-         --                                 Listener.Mouse_Y * 2.0
-         --                                / Event.Render_Target.Height - 1.0;
-         --              Camera         : constant Xi.Camera.Xi_Camera :=
-         --                                 Listener.Model.Scene.Active_Camera;
-         --              Matrix         : constant Matrix_4 :=
-         --                              Camera.Inverse_Transformation_Matrix;
-         --              Screen_Pos     : constant Vector_4 :=
-         --                              (if True
-         --                      then (Listener.Mouse_X, Listener.Mouse_Y,
-         --                                 0.0, 1.0)
-         --                               else (X, Y, 0.0, 1.0));
-         --              World_Position : Vector_4 := Matrix * Screen_Pos;
-         --           begin
-         --              Ada.Text_IO.Put_Line
-         --             ("mouse: " & Xi.Float_Images.Image (Listener.Mouse_X)
-         --                 & ", " & Xi.Float_Images.Image (Listener.Mouse_Y)
-         --                 & " -> "
-         --                 & Xi.Float_Images.Image (X)
-         --                 & ", "
-         --                 & Xi.Float_Images.Image (Y)
-         --                 & " -> "
-         --                 & Xi.Float_Images.Image (World_Position (1))
-         --                 & ", "
-         --                 & Xi.Float_Images.Image (World_Position (2)));
-         --
-         --              World_Position (3) := 1.0;
-         --              Listener.Model.Highlight.Set_Position
-         --                (World_Position (1 .. 3));
-         --           end;
+         Check_Mouse_Square;
+
          declare
-            use type Chaos.Actors.Chaos_Actor;
-            Area   : constant Chaos.Areas.Chaos_Area := Listener.Model.Area;
-            X      : constant Xi_Float :=
-                       (Listener.Mouse_X - Event.Render_Target.Width / 2.0)
-                  + Listener.Model.Centre_X
-                  + Xi_Float (Area.Pixels_Across / 2);
-            Y      : constant Xi_Float :=
-                  Xi_Float (Area.Pixels_Down) -
-                  ((Listener.Mouse_Y - Event.Render_Target.Height / 2.0)
-                   + Listener.Model.Centre_Y
-                   + Xi_Float (Area.Pixels_Down / 2));
-            Square : constant Chaos.Locations.Square_Location :=
-                       Area.To_Square
-                         ((Integer (X),
-                          Integer (Y)));
             Pixel  : constant Chaos.Locations.Pixel_Location :=
-                       Listener.Model.Area.To_Pixels (Square);
-            Actor  : constant Chaos.Actors.Chaos_Actor :=
-                       Area.Actor (Square);
+                       Listener.Model.Area.To_Pixels
+                         (Mouse_Square);
          begin
 
             Listener.Model.Highlight.Set_Position
               (Xi_Float (Pixel.X - Listener.Model.Area.Pixels_Across / 2),
                Xi_Float (Listener.Model.Area.Pixels_Down / 2 - Pixel.Y),
                1.0);
-
-            if Actor /= null then
-               Actor.Log (Actor.Long_Name);
-            end if;
          end;
 
       end if;
+
+      declare
+         use Xi.Mouse;
+      begin
+         if Current_Mouse.State.Button (Left) = Down then
+            Listener.Model.Left_Click := True;
+         elsif Listener.Model.Left_Click then
+            Listener.Model.Left_Click := False;
+            Check_Mouse_Square;
+            Listener.Model.On_Square_Click
+              (Mouse_Square);
+         end if;
+      end;
    end Frame_Started;
+
+   ---------------------
+   -- On_Square_Click --
+   ---------------------
+
+   procedure On_Square_Click
+     (Model  : in out Area_Model_Record'Class;
+      Square : Chaos.Locations.Square_Location)
+   is
+      use type Chaos.Actors.Chaos_Actor;
+      Area : constant Chaos.Areas.Chaos_Area := Model.Area;
+      Actor : constant Chaos.Actors.Chaos_Actor :=
+                Area.Actor (Square);
+   begin
+      if Actor = null then
+         Model.Actor := null;
+      elsif Chaos.Game.Current_Game.Party.Is_Party_Member (Actor) then
+         Model.Actor := Actor;
+      elsif Model.Actor /= null then
+         Chaos.Game.Current_Game.Interact
+           (Actor       => Model.Actor,
+            Target      => Actor,
+            Interaction => Chaos.Game.Default);
+      end if;
+   end On_Square_Click;
 
 end Chaos.Xi_UI.Areas;

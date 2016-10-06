@@ -20,6 +20,20 @@ package body Chaos.Locations is
       return Result;
    end "&";
 
+   --------------
+   -- Adjacent --
+   --------------
+
+   function Adjacent
+     (Square_1, Square_2 : Square_Location)
+      return Boolean
+   is
+      DX : constant Integer := abs (Square_2.X - Square_1.X);
+      DY : constant Integer := abs (Square_2.Y - Square_1.Y);
+   begin
+      return DX = 1 or else DY = 1;
+   end Adjacent;
+
    ------------
    -- Append --
    ------------
@@ -31,6 +45,22 @@ package body Chaos.Locations is
    begin
       To.Path.Append (Square);
    end Append;
+
+   ----------------
+   -- Drop_First --
+   ----------------
+
+   function Drop_First
+     (Path : Square_Path)
+      return Square_Path
+   is
+   begin
+      return Result : Square_Path do
+         for I in 2 .. Path.Path.Last_Index loop
+            Result.Path.Append (Square (Path, I));
+         end loop;
+      end return;
+   end Drop_First;
 
    ---------------
    -- Drop_Last --
@@ -145,6 +175,58 @@ package body Chaos.Locations is
       return Result;
 
    end Find_Path;
+
+   ------------------
+   -- First_Square --
+   ------------------
+
+   function First_Square
+     (Path : Square_Path)
+      return Square_Location
+   is
+   begin
+      return Square (Path, 1);
+   end First_Square;
+
+   -------------------
+   -- Get_Direction --
+   -------------------
+
+   function Get_Direction
+     (From, To : Square_Location)
+      return Orientation
+   is
+      DX : constant Integer := To.X - From.X;
+      DY : constant Integer := To.Y - From.Y;
+   begin
+      if abs DX > 2 * abs DY then
+         if DX > 0 then
+            return East;
+         else
+            return West;
+         end if;
+      elsif abs DY > 2 * abs DX then
+         if DY > 0 then
+            return South;
+         else
+            return North;
+         end if;
+      else
+         if DX > 0 then
+            if DY > 0 then
+               return North_East;
+            else
+               return South_East;
+            end if;
+         else
+            if DY > 0 then
+               return North_West;
+            else
+               return South_West;
+            end if;
+         end if;
+      end if;
+   end Get_Direction;
 
    ------------
    -- Length --

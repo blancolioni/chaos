@@ -89,6 +89,48 @@ package body Chaos.Game is
       return Local_Current_Game;
    end Current_Game;
 
+   --------------
+   -- Interact --
+   --------------
+
+   procedure Interact
+     (Game        : in out Chaos_Game_Record'Class;
+      Actor       : Chaos.Actors.Chaos_Actor;
+      Target      : Chaos.Actors.Chaos_Actor;
+      Interaction : Interaction_Type := Default)
+   is
+      pragma Unreferenced (Interaction);
+
+      procedure Move
+        (Mover : in out Chaos.Actors.Chaos_Actor_Record'Class);
+
+      ----------
+      -- Move --
+      ----------
+
+      procedure Move
+        (Mover : in out Chaos.Actors.Chaos_Actor_Record'Class)
+      is
+      begin
+         Mover.Set_Orientation
+           (Chaos.Locations.Get_Direction
+              (Mover.Location, Target.Location));
+         if not Chaos.Locations.Adjacent
+           (Mover.Location, Target.Location)
+         then
+            Mover.Set_Path
+              (Chaos.Locations.Drop_Last
+                 (Game.Area.Find_Path
+                      (Mover.Location, Target.Location)));
+         end if;
+      end Move;
+
+   begin
+      Ada.Text_IO.Put_Line
+        (Actor.Short_Name & " talks to " & Target.Short_Name);
+      Actor.Update (Move'Access);
+   end Interact;
+
    -----------
    -- Party --
    -----------

@@ -6,6 +6,9 @@ with Chaos.Party;
 
 package Chaos.Game is
 
+   type Interaction_Type is
+     (Default, Talk, Attack, Steal, Disarm, Turn);
+
    type Chaos_Game_Record is tagged private;
 
    function Party
@@ -33,6 +36,12 @@ package Chaos.Game is
      (Game     : in out Chaos_Game_Record'Class;
       Talker   : Chaos.Actors.Chaos_Actor;
       Listener : Chaos.Actors.Chaos_Actor);
+
+   procedure Interact
+     (Game        : in out Chaos_Game_Record'Class;
+      Actor       : Chaos.Actors.Chaos_Actor;
+      Target      : Chaos.Actors.Chaos_Actor;
+      Interaction : Interaction_Type := Default);
 
    procedure Start (Game : in out Chaos_Game_Record'Class);
 
