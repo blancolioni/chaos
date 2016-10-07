@@ -94,7 +94,9 @@ package body Chaos.Locations is
          record
             Current   : Square_Location;
             Previous  : Natural;
+            Length    : Natural;
             Remaining : Natural;
+            Total     : Natural;
          end record;
 
       package Queue_Of_Partials is
@@ -107,11 +109,16 @@ package body Chaos.Locations is
       Vector : Vector_Of_Partials.Vector;
       Tried  : List_Of_Squares.List;
 
+      DXs : constant array (1 .. 8) of Integer :=
+              (1, -1, 0, 0, 1, 1, -1, -1);
+      DYs : constant array (1 .. 8) of Integer :=
+              (0, 0, 1, -1, 1, -1, 1, -1);
+
       Result : Square_Path;
 
    begin
 
-      Queue.Append ((Start, 0, 0));
+      Queue.Append ((Start, 0, 0, 0, 0));
 
       while not Queue.Is_Empty loop
          declare
@@ -134,39 +141,41 @@ package body Chaos.Locations is
                Tried.Append (P.Current);
                Vector.Append (P);
 
-               for DX in -1 .. 1 loop
-                  for DY in -1 .. 1 loop
-                     declare
-                        use Queue_Of_Partials;
-                        X : constant Integer := P.Current.X + DX;
-                        Y : constant Integer := P.Current.Y + DY;
-                        R : constant Natural :=
-                              (X - Finish.X) ** 2 + (Y - Finish.Y) ** 2;
-                        Position : Cursor := Queue.First;
-                     begin
-                        if X in 0 .. Max_X and then Y in 0 .. Max_Y then
-                           declare
-                              New_P : constant Partial_Path :=
-                                        ((X, Y), Vector.Last_Index, R);
-                           begin
-                              if OK (New_P.Current)
-                                or else New_P.Current = Finish
-                              then
-                                 while Has_Element (Position)
-                                   and then R > Element (Position).Remaining
-                                 loop
-                                    Next (Position);
-                                 end loop;
-                                 if Has_Element (Position) then
-                                    Queue.Insert (Position, New_P);
-                                 else
-                                    Queue.Append (New_P);
-                                 end if;
+               for Direction in DXs'Range loop
+                  declare
+                     use Queue_Of_Partials;
+                     DX : constant Integer := DXs (Direction);
+                     DY : constant Integer := DYs (Direction);
+                     X  : constant Integer := P.Current.X + DX;
+                     Y  : constant Integer := P.Current.Y + DY;
+                     R  : constant Natural :=
+                            (X - Finish.X) ** 2 + (Y - Finish.Y) ** 2;
+                     Position : Cursor := Queue.First;
+                  begin
+                     if X in 0 .. Max_X and then Y in 0 .. Max_Y then
+                        declare
+                           New_P : constant Partial_Path :=
+                                     ((X, Y), Vector.Last_Index,
+                                      P.Length + 1, R, P.Length + 1 + R);
+                        begin
+                           if OK (New_P.Current)
+                             or else New_P.Current = Finish
+                           then
+                              while Has_Element (Position)
+                                and then New_P.Length >=
+                                  Element (Position).Length
+                              loop
+                                 Next (Position);
+                              end loop;
+                              if Has_Element (Position) then
+                                 Queue.Insert (Position, New_P);
+                              else
+                                 Queue.Append (New_P);
                               end if;
-                           end;
-                        end if;
-                     end;
-                  end loop;
+                           end if;
+                        end;
+                     end if;
+                  end;
                end loop;
             end if;
          end;
