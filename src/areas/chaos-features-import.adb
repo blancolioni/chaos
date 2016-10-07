@@ -5,15 +5,22 @@ package body Chaos.Features.Import is
    -----------------
 
    function Import_Door
-     (Wed   : Chaos.Resources.Wed.Wed_Resource'Class;
-      Index : Positive)
+     (Area       : Chaos.Resources.Area.Area_Resource'Class;
+      Wed        : Chaos.Resources.Wed.Wed_Resource'Class;
+      Area_Index : Positive;
+      Wed_Index  : Positive)
       return Chaos_Feature
    is
-      Feature : constant Chaos_Feature := new Chaos_Feature_Record;
-      Door    : Chaos.Resources.Wed.Door_Entry renames
-                  Wed.Doors.Element (Index);
+      Feature   : constant Chaos_Feature := new Chaos_Feature_Record;
+      Area_Door : Chaos.Resources.Area.Door_Entry renames
+                    Area.Doors.Element (Area_Index);
+      Wed_Door  : Chaos.Resources.Wed.Door_Entry renames
+                    Wed.Doors.Element (Wed_Index);
+      Open_Polygons : Polygon_Vectors.Vector;
+
    begin
-      for Polygon of Door.Polygons_Open loop
+
+      for Polygon of Wed_Door.Polygons_Open loop
          declare
             Vertex_Count : constant Natural :=
                              Natural (Polygon.Vertex_Count);
@@ -34,9 +41,30 @@ package body Chaos.Features.Import is
                     (Natural (V.X), Natural (V.Y));
                end;
             end loop;
-            Feature.Polygons.Append (Feature_Poly);
+            Open_Polygons.Append (Feature_Poly);
          end;
       end loop;
+
+      Feature.Polygon_Sets.Append (Open_Polygons);
+
+      declare
+         Count : constant Natural := Natural (Area_Door.Open_Vertex_Count);
+         Sensitive : Feature_Polygon (1 .. Count);
+      begin
+         for Index in 1 .. Count loop
+            declare
+               V : constant Chaos.Resources.Area.Vertex :=
+                     Area.Vertices.Element
+                       (Natural (Area_Door.First_Open_Vertex)
+                        + Index);
+            begin
+               Sensitive (Index) := (Natural (V.X), Natural (V.Y));
+            end;
+         end loop;
+         Feature.Sensitive_Areas.Append (Sensitive);
+      end;
+
+      Feature.State := 1;
 
       return Feature;
 

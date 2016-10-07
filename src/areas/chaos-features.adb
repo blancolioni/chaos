@@ -10,7 +10,7 @@ package body Chaos.Features is
       return Feature_Polygon
    is
    begin
-      return Feature.Polygons.Element (Index);
+      return Feature.Polygon_Sets.Element (Feature.State).Element (Index);
    end Polygon;
 
    -------------------
@@ -22,7 +22,19 @@ package body Chaos.Features is
       return Natural
    is
    begin
-      return Feature.Polygons.Last_Index;
+      return Feature.Polygon_Sets.Element (Feature.State).Last_Index;
    end Polygon_Count;
+
+   --------------------
+   -- Sensitive_Area --
+   --------------------
+
+   function Sensitive_Area
+     (Feature : Chaos_Feature_Record'Class)
+      return Feature_Polygon
+   is
+   begin
+      return Feature.Sensitive_Areas.Element (Feature.State);
+   end Sensitive_Area;
 
 end Chaos.Features;

@@ -165,9 +165,20 @@ package body Chaos.Areas.Import is
          Area.Images.Import_Tileset (Tis);
 
          for I in 1 .. Wed.Doors.Last_Index loop
-            Area.Features.Append
-              (Chaos.Features.Import.Import_Door
-                 (Wed, I));
+            declare
+               use Chaos.Resources;
+               Ref : constant Resource_Reference :=
+                       Wed.Doors.Element (I).Name;
+            begin
+               for J in 1 .. Are.Doors.Last_Index loop
+                  if Are.Doors.Element (J).Resource_Name = Ref then
+                     Area.Features.Append
+                       (Chaos.Features.Import.Import_Door
+                          (Are, Wed, J, I));
+                     exit;
+                  end if;
+               end loop;
+            end;
          end loop;
 
       end Create;
