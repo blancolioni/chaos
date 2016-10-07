@@ -83,6 +83,7 @@ package body Chaos.Areas is
                          + Float (Pixel_Height / Pixels_Per_Square) ** 2);
       Init_Square : constant Square_Type :=
                       (Actor       => null,
+                       Feature     => null,
                        Passable    => False,
                        Transparent => False);
    begin
@@ -111,6 +112,31 @@ package body Chaos.Areas is
    begin
       return False;
    end Current_Battle;
+
+   -------------
+   -- Feature --
+   -------------
+
+   function Feature
+     (Area  : Chaos_Area_Record'Class;
+      Index : Positive)
+      return Chaos.Features.Chaos_Feature
+   is
+   begin
+      return Area.Features.Element (Index);
+   end Feature;
+
+   -------------------
+   -- Feature_Count --
+   -------------------
+
+   function Feature_Count
+     (Area : Chaos_Area_Record'Class)
+      return Natural
+   is
+   begin
+      return Area.Features.Last_Index;
+   end Feature_Count;
 
    ---------------
    -- Find_Path --

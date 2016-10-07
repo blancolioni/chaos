@@ -17,6 +17,7 @@ with Xi.Materials.Pass;
 with Xi.Matrices;
 with Xi.Mouse;
 with Xi.Node;
+with Xi.Render_Operation;
 with Xi.Scene;
 with Xi.Shapes;
 with Xi.Texture;
@@ -33,6 +34,7 @@ with Chaos.Expressions;
 with Chaos.Logging;
 
 with Chaos.Actors;
+with Chaos.Features;
 with Chaos.Teams;
 
 with Chaos.Animations.Actors;
@@ -119,6 +121,19 @@ package body Chaos.Xi_UI.Areas is
      (Model  : in out Area_Model_Record'Class;
       Square : Chaos.Locations.Square_Location);
 
+   function To_World_Position
+     (Model     : Area_Model_Record'Class;
+      Pixel_Loc : Chaos.Locations.Pixel_Location;
+      Z         : Xi.Xi_Float := 0.0)
+      return Xi.Matrices.Vector_3;
+
+   function To_World_Position
+     (Model      : Area_Model_Record'Class;
+      Square_Loc : Chaos.Locations.Square_Location;
+      Z          : Xi.Xi_Float := 0.0)
+      return Xi.Matrices.Vector_3
+   is (Model.To_World_Position (Model.Area.To_Pixels (Square_Loc), Z));
+
    type Area_Frame_Listener is
      new Xi.Frame_Event.Xi_Frame_Listener_Interface with
       record
@@ -147,12 +162,8 @@ package body Chaos.Xi_UI.Areas is
       use type Chaos.Xi_UI.Animations.Xi_Animation;
       Actor_Loc : constant Chaos.Locations.Square_Location :=
                     Actor.Actor.Location;
-      Pixel_Loc : constant Chaos.Locations.Pixel_Location :=
-                    Model.Area.To_Pixels (Actor_Loc);
       Base_Loc  : Xi.Matrices.Vector_3 :=
-                    (Xi_Float (Pixel_Loc.X - Model.Area.Pixels_Across / 2),
-                     Xi_Float (Model.Area.Pixels_Down / 2 - Pixel_Loc.Y),
-                     1.0);
+                    Model.To_World_Position (Actor_Loc, 2.0);
       World_Loc : Xi.Matrices.Vector_3;
       New_Anim  : constant Chaos.Xi_UI.Animations.Xi_Animation :=
                     Chaos.Xi_UI.Animations.Xi_Animation
@@ -341,6 +352,36 @@ package body Chaos.Xi_UI.Areas is
         ("XI",
          "created"
          & Natural'Image (Area.Tiles_Across * Area.Tiles_Down) & " tiles");
+
+      for Feature_Index in 1 .. Area.Feature_Count loop
+         declare
+            Feature : constant Chaos.Features.Chaos_Feature :=
+                        Area.Feature (Feature_Index);
+         begin
+            for Polygon_Index in 1 .. Feature.Polygon_Count loop
+               declare
+                  Node : constant Xi.Node.Xi_Node :=
+                           Model.Map_Top.Create_Child
+                             ("feature" & Integer'Image (-Feature_Index)
+                              & Integer'Image (-Polygon_Index));
+                  Entity : Xi.Entity.Xi_Entity;
+                  Boundary : constant Chaos.Features.Feature_Polygon :=
+                               Feature.Polygon (Polygon_Index);
+               begin
+                  Xi.Entity.Xi_New (Entity);
+                  Entity.Begin_Operation (Xi.Render_Operation.Triangle_Fan);
+                  for Loc of Boundary loop
+                     Entity.Normal (0.0, 0.0, 1.0);
+--                       Entity.Color ((1.0, 0.0, 0.0, 1.0));
+                     Entity.Vertex (Model.To_World_Position (Loc, 1.0));
+                  end loop;
+                  Entity.End_Operation;
+                  Entity.Set_Material (Xi.Assets.Material ("Xi.Blue"));
+                  Node.Set_Entity (Entity);
+               end;
+            end loop;
+         end;
+      end loop;
 
       declare
          use Xi;
@@ -697,5 +738,26 @@ package body Chaos.Xi_UI.Areas is
             Interaction => Chaos.Game.Default);
       end if;
    end On_Square_Click;
+
+   -----------------------
+   -- To_World_Position --
+   -----------------------
+
+   function To_World_Position
+     (Model     : Area_Model_Record'Class;
+      Pixel_Loc : Chaos.Locations.Pixel_Location;
+      Z         : Xi.Xi_Float := 0.0)
+      return Xi.Matrices.Vector_3
+   is
+      use Xi;
+      X : constant Xi_Float :=
+            Xi_Float (Pixel_Loc.X
+                      - Model.Area.Pixels_Across / 2);
+      Y : constant Xi_Float :=
+            Xi_Float (Model.Area.Pixels_Down / 2
+                      - Pixel_Loc.Y);
+   begin
+      return (X, Y, Z);
+   end To_World_Position;
 
 end Chaos.Xi_UI.Areas;

@@ -34,6 +34,46 @@ package Chaos.Resources.Wed is
    package Overlay_Entry_Vectors is
      new Ada.Containers.Vectors (Positive, Overlay_Entry);
 
+   type Vertex is
+      record
+         X, Y : Word_16;
+      end record;
+
+   package Vertex_Vectors is
+     new Ada.Containers.Vectors (Positive, Vertex);
+
+   type Polygon_Entry is
+      record
+         Start_Vertex_Index : Word_32;
+         Vertex_Count       : Word_32;
+         Flags              : Word_8;
+         Height             : Word_8;
+         Min_X              : Word_16;
+         Max_X              : Word_16;
+         Min_Y              : Word_16;
+         Max_Y              : Word_16;
+      end record;
+
+   package Polygon_Entry_Vectors is
+     new Ada.Containers.Vectors (Positive, Polygon_Entry);
+
+   type Door_Entry is
+      record
+         Name                  : Resource_Reference;
+         Closed                : Word_16;
+         First_Tile_Cell_Index : Word_16;
+         Tile_Cell_Count       : Word_16;
+         Polygon_Count_Open    : Word_16;
+         Polygon_Count_Closed  : Word_16;
+         Polygon_Offset_Open   : Word_32;
+         Polygon_Offset_Closed : Word_32;
+         Polygons_Open         : Polygon_Entry_Vectors.Vector;
+         Polygons_Closed       : Polygon_Entry_Vectors.Vector;
+      end record;
+
+   package Door_Entry_Vectors is
+     new Ada.Containers.Vectors (Positive, Door_Entry);
+
    type Wed_Resource is
      new Chaos_Resource with
       record
@@ -43,7 +83,16 @@ package Chaos.Resources.Wed is
          Secondary_Header_Offset : Word_32;
          Doors_Offset            : Word_32;
          Door_Tile_Cell_Offset   : Word_32;
+         Wall_Polygon_Count      : Word_32;
+         Polygons_Offset         : Word_32;
+         Vertices_Offset         : Word_32;
+         Wall_Groups_Offset      : Word_32;
+         Polygon_Indices_Offset  : Word_32;
+         Vertex_Count            : Natural := 0;
          Overlays                : Overlay_Entry_Vectors.Vector;
+         Doors                   : Door_Entry_Vectors.Vector;
+         Polygons                : Polygon_Entry_Vectors.Vector;
+         Vertices                : Vertex_Vectors.Vector;
       end record;
 
    overriding function Signature

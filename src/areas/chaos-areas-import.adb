@@ -10,6 +10,7 @@ with Chaos.Resources.Manager;
 
 with Chaos.Creatures.Import;
 with Chaos.Expressions.Import;
+with Chaos.Features.Import;
 
 with Chaos.Areas.Db;
 
@@ -162,6 +163,12 @@ package body Chaos.Areas.Import is
          Area.Images :=
            Chaos.UI.Current_UI.Create_Image_Container;
          Area.Images.Import_Tileset (Tis);
+
+         for I in 1 .. Wed.Doors.Last_Index loop
+            Area.Features.Append
+              (Chaos.Features.Import.Import_Door
+                 (Wed, I));
+         end loop;
 
       end Create;
 

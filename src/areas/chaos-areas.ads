@@ -12,6 +12,8 @@ with Chaos.Actors;
 with Chaos.Commands;
 with Chaos.Images;
 
+with Chaos.Features;
+
 package Chaos.Areas is
 
    Pixels_Per_Square : constant := 32;
@@ -70,6 +72,16 @@ package Chaos.Areas is
    function Script
      (Area : Chaos_Area_Record'class)
       return Chaos.Expressions.Chaos_Expression;
+
+   function Feature_Count
+     (Area : Chaos_Area_Record'Class)
+      return Natural;
+
+   function Feature
+     (Area : Chaos_Area_Record'Class;
+      Index : Positive)
+      return Chaos.Features.Chaos_Feature
+     with Pre => Index <= Area.Feature_Count;
 
    function Actor_Count
      (Area     : Chaos_Area_Record'Class)
@@ -136,6 +148,10 @@ package Chaos.Areas is
 
 private
 
+   package Feature_Vectors is
+     new Ada.Containers.Vectors (Positive, Chaos.Features.Chaos_Feature,
+                                 Chaos.Features."=");
+
    package Actor_Vectors is
      new Ada.Containers.Vectors (Positive, Chaos.Actors.Chaos_Actor,
                                  Chaos.Actors."=");
@@ -143,6 +159,7 @@ private
    type Square_Type is
       record
          Actor       : Chaos.Actors.Chaos_Actor;
+         Feature     : Chaos.Features.Chaos_Feature;
          Passable    : Boolean := True;
          Transparent : Boolean := True;
       end record;
@@ -169,6 +186,7 @@ private
          Squares        : Square_Vectors.Vector;
          Tiles          : Tileset_Map_Entry_Vectors.Vector;
          Actors         : Actor_Vectors.Vector;
+         Features       : Feature_Vectors.Vector;
          Visibility     : Chaos.Vision.Chaos_Vision;
          Script         : Chaos.Expressions.Chaos_Expression;
          Environment    : Chaos.Expressions.Chaos_Environment;
