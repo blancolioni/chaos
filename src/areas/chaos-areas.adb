@@ -355,10 +355,10 @@ package body Chaos.Areas is
                    Square_X * Root_2 + Square_Y * Root_2;
       Rot_Y    : constant Float :=
                    Square_Y * Root_2 - Square_X * Root_2;
-      Pixel_X  : constant Natural :=
+      Pixel_X  : constant Integer :=
                    Integer (Rot_X * Float (Pixels_Per_Square))
                    + Area.Pixel_Width / 2;
-      Pixel_Y  : constant Natural :=
+      Pixel_Y  : constant Integer :=
                    Integer (Rot_Y * Float (Pixels_Per_Square))
                    + Area.Pixel_Height / 2;
    begin

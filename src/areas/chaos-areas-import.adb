@@ -143,10 +143,13 @@ package body Chaos.Areas.Import is
                      Bmp_X : constant Natural :=
                                Pixel_Loc.X * SR.Width / Area.Pixel_Width;
                      Bmp_Y : constant Natural :=
-                               Pixel_Loc.Y * SR.Height / Area.Pixel_Height;
+                               SR.Height -
+                                 Pixel_Loc.Y * SR.Height / Area.Pixel_Height
+                                   - 1;
+                     Index : constant Natural :=
+                               SR.Color_Index (Bmp_X, Bmp_Y);
                      Feature : constant Search_Map_Index :=
-                                 Search_Map_Index'Val
-                                   (SR.Color_Index (Bmp_X, Bmp_Y));
+                                 Search_Map_Index'Val (Index);
                      Square  : Square_Type renames Area.Squares (Square_Index);
                   begin
                      Square.Transparent := Transparent (Feature);
