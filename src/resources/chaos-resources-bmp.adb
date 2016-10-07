@@ -51,9 +51,11 @@ package body Chaos.Resources.Bmp is
    overriding procedure Load
      (Resource : in out Bmp_Resource)
    is
+      File : WL.Binary_IO.File_Type :=
+               WL.Binary_IO.View (Resource.File, Resource.Start,
+                                  Resource.Length);
    begin
-      WL.Binary_IO.Set_Offset (Resource.File, 0);
-      WL.Bitmap_IO.Read (Resource.BM, Resource.File);
+      WL.Bitmap_IO.Read (Resource.BM, File);
    end Load;
 
    -----------
