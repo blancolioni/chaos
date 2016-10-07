@@ -83,18 +83,20 @@ package body Chaos.Xi_UI.Areas is
    type Area_Model_Record is
      new Chaos.Xi_UI.Models.Root_Chaos_Xi_Model with
       record
-         Scene      : Xi.Scene.Xi_Scene;
-         Top        : Xi.Node.Xi_Node;
-         Map_Top    : Xi.Node.Xi_Node;
-         Actor_Top  : Xi.Node.Xi_Node;
-         Base_Top   : Xi.Node.Xi_Node;
-         Area       : Chaos.Areas.Chaos_Area;
-         Actor      : Chaos.Actors.Chaos_Actor;
-         Actors     : Actor_Node_Vectors.Vector;
-         Highlight  : Xi.Node.Xi_Node;
-         Centre_X   : Xi.Xi_Float;
-         Centre_Y   : Xi.Xi_Float;
-         Left_Click : Boolean := False;
+         Scene            : Xi.Scene.Xi_Scene;
+         Top              : Xi.Node.Xi_Node;
+         Map_Top          : Xi.Node.Xi_Node;
+         Actor_Top        : Xi.Node.Xi_Node;
+         Base_Top         : Xi.Node.Xi_Node;
+         Area             : Chaos.Areas.Chaos_Area;
+         Actor            : Chaos.Actors.Chaos_Actor;
+         Actors           : Actor_Node_Vectors.Vector;
+         Highlight        : Xi.Node.Xi_Node;
+         Good_Destination : Xi.Entity.Xi_Entity;
+         Bad_Destination  : Xi.Entity.Xi_Entity;
+         Centre_X         : Xi.Xi_Float;
+         Centre_Y         : Xi.Xi_Float;
+         Left_Click       : Boolean := False;
       end record;
 
    type Area_Model_Access is access all Area_Model_Record'Class;
@@ -271,15 +273,32 @@ package body Chaos.Xi_UI.Areas is
            (Create_Actor_Node (Model, Model.Area.Actor (I)));
       end loop;
 
+      Model.Good_Destination :=
+        Xi.Shapes.Square
+          (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
       declare
-         Entity : constant Xi.Entity.Xi_Entity :=
-                    Xi.Shapes.Square
-                      (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
+         Mat : constant Xi.Materials.Material.Xi_Material :=
+                 Xi.Assets.Material ("Xi.Solid_Lit_Color").Instantiate;
       begin
-         Entity.Set_Material (Xi.Assets.Material ("Xi.Blue"));
-         Model.Highlight.Set_Entity (Entity);
-         Model.Highlight.Rotate (45.0, 0.0, 0.0, 1.0);
+         Mat.Set_Parameter_Value
+           ("color", Xi.Value.Color_Value (0.0, 0.7, 0.0, 1.0));
+         Model.Good_Destination.Set_Material (Mat);
       end;
+
+      Model.Bad_Destination :=
+        Xi.Shapes.Square
+          (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
+      declare
+         Mat : constant Xi.Materials.Material.Xi_Material :=
+                 Xi.Assets.Material ("Xi.Solid_Lit_Color").Instantiate;
+      begin
+         Mat.Set_Parameter_Value
+           ("color", Xi.Value.Color_Value (0.7, 0.7, 0.7, 1.0));
+         Model.Bad_Destination.Set_Material (Mat);
+      end;
+
+      Model.Highlight.Set_Entity (Model.Good_Destination);
+      Model.Highlight.Rotate (45.0, 0.0, 0.0, 1.0);
 
       for Tile_Y in 1 .. Area.Tiles_Down loop
          declare
@@ -491,6 +510,9 @@ package body Chaos.Xi_UI.Areas is
       use Ada.Calendar;
       Now : constant Time := Clock;
 
+      Model : constant Area_Model_Access := Listener.Model;
+      Area  : constant Chaos.Areas.Chaos_Area := Model.Area;
+
       Got_Mouse_Square : Boolean := False;
       Mouse_Square : Chaos.Locations.Square_Location;
 
@@ -602,6 +624,12 @@ package body Chaos.Xi_UI.Areas is
               (Xi_Float (Pixel.X - Listener.Model.Area.Pixels_Across / 2),
                Xi_Float (Listener.Model.Area.Pixels_Down / 2 - Pixel.Y),
                1.0);
+
+            if Area.Passable (Mouse_Square) then
+               Model.Highlight.Set_Entity (Model.Good_Destination);
+            else
+               Model.Highlight.Set_Entity (Model.Bad_Destination);
+            end if;
          end;
 
       end if;
