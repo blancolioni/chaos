@@ -654,7 +654,12 @@ package body Chaos.Xi_UI.Areas is
                 Area.Actor (Square);
    begin
       if Actor = null then
-         Model.Actor := null;
+         if Model.Actor /= null
+           and then Area.Passable (Square)
+         then
+            Chaos.Game.Current_Game.Walk_To
+              (Model.Actor, Square);
+         end if;
       elsif Chaos.Game.Current_Game.Party.Is_Party_Member (Actor) then
          Model.Actor := Actor;
       elsif Model.Actor /= null then

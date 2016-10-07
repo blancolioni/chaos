@@ -47,6 +47,11 @@ package Chaos.Game is
       Target      : Chaos.Actors.Chaos_Actor;
       Interaction : Interaction_Type := Default);
 
+   procedure Walk_To
+     (Game        : in out Chaos_Game_Record'Class;
+      Actor       : Chaos.Actors.Chaos_Actor;
+      Destination : Chaos.Locations.Square_Location);
+
    procedure Arrive
      (Game        : in out Chaos_Game_Record'Class;
       Actor       : Chaos.Actors.Chaos_Actor);

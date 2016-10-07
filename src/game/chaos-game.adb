@@ -74,21 +74,24 @@ package body Chaos.Game is
      (Game        : in out Chaos_Game_Record'Class;
       Actor       : Chaos.Actors.Chaos_Actor)
    is
+      use type Chaos.Actors.Chaos_Actor;
    begin
-      case Game.Interaction is
-         when Default =>
-            Game.Start_Dialog (Actor, Game.Target);
-         when Talk =>
-            Game.Start_Dialog (Actor, Game.Target);
-         when Attack =>
-            null;
-         when Steal =>
-            null;
-         when Disarm =>
-            null;
-         when Manipulate =>
-            null;
-      end case;
+      if Game.Target /= null then
+         case Game.Interaction is
+            when Default =>
+               Game.Start_Dialog (Actor, Game.Target);
+            when Talk =>
+               Game.Start_Dialog (Actor, Game.Target);
+            when Attack =>
+               null;
+            when Steal =>
+               null;
+            when Disarm =>
+               null;
+            when Manipulate =>
+               null;
+         end case;
+      end if;
    end Arrive;
 
    -----------------
@@ -284,5 +287,44 @@ package body Chaos.Game is
       Game.Show_Dialog_State;
 
    end Start_Dialog;
+
+   -------------
+   -- Walk_To --
+   -------------
+
+   procedure Walk_To
+     (Game        : in out Chaos_Game_Record'Class;
+      Actor       : Chaos.Actors.Chaos_Actor;
+      Destination : Chaos.Locations.Square_Location)
+   is
+      use Chaos.Locations;
+
+      procedure Move
+        (Mover : in out Chaos.Actors.Chaos_Actor_Record'Class);
+
+      ----------
+      -- Move --
+      ----------
+
+      procedure Move
+        (Mover : in out Chaos.Actors.Chaos_Actor_Record'Class)
+      is
+      begin
+         Mover.Set_Orientation
+           (Chaos.Locations.Get_Direction
+              (Mover.Location, Destination));
+         Mover.Set_Path
+           (Chaos.Locations.Drop_Last
+              (Game.Area.Find_Path
+                   (Mover.Location, Destination)));
+      end Move;
+
+   begin
+      if Destination /= Actor.Location then
+         Game.Interaction := Default;
+         Game.Target := null;
+         Actor.Update (Move'Access);
+      end if;
+   end Walk_To;
 
 end Chaos.Game;
