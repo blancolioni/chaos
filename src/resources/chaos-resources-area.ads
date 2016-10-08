@@ -107,6 +107,17 @@ package Chaos.Resources.Area is
    package Area_Door_Vectors is
      new Ada.Containers.Vectors (Positive, Door_Entry);
 
+   type Entrance_Entry is
+      record
+         Name        : String (1 .. 32);
+         X, Y        : Word_16;
+         Orientation : Word_16;
+         Unused      : Unused_Bytes (1 .. 66);
+      end record;
+
+   package Area_Entrance_Vectors is
+     new Ada.Containers.Vectors (Positive, Entrance_Entry);
+
    type Area_Resource is
      new Chaos_Resource with
       record
@@ -162,6 +173,7 @@ package Chaos.Resources.Area is
          Actors                    : Area_Actor_Vectors.Vector;
          Doors                     : Area_Door_Vectors.Vector;
          Vertices                  : Vertex_Vectors.Vector;
+         Entrances                 : Area_Entrance_Vectors.Vector;
       end record;
 
    overriding function Signature

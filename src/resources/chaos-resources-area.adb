@@ -173,6 +173,24 @@ package body Chaos.Resources.Area is
          end;
       end loop;
 
+      Area.Set_Offset (Area.Entrances_Offset);
+      for I in 1 .. Area.Entrances_Count loop
+         declare
+            Entrance : Entrance_Entry;
+         begin
+            Area.Get (Entrance.Name);
+            Area.Get (Entrance.X);
+            Area.Get (Entrance.Y);
+            Area.Get (Entrance.Orientation);
+            Area.Get (Entrance.Unused);
+            Chaos.Logging.Log
+              ("AREA",
+               Entrance.Name & Entrance.X'Img & Entrance.Y'Img
+               & Entrance.Orientation'Img);
+            Area.Entrances.Append (Entrance);
+         end;
+      end loop;
+
       Area.Set_Offset (Area.Vertices_Offset);
       for I in 1 .. Area.Vertices_Count loop
          declare
