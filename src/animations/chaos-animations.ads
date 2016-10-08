@@ -54,6 +54,11 @@ package Chaos.Animations is
    procedure Set_Animation_Factory
      (Factory : not null access Chaos_Animation_Factory'Class);
 
+   function Get_Animation
+     (Code  : String;
+      Index : Positive)
+      return Chaos_Animation;
+
 private
 
    use Chaos.Resources.Bam;
@@ -74,10 +79,5 @@ private
          Frames  : Frame_Vectors.Vector;
          Palette : Chaos.Resources.Resource_Palette;
       end record;
-
-   function Get_Animation
-     (Code  : String;
-      Index : Positive)
-      return Chaos_Animation;
 
 end Chaos.Animations;
