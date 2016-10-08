@@ -93,9 +93,9 @@ package body Chaos.Xi_UI.Areas is
          Area             : Chaos.Areas.Chaos_Area;
          Actor            : Chaos.Actors.Chaos_Actor;
          Actors           : Actor_Node_Vectors.Vector;
-         Highlight        : Xi.Node.Xi_Node;
-         Good_Destination : Xi.Entity.Xi_Entity;
-         Bad_Destination  : Xi.Entity.Xi_Entity;
+         Highlight_Square : Xi.Node.Xi_Node;
+         Mouse_Cursor     : Xi.Node.Xi_Node;
+         Cursors          : Chaos.Animations.Chaos_Animation;
          Centre_X         : Xi.Xi_Float;
          Centre_Y         : Xi.Xi_Float;
          Left_Click       : Boolean := False;
@@ -275,7 +275,8 @@ package body Chaos.Xi_UI.Areas is
       Model.Scene := Xi.Scene.Create_Scene;
       Model.Top := Model.Scene.Create_Node ("top");
       Model.Map_Top := Model.Top.Create_Child ("map-top");
-      Model.Highlight := Model.Top.Create_Child ("highlight");
+      Model.Highlight_Square := Model.Top.Create_Child ("highlight-square");
+      Model.Mouse_Cursor := Model.Top.Create_Child ("mouse-cursor");
       Model.Base_Top := Model.Top.Create_Child ("base-top");
       Model.Actor_Top := Model.Top.Create_Child ("actor-top");
 
@@ -284,32 +285,55 @@ package body Chaos.Xi_UI.Areas is
            (Create_Actor_Node (Model, Model.Area.Actor (I)));
       end loop;
 
-      Model.Good_Destination :=
-        Xi.Shapes.Square
-          (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
       declare
-         Mat : constant Xi.Materials.Material.Xi_Material :=
-                 Xi.Assets.Material ("Xi.Solid_Lit_Color").Instantiate;
+         Entity : constant Xi.Entity.Xi_Entity :=
+                    Xi.Shapes.Square
+                      (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
+         Animation : constant Chaos.Xi_UI.Animations.Xi_Animation :=
+                       Chaos.Xi_UI.Animations.Xi_Animation
+                         (Chaos.Animations.Get_Animation
+                            ("CURSORS", 1));
       begin
-         Mat.Set_Parameter_Value
-           ("color", Xi.Value.Color_Value (0.0, 0.7, 0.0, 1.0));
-         Model.Good_Destination.Set_Material (Mat);
+         Entity.Set_Texture (Animation.Texture (1));
+         Entity.Material.Technique (1).Pass (1).Alpha_Discard
+           (Operator => Xi.Materials.Equal,
+            Value    => 0.0);
+         Model.Mouse_Cursor.Set_Entity (Entity);
       end;
 
-      Model.Bad_Destination :=
-        Xi.Shapes.Square
-          (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
       declare
-         Mat : constant Xi.Materials.Material.Xi_Material :=
-                 Xi.Assets.Material ("Xi.Solid_Lit_Color").Instantiate;
+         Entity       : constant Xi.Entity.Xi_Entity :=
+                          Xi.Shapes.Square
+                            (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
+         Border_Width : constant := 3;
+         Texture_Data : Xi.Color.Xi_Color_2D_Array
+           (1 .. Chaos.Areas.Pixels_Per_Square,
+            1 .. Chaos.Areas.Pixels_Per_Square);
       begin
-         Mat.Set_Parameter_Value
-           ("color", Xi.Value.Color_Value (0.7, 0.7, 0.7, 1.0));
-         Model.Bad_Destination.Set_Material (Mat);
-      end;
+         for X in Texture_Data'Range (1) loop
+            for Y in Texture_Data'Range (2) loop
+               if X in 1 + Border_Width ..
+                 Chaos.Areas.Pixels_Per_Square - Border_Width
+                 and then Y in 1 + Border_Width ..
+                   Chaos.Areas.Pixels_Per_Square - Border_Width
+               then
+                  Texture_Data (X, Y) := (0.0, 0.0, 0.0, 0.0);
+               else
+                  Texture_Data (X, Y) := (1.0, 1.0, 1.0, 1.0);
+               end if;
+            end loop;
+         end loop;
 
-      Model.Highlight.Set_Entity (Model.Good_Destination);
-      Model.Highlight.Rotate (45.0, 0.0, 0.0, 1.0);
+         Entity.Set_Texture
+           (Xi.Texture.Create_From_Data ("highlight-square", Texture_Data));
+         Entity.Material.Technique (1).Pass (1).Alpha_Discard
+           (Operator => Xi.Materials.Equal,
+            Value    => 0.0);
+         Entity.Material.Technique (1).Pass (1).Set_Lighting_Enabled (False);
+
+         Model.Highlight_Square.Set_Entity (Entity);
+         Model.Highlight_Square.Rotate (45.0, 0.0, 0.0, 1.0);
+      end;
 
       for Tile_Y in 1 .. Area.Tiles_Down loop
          declare
@@ -342,7 +366,6 @@ package body Chaos.Xi_UI.Areas is
                   Square.Set_Texture (Texture);
                   Node.Set_Position (X, Y, 0.0);
                   Node.Set_Entity (Square);
-
                end;
             end loop;
          end;
@@ -380,6 +403,25 @@ package body Chaos.Xi_UI.Areas is
                   Node.Set_Entity (Entity);
                end;
             end loop;
+
+            declare
+               Boundary : constant Chaos.Features.Feature_Polygon :=
+                            Feature.Sensitive_Area;
+               Node     : constant Xi.Node.Xi_Node :=
+                            Model.Map_Top.Create_Child
+                              ("sensitive" & Integer'Image (-Feature_Index));
+               Entity   : Xi.Entity.Xi_Entity;
+            begin
+               Xi.Entity.Xi_New (Entity);
+               Entity.Begin_Operation (Xi.Render_Operation.Triangle_Fan);
+               for Loc of Boundary loop
+                  Entity.Normal (0.0, 0.0, 1.0);
+                  Entity.Vertex (Model.To_World_Position (Loc, 1.0));
+               end loop;
+               Entity.End_Operation;
+               Entity.Set_Material (Xi.Assets.Material ("Xi.Purple"));
+               Node.Set_Entity (Entity);
+            end;
          end;
       end loop;
 
@@ -421,7 +463,6 @@ package body Chaos.Xi_UI.Areas is
             Model.Centre_Y := Camera_Y;
             Camera.Set_Position (Camera_X, Camera_Y, 1000.0);
             Camera.Look_At (Camera_X, Camera_Y, 0.0);
-            Model.Highlight.Set_Position (Camera_X, Camera_Y, 1.0);
             Ada.Text_IO.Put_Line
               ("start: "
                & Xi.Float_Images.Image (Camera_X)
@@ -555,7 +596,9 @@ package body Chaos.Xi_UI.Areas is
       Area  : constant Chaos.Areas.Chaos_Area := Model.Area;
 
       Got_Mouse_Square : Boolean := False;
-      Mouse_Square : Chaos.Locations.Square_Location;
+      World_X, World_Y : Xi_Float;
+      Pixel_Loc        : Chaos.Locations.Pixel_Location;
+      Mouse_Square     : Chaos.Locations.Square_Location;
 
       function Check_Number_Pressed (Number : Natural) return Boolean;
 
@@ -595,27 +638,25 @@ package body Chaos.Xi_UI.Areas is
             Listener.Mouse_X := Xi.Mouse.Current_Mouse.State.X;
             Listener.Mouse_Y := Xi.Mouse.Current_Mouse.State.Y;
 
-            declare
-               Area   : constant Chaos.Areas.Chaos_Area :=
-                          Listener.Model.Area;
-               X      : constant Xi_Float :=
-                          (Listener.Mouse_X - Event.Render_Target.Width / 2.0)
-                          + Listener.Model.Centre_X
-                          + Xi_Float (Area.Pixels_Across / 2);
-               Y      : constant Xi_Float :=
-                          Xi_Float (Area.Pixels_Down) -
-                          ((Listener.Mouse_Y
-                           - Event.Render_Target.Height / 2.0)
-                           + Listener.Model.Centre_Y
-                           + Xi_Float (Area.Pixels_Down / 2));
-               Square : constant Chaos.Locations.Square_Location :=
-                          Area.To_Square
-                            ((Integer (X),
-                             Integer (Y)));
-            begin
-               Mouse_Square := Square;
-            end;
+            World_X :=
+              (Listener.Mouse_X - Event.Render_Target.Width / 2.0)
+              + Listener.Model.Centre_X;
+            World_Y :=
+              (Listener.Mouse_Y - Event.Render_Target.Height / 2.0)
+              + Listener.Model.Centre_Y;
 
+            Pixel_Loc :=
+              (Integer (World_X) + Area.Pixels_Across / 2,
+               Area.Pixels_Down - Integer (World_Y) - Area.Pixels_Down / 2);
+
+            if Pixel_Loc.X in 1 .. Area.Pixels_Across
+              and then Pixel_Loc.Y in 1 .. Area.Pixels_Down
+            then
+               Mouse_Square := Area.To_Square (Pixel_Loc);
+            else
+               Mouse_Square := (Area.Squares_Across / 2,
+                                Area.Squares_Down / 2);
+            end if;
             Got_Mouse_Square := True;
          end if;
       end Check_Mouse_Square;
@@ -661,16 +702,16 @@ package body Chaos.Xi_UI.Areas is
                          (Mouse_Square);
          begin
 
-            Listener.Model.Highlight.Set_Position
+            Listener.Model.Highlight_Square.Set_Position
               (Xi_Float (Pixel.X - Listener.Model.Area.Pixels_Across / 2),
                Xi_Float (Listener.Model.Area.Pixels_Down / 2 - Pixel.Y),
                1.0);
 
-            if Area.Passable (Mouse_Square) then
-               Model.Highlight.Set_Entity (Model.Good_Destination);
-            else
-               Model.Highlight.Set_Entity (Model.Bad_Destination);
-            end if;
+            Listener.Model.Mouse_Cursor.Set_Position
+              (World_X, World_Y, 10.0);
+            Model.Highlight_Square.Set_Visible
+              (Area.Passable (Mouse_Square));
+
          end;
 
       end if;
@@ -694,18 +735,6 @@ package body Chaos.Xi_UI.Areas is
             exit;
          end if;
       end loop;
-
---        if Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('1')) then
---           Chaos.Game.Current_Game.Select_Option (1);
---        elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('2')) then
---           Chaos.Game.Current_Game.Select_Option (2);
---        elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('3')) then
---           Chaos.Game.Current_Game.Select_Option (3);
---        elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('4')) then
---           Chaos.Game.Current_Game.Select_Option (4);
---        elsif Xi.Keyboard.Key_Down (Xi.Keyboard.Character_Key ('5')) then
---           Chaos.Game.Current_Game.Select_Option (5);
---        end if;
 
    end Frame_Started;
 
