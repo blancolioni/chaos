@@ -86,6 +86,7 @@ package body Chaos.Xi_UI.Areas is
      new Chaos.Xi_UI.Models.Root_Chaos_Xi_Model with
       record
          Scene            : Xi.Scene.Xi_Scene;
+         Camera           : Xi.Camera.Xi_Camera;
          Top              : Xi.Node.Xi_Node;
          Map_Top          : Xi.Node.Xi_Node;
          Actor_Top        : Xi.Node.Xi_Node;
@@ -273,6 +274,7 @@ package body Chaos.Xi_UI.Areas is
       Model.Area := Area;
       Model.Actor := Chaos.Game.Current_Game.Party.Party_Member (1);
       Model.Scene := Xi.Scene.Create_Scene;
+      Model.Camera := Model.Scene.Active_Camera;
       Model.Top := Model.Scene.Create_Node ("top");
       Model.Map_Top := Model.Top.Create_Child ("map-top");
       Model.Highlight_Square := Model.Top.Create_Child ("highlight-square");
@@ -596,6 +598,7 @@ package body Chaos.Xi_UI.Areas is
       Area  : constant Chaos.Areas.Chaos_Area := Model.Area;
 
       Got_Mouse_Square : Boolean := False;
+      Mouse_X, Mouse_Y : Xi_Float;
       World_X, World_Y : Xi_Float;
       Pixel_Loc        : Chaos.Locations.Pixel_Location;
       Mouse_Square     : Chaos.Locations.Square_Location;
@@ -635,14 +638,12 @@ package body Chaos.Xi_UI.Areas is
          use type Chaos.Actors.Chaos_Actor;
       begin
          if not Got_Mouse_Square then
-            Listener.Mouse_X := Xi.Mouse.Current_Mouse.State.X;
-            Listener.Mouse_Y := Xi.Mouse.Current_Mouse.State.Y;
 
             World_X :=
-              (Listener.Mouse_X - Event.Render_Target.Width / 2.0)
+              (Mouse_X - Event.Render_Target.Width / 2.0)
               + Listener.Model.Centre_X;
             World_Y :=
-              (Listener.Mouse_Y - Event.Render_Target.Height / 2.0)
+              (Mouse_Y - Event.Render_Target.Height / 2.0)
               + Listener.Model.Centre_Y;
 
             Pixel_Loc :=
@@ -671,6 +672,10 @@ package body Chaos.Xi_UI.Areas is
       end Check_Number_Pressed;
 
    begin
+
+      Mouse_X := Xi.Mouse.Current_Mouse.State.X;
+      Mouse_Y := Xi.Mouse.Current_Mouse.State.Y;
+
       if Now - Listener.Last_Script_Execution > Scripts_Delay then
          Chaos.Expressions.Execute
            (Listener.Model.Area.Script);
@@ -691,8 +696,8 @@ package body Chaos.Xi_UI.Areas is
          Xi.Main.Leave_Main_Loop;
       end if;
 
-      if Xi.Mouse.Current_Mouse.State.X /= Listener.Mouse_X
-        or else Xi.Mouse.Current_Mouse.State.Y /= Listener.Mouse_Y
+      if Mouse_X /= Listener.Mouse_X
+        or else Mouse_Y /= Listener.Mouse_Y
       then
          Check_Mouse_Square;
 
@@ -712,9 +717,32 @@ package body Chaos.Xi_UI.Areas is
             Model.Highlight_Square.Set_Visible
               (Area.Passable (Mouse_Square));
 
+            Listener.Mouse_X := Mouse_X;
+            Listener.Mouse_Y := Mouse_Y;
          end;
 
       end if;
+
+      if Mouse_X < 50.0 then
+         Listener.Model.Centre_X :=
+           Listener.Model.Centre_X - 5.0;
+      elsif Mouse_X > Event.Render_Target.Width - 50.0 then
+         Listener.Model.Centre_X :=
+           Listener.Model.Centre_X + 5.0;
+      end if;
+
+      if Mouse_Y < 50.0 then
+         Listener.Model.Centre_Y :=
+           Listener.Model.Centre_Y - 5.0;
+      elsif Mouse_Y > Event.Render_Target.Height - 50.0 then
+         Listener.Model.Centre_Y :=
+           Listener.Model.Centre_Y + 5.0;
+      end if;
+
+      Listener.Model.Camera.Set_Position
+        (Listener.Model.Centre_X, Listener.Model.Centre_Y, 1000.0);
+      Listener.Model.Camera.Look_At
+        (Listener.Model.Centre_X, Listener.Model.Centre_Y, 0.0);
 
       declare
          use Xi.Mouse;
