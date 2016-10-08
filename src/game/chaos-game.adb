@@ -314,9 +314,8 @@ package body Chaos.Game is
            (Chaos.Locations.Get_Direction
               (Mover.Location, Destination));
          Mover.Set_Path
-           (Chaos.Locations.Drop_Last
-              (Game.Area.Find_Path
-                   (Mover.Location, Destination)));
+           (Game.Area.Find_Path
+              (Mover.Location, Destination));
       end Move;
 
    begin
