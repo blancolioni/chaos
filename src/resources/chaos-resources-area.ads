@@ -62,13 +62,13 @@ package Chaos.Resources.Area is
 
    type Rectangle is
       record
-         Top_Left     : Vertex;
-         Bottom_Right : Vertex;
+         X1, X2 : Word_16;
+         Y1, Y2 : Word_16;
       end record;
 
    type Door_Entry is
       record
-         Name                        : String (1 .. 20);
+         Name                        : String (1 .. 32);
          Resource_Name               : Resource_Reference;
          Flags                       : Word_32;
          First_Open_Vertex           : Word_32;

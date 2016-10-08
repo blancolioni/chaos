@@ -115,6 +115,75 @@ package body Chaos.Resources.Area is
             Area.Actors.Append (Actor);
          end;
       end loop;
+
+      Area.Set_Offset (Area.Doors_Offset);
+      for I in 1 .. Area.Doors_Count loop
+         declare
+            Door : Door_Entry;
+         begin
+            Area.Get (Door.Name);
+            Area.Get (Door.Resource_Name);
+            Area.Get (Door.Flags);
+            Area.Get (Door.First_Open_Vertex);
+            Area.Get (Door.Open_Vertex_Count);
+            Area.Get (Door.Closed_Vertex_Count);
+            Area.Get (Door.First_Closed_Vertex);
+            Area.Get (Door.Open_Bounding_Box.X1);
+            Area.Get (Door.Open_Bounding_Box.Y1);
+            Area.Get (Door.Open_Bounding_Box.X2);
+            Area.Get (Door.Open_Bounding_Box.Y2);
+            Area.Get (Door.Closed_Bounding_Box.X1);
+            Area.Get (Door.Closed_Bounding_Box.Y1);
+            Area.Get (Door.Closed_Bounding_Box.X2);
+            Area.Get (Door.Closed_Bounding_Box.Y2);
+            Area.Get (Door.First_Open_Impeded_Vertex);
+            Area.Get (Door.Open_Impeded_Vertex_Count);
+            Area.Get (Door.Closed_Impeded_Vertex_Count);
+            Area.Get (Door.First_Closed_Impeded_Vertex);
+            Area.Get (Door.HP);
+            Area.Get (Door.AC);
+            Area.Get (Door.Door_Open_Sound);
+            Area.Get (Door.Door_Close_Sound);
+            Area.Get (Door.Cursor_Index);
+            Area.Get (Door.Trap_Detection_Difficulty);
+            Area.Get (Door.Trap_Removal_Difficulty);
+            Area.Get (Door.Is_Trapped);
+            Area.Get (Door.Trap_Detected);
+            Area.Get (Door.Trap_Launch_Target_X);
+            Area.Get (Door.Trap_Launch_Target_Y);
+            Area.Get (Door.Key_Item);
+            Area.Get (Door.Door_Script);
+            Area.Get (Door.Secret_Door_Detection);
+            Area.Get (Door.Lock_Difficulty);
+            Area.Get (Door.Toggle_Door_Open_Box.X1);
+            Area.Get (Door.Toggle_Door_Open_Box.Y1);
+            Area.Get (Door.Toggle_Door_Open_Box.X2);
+            Area.Get (Door.Toggle_Door_Open_Box.Y2);
+            Area.Get (Door.Lockpick_String);
+            Area.Get (Door.Travel_Trigger);
+            Area.Get (Door.Dialog_Speaker_Name);
+            Area.Get (Door.Dialog);
+            Area.Get (Door.Unknown_1);
+            Area.Get (Door.Unknown_2);
+
+            Chaos.Logging.Log
+              ("AREA", To_String (Door.Resource_Name) & " " & Door.Name);
+
+            Area.Doors.Append (Door);
+         end;
+      end loop;
+
+      Area.Set_Offset (Area.Vertices_Offset);
+      for I in 1 .. Area.Vertices_Count loop
+         declare
+            V : Vertex;
+         begin
+            Area.Get (V.X);
+            Area.Get (V.Y);
+            Area.Vertices.Append (V);
+         end;
+      end loop;
+
    end Load;
 
 end Chaos.Resources.Area;
