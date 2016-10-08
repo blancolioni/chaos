@@ -123,6 +123,10 @@ private
    procedure Get (Resource : in out Chaos_Resource'Class;
                   Res_Ref  : out Resource_Reference);
 
+   procedure Get
+     (Resource : in out Chaos_Resource'Class;
+      Text     : out String);
+
    procedure Get (Resource : in out Chaos_Resource'Class;
                   Value    : out Word_32);
 

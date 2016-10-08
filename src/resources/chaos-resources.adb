@@ -53,6 +53,18 @@ package body Chaos.Resources is
 
    procedure Get
      (Resource : in out Chaos_Resource'Class;
+      Text     : out String)
+   is
+   begin
+      Read (Resource.File, Text'Size, Text'Address);
+   end Get;
+
+   ---------
+   -- Get --
+   ---------
+
+   procedure Get
+     (Resource : in out Chaos_Resource'Class;
       Value    : out Word_32)
    is
    begin
