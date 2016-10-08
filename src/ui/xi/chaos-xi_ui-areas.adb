@@ -96,10 +96,10 @@ package body Chaos.Xi_UI.Areas is
          Actors           : Actor_Node_Vectors.Vector;
          Highlight_Square : Xi.Node.Xi_Node;
          Mouse_Cursor     : Xi.Node.Xi_Node;
-         Cursors          : Chaos.Animations.Chaos_Animation;
          Centre_X         : Xi.Xi_Float;
          Centre_Y         : Xi.Xi_Float;
          Left_Click       : Boolean := False;
+         Cursor_Index     : Natural := 0;
       end record;
 
    type Area_Model_Access is access all Area_Model_Record'Class;
@@ -554,6 +554,7 @@ package body Chaos.Xi_UI.Areas is
          Result.Base.Entity.Set_Material (Base_Material (Attitude));
       end;
 
+      Result.Base.Set_Visible (False);
       Result.Node.Set_Entity (Xi.Shapes.Square (0.5));
       Result.Node.Entity.Set_Material (Result.Material);
       Model.Animate (Result);
@@ -713,9 +714,37 @@ package body Chaos.Xi_UI.Areas is
                1.0);
 
             Listener.Model.Mouse_Cursor.Set_Position
-              (World_X, World_Y, 10.0);
+              (World_X + 16.0, World_Y - 16.0, 4.0);
             Model.Highlight_Square.Set_Visible
               (Area.Passable (Mouse_Square));
+
+            declare
+               use type Chaos.Actors.Chaos_Actor;
+               New_Cursor_Index : constant Positive :=
+                                    (if not Area.Passable (Mouse_Square)
+                                     then 8
+                                     elsif Area.Actor (Mouse_Square) /= null
+                                     then 19
+                                     elsif Area.Has_Destination (Mouse_Square)
+                                     then 31
+                                     else 1);
+            begin
+               if New_Cursor_Index /= Listener.Model.Cursor_Index then
+                  declare
+                     Texture  : constant Xi.Texture.Xi_Texture :=
+                                  Chaos.Xi_UI.Animations.Xi_Animation
+                                    (Chaos.Animations.Get_Animation
+                                       ("CURSORS", New_Cursor_Index))
+                       .Texture (1);
+
+                     Material : constant Xi.Materials.Material.Xi_Material :=
+                                  Listener.Model.Mouse_Cursor.Entity.Material;
+                  begin
+                     Material.Technique (1).Pass (1).Set_Texture (Texture);
+                     Listener.Model.Cursor_Index := New_Cursor_Index;
+                  end;
+               end if;
+            end;
 
             Listener.Mouse_X := Mouse_X;
             Listener.Mouse_Y := Mouse_Y;
