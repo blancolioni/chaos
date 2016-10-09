@@ -47,19 +47,15 @@ package body Chaos.Xi_UI.Areas is
    Walk_Delay         : constant Duration := 0.02;
    Inter_Square_Steps : constant := 20;
 
+   Max_Tiles_Across : constant := 128;
+   Max_Tiles_Down   : constant := 128;
+
    Base_Material : array (Chaos.Teams.Chaos_Attitude) of
      Xi.Materials.Material.Xi_Material;
 
    function Create_Base_Material
      (Attitude : Chaos.Teams.Chaos_Attitude)
       return Xi.Materials.Material.Xi_Material;
-
-   package Area_Model_Maps is
-     new WL.String_Maps
-       (Chaos.Xi_UI.Models.Chaos_Xi_Model,
-        Chaos.Xi_UI.Models."=");
-
-   Model_Cache : Area_Model_Maps.Map;
 
    type Actor_Node is
       record
@@ -82,8 +78,10 @@ package body Chaos.Xi_UI.Areas is
      new Ada.Containers.Vectors
        (Positive, Actor_Node);
 
-   type Area_Model_Record is
-     new Chaos.Xi_UI.Models.Root_Chaos_Xi_Model with
+   type Xi_Node_Array is
+     array (Positive range <>, Positive range <>) of Xi.Node.Xi_Node;
+
+   type Base_Model_Record is
       record
          Scene            : Xi.Scene.Xi_Scene;
          Camera           : Xi.Camera.Xi_Camera;
@@ -91,11 +89,23 @@ package body Chaos.Xi_UI.Areas is
          Map_Top          : Xi.Node.Xi_Node;
          Actor_Top        : Xi.Node.Xi_Node;
          Base_Top         : Xi.Node.Xi_Node;
+         Feature_Top      : Xi.Node.Xi_Node;
+         Highlight_Square : Xi.Node.Xi_Node;
+         Mouse_Cursor     : Xi.Node.Xi_Node;
+         Tile_Nodes       : access Xi_Node_Array;
+      end record;
+
+   Base_Model : Base_Model_Record;
+   Base_Model_Created : Boolean := False;
+
+   procedure Create_Base_Model;
+
+   type Area_Model_Record is
+     new Chaos.Xi_UI.Models.Root_Chaos_Xi_Model with
+      record
          Area             : Chaos.Areas.Chaos_Area;
          Actor            : Chaos.Actors.Chaos_Actor;
          Actors           : Actor_Node_Vectors.Vector;
-         Highlight_Square : Xi.Node.Xi_Node;
-         Mouse_Cursor     : Xi.Node.Xi_Node;
          Centre_X         : Xi.Xi_Float;
          Centre_Y         : Xi.Xi_Float;
          Left_Click       : Boolean := False;
@@ -107,7 +117,12 @@ package body Chaos.Xi_UI.Areas is
    overriding function Scene
      (Model : Area_Model_Record)
       return Xi.Scene.Xi_Scene
-   is (Model.Scene);
+   is (Base_Model.Scene);
+
+   package Area_Model_Maps is
+     new WL.String_Maps (Area_Model_Access);
+
+   Model_Cache : Area_Model_Maps.Map;
 
    function Create_Actor_Node
      (Model : Area_Model_Record'Class;
@@ -256,121 +271,64 @@ package body Chaos.Xi_UI.Areas is
    is
       use type Xi.Entity.Xi_Entity;
 
-      Model  : Area_Model_Record;
+      Model  : Area_Model_Access;
       Images : constant Chaos.Xi_UI.Images.Xi_Image_Container :=
                  Chaos.Xi_UI.Images.Xi_Image_Container
                    (Area.Images);
    begin
-      if Model_Cache.Contains (Area.Identifier) then
-         return Model_Cache.Element (Area.Identifier);
+
+      if not Base_Model_Created then
+         Create_Base_Model;
       end if;
 
-      Chaos.Logging.Log
-        ("XI", "Creating model for area " & Area.Identifier
-         & Natural'Image (Area.Tiles_Across)
-         & " x"
-         & Natural'Image (Area.Tiles_Down));
+      if Model_Cache.Contains (Area.Identifier) then
+         Model := Model_Cache.Element (Area.Identifier);
+      else
+         Chaos.Logging.Log
+           ("XI", "Creating model for area " & Area.Identifier
+            & Natural'Image (Area.Tiles_Across)
+            & " x"
+            & Natural'Image (Area.Tiles_Down));
 
-      Model.Area := Area;
-      Model.Actor := null; -- Chaos.Game.Current_Game.Party.Party_Member (1);
-      Model.Scene := Xi.Scene.Create_Scene;
-      Model.Camera := Model.Scene.Active_Camera;
-      Model.Top := Model.Scene.Create_Node ("top");
-      Model.Map_Top := Model.Top.Create_Child ("map-top");
-      Model.Highlight_Square := Model.Top.Create_Child ("highlight-square");
-      Model.Mouse_Cursor := Model.Top.Create_Child ("mouse-cursor");
-      Model.Base_Top := Model.Top.Create_Child ("base-top");
-      Model.Actor_Top := Model.Top.Create_Child ("actor-top");
+         Model := new Area_Model_Record;
+         Model_Cache.Insert (Area.Identifier, Model);
+         Model.Area := Area;
 
+      end if;
+
+      Model.Actor := Chaos.Game.Current_Game.Party.Party_Member (1);
+
+      Model.Actors.Clear;
       for I in 1 .. Model.Area.Actor_Count loop
          Model.Actors.Append
-           (Create_Actor_Node (Model, Model.Area.Actor (I)));
+           (Create_Actor_Node (Model.all, Model.Area.Actor (I)));
       end loop;
 
-      declare
-         Entity : constant Xi.Entity.Xi_Entity :=
-                    Xi.Shapes.Square
-                      (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
-         Animation : constant Chaos.Xi_UI.Animations.Xi_Animation :=
-                       Chaos.Xi_UI.Animations.Xi_Animation
-                         (Chaos.Animations.Get_Animation
-                            ("CURSORS", 1));
-      begin
-         Entity.Set_Texture (Animation.Texture (1));
-         Entity.Material.Technique (1).Pass (1).Alpha_Discard
-           (Operator => Xi.Materials.Equal,
-            Value    => 0.0);
-         Model.Mouse_Cursor.Set_Entity (Entity);
-      end;
-
-      declare
-         Entity       : constant Xi.Entity.Xi_Entity :=
-                          Xi.Shapes.Square
-                            (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
-         Border_Width : constant := 3;
-         Texture_Data : Xi.Color.Xi_Color_2D_Array
-           (1 .. Chaos.Areas.Pixels_Per_Square,
-            1 .. Chaos.Areas.Pixels_Per_Square);
-      begin
-         for X in Texture_Data'Range (1) loop
-            for Y in Texture_Data'Range (2) loop
-               if X in 1 + Border_Width ..
-                 Chaos.Areas.Pixels_Per_Square - Border_Width
-                 and then Y in 1 + Border_Width ..
-                   Chaos.Areas.Pixels_Per_Square - Border_Width
-               then
-                  Texture_Data (X, Y) := (0.0, 0.0, 0.0, 0.0);
-               else
-                  Texture_Data (X, Y) := (1.0, 1.0, 1.0, 1.0);
-               end if;
-            end loop;
+      for Y in 1 .. Area.Tiles_Down loop
+         for X in 1 .. Area.Tiles_Across loop
+            declare
+               Tile_X    : constant Natural :=
+                             Max_Tiles_Across / 2 - Area.Tiles_Across / 2
+                               + X - 1;
+               Tile_Y    : constant Natural :=
+                             Max_Tiles_Down / 2 - Area.Tiles_Down / 2
+                               + Y - 1;
+               Tile_Node : constant Xi.Node.Xi_Node :=
+                             Base_Model.Tile_Nodes (Tile_X, Tile_Y);
+               Tile_Index : constant Positive :=
+                              Area.Tile_Index (X, Y);
+               Image      : constant Xi.Color.Xi_Color_2D_Array :=
+                              Images.Tile (Tile_Index);
+               Name       : constant String :=
+                              "tile" & Integer'Image (-Tile_X)
+                            & Integer'Image (-Tile_Y);
+               Texture    : constant Xi.Texture.Xi_Texture :=
+                              Xi.Texture.Create_From_Data
+                                (Name, Image);
+            begin
+               Tile_Node.Entity.Set_Texture (Texture);
+            end;
          end loop;
-
-         Entity.Set_Texture
-           (Xi.Texture.Create_From_Data ("highlight-square", Texture_Data));
-         Entity.Material.Technique (1).Pass (1).Alpha_Discard
-           (Operator => Xi.Materials.Equal,
-            Value    => 0.0);
-         Entity.Material.Technique (1).Pass (1).Set_Lighting_Enabled (False);
-
-         Model.Highlight_Square.Set_Entity (Entity);
---           Model.Highlight_Square.Rotate (45.0, 0.0, 0.0, 1.0);
-      end;
-
-      for Tile_Y in 1 .. Area.Tiles_Down loop
-         declare
-            use Xi;
-            Y : constant Xi_Float :=
-                  Xi_Float
-                    ((Area.Tiles_Down / 2 - Tile_Y + 1)
-                     * 64 - 32);
-         begin
-            for Tile_X in 1 .. Area.Tiles_Down loop
-               declare
-                  X          : constant Xi_Float :=
-                                 Xi_Float ((Tile_X - Area.Tiles_Across / 2)
-                                           * 64 - 32);
-                  Name       : constant String :=
-                                 "tile" & Integer'Image (-Tile_X)
-                               & Integer'Image (-Tile_Y);
-                  Node       : constant Xi.Node.Xi_Node :=
-                                 Model.Map_Top.Create_Child (Name);
-                  Square     : constant Xi.Entity.Xi_Entity :=
-                                 Xi.Shapes.Square (32.0);
-                  Tile_Index : constant Positive :=
-                                 Model.Area.Tile_Index (Tile_X, Tile_Y);
-                  Image      : constant Xi.Color.Xi_Color_2D_Array :=
-                                 Images.Tile (Tile_Index);
-                  Texture    : constant Xi.Texture.Xi_Texture :=
-                                 Xi.Texture.Create_From_Data
-                                   (Name, Image);
-               begin
-                  Square.Set_Texture (Texture);
-                  Node.Set_Position (X, Y, 0.0);
-                  Node.Set_Entity (Square);
-               end;
-            end loop;
-         end;
       end loop;
 
       Chaos.Logging.Log
@@ -386,7 +344,7 @@ package body Chaos.Xi_UI.Areas is
             for Polygon_Index in 1 .. Feature.Polygon_Count loop
                declare
                   Node : constant Xi.Node.Xi_Node :=
-                           Model.Map_Top.Create_Child
+                           Base_Model.Feature_Top.Create_Child
                              ("feature" & Integer'Image (-Feature_Index)
                               & Integer'Image (-Polygon_Index));
                   Entity : Xi.Entity.Xi_Entity;
@@ -410,7 +368,7 @@ package body Chaos.Xi_UI.Areas is
                Boundary : constant Chaos.Features.Feature_Polygon :=
                             Feature.Sensitive_Area;
                Node     : constant Xi.Node.Xi_Node :=
-                            Model.Map_Top.Create_Child
+                            Base_Model.Feature_Top.Create_Child
                               ("sensitive" & Integer'Image (-Feature_Index));
                Entity   : Xi.Entity.Xi_Entity;
             begin
@@ -476,20 +434,17 @@ package body Chaos.Xi_UI.Areas is
       end;
 
       declare
-         Result   : constant Chaos.Xi_UI.Models.Chaos_Xi_Model :=
-                      new Area_Model_Record'(Model);
          Listener : constant Xi.Frame_Event.Xi_Frame_Listener :=
                       new Area_Frame_Listener'
                         (Last_Script_Execution => Ada.Calendar.Clock,
                          Last_Walk_Execution   => Ada.Calendar.Clock,
-                         Model                 => Area_Model_Access (Result),
+                         Model                 => Model,
                          Mouse_X               => 0.0,
                          Mouse_Y               => 0.0,
                          Key                   => Character'Val (0));
       begin
          Xi.Main.Add_Frame_Listener (Listener);
-         Model_Cache.Insert (Area.Identifier, Result);
-         return Result;
+         return Chaos.Xi_UI.Models.Chaos_Xi_Model (Model);
       end;
 
    end Area_Model;
@@ -509,8 +464,8 @@ package body Chaos.Xi_UI.Areas is
                   Last_Frame_Update => Ada.Calendar.Clock,
                   Last_Walk_Update => Ada.Calendar.Clock,
                   Node         =>
-                    Model.Actor_Top.Create_Child (Actor.Identifier),
-                  Base         => Model.Base_Top.Create_Child
+                    Base_Model.Actor_Top.Create_Child (Actor.Identifier),
+                  Base         => Base_Model.Base_Top.Create_Child
                     (Actor.Identifier & "-base"),
                   Material     => Xi.Materials.Material.Xi_New_With_Defaults,
                   Animation    =>
@@ -582,6 +537,109 @@ package body Chaos.Xi_UI.Areas is
       Material.Set_Parameter_Value ("color", Xi.Value.Color_Value (Color));
       return Material;
    end Create_Base_Material;
+
+   -----------------------
+   -- Create_Base_Model --
+   -----------------------
+
+   procedure Create_Base_Model is
+      Model : Base_Model_Record renames Base_Model;
+   begin
+      Model.Scene := Xi.Scene.Create_Scene;
+      Model.Camera := Model.Scene.Active_Camera;
+      Model.Top := Model.Scene.Create_Node ("top");
+      Model.Map_Top := Model.Top.Create_Child ("map-top");
+      Model.Highlight_Square := Model.Top.Create_Child ("highlight-square");
+      Model.Mouse_Cursor := Model.Top.Create_Child ("mouse-cursor");
+      Model.Base_Top := Model.Top.Create_Child ("base-top");
+      Model.Actor_Top := Model.Top.Create_Child ("actor-top");
+      Model.Feature_Top := Model.Top.Create_Child ("feature-top");
+
+      declare
+         Entity    : constant Xi.Entity.Xi_Entity :=
+                       Xi.Shapes.Square
+                         (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
+         Animation : constant Chaos.Xi_UI.Animations.Xi_Animation :=
+                       Chaos.Xi_UI.Animations.Xi_Animation
+                         (Chaos.Animations.Get_Animation
+                            ("CURSORS", 1));
+      begin
+         Entity.Set_Texture (Animation.Texture (1));
+         Entity.Material.Technique (1).Pass (1).Alpha_Discard
+           (Operator => Xi.Materials.Equal,
+            Value    => 0.0);
+         Model.Mouse_Cursor.Set_Entity (Entity);
+      end;
+
+      Model.Tile_Nodes :=
+        new Xi_Node_Array (1 .. Max_Tiles_Across, 1 .. Max_Tiles_Down - 1);
+
+      for Tile_Y in Model.Tile_Nodes'Range (2) loop
+         declare
+            use Xi;
+            Y : constant Xi_Float :=
+                  Xi_Float
+                    ((Max_Tiles_Down / 2 - Tile_Y)
+                     * 64 - 32);
+         begin
+            for Tile_X in Model.Tile_Nodes'Range (1) loop
+               declare
+                  X          : constant Xi_Float :=
+                                 Xi_Float ((Tile_X - Max_Tiles_Across / 2 + 1)
+                                           * 64 - 32);
+                  Name       : constant String :=
+                                 "tile" & Integer'Image (-Tile_X)
+                               & Integer'Image (-Tile_Y);
+                  Node       : constant Xi.Node.Xi_Node :=
+                                 Model.Map_Top.Create_Child (Name);
+                  Square     : constant Xi.Entity.Xi_Entity :=
+                                 Xi.Shapes.Square (32.0);
+               begin
+                  Node.Set_Position (X, Y, 0.0);
+                  Node.Set_Entity (Square);
+                  Model.Tile_Nodes (Tile_X, Tile_Y) := Node;
+               end;
+            end loop;
+         end;
+      end loop;
+
+      declare
+         Entity       : constant Xi.Entity.Xi_Entity :=
+                          Xi.Shapes.Square
+                            (Xi.Xi_Float (Chaos.Areas.Pixels_Per_Square / 2));
+         Border_Width : constant := 3;
+         Texture_Data : Xi.Color.Xi_Color_2D_Array
+           (1 .. Chaos.Areas.Pixels_Per_Square,
+            1 .. Chaos.Areas.Pixels_Per_Square);
+      begin
+         for X in Texture_Data'Range (1) loop
+            for Y in Texture_Data'Range (2) loop
+               if X in 1 + Border_Width ..
+                 Chaos.Areas.Pixels_Per_Square - Border_Width
+                 and then Y in 1 + Border_Width ..
+                   Chaos.Areas.Pixels_Per_Square - Border_Width
+               then
+                  Texture_Data (X, Y) := (0.0, 0.0, 0.0, 0.0);
+               else
+                  Texture_Data (X, Y) := (1.0, 1.0, 1.0, 1.0);
+               end if;
+            end loop;
+         end loop;
+
+         Entity.Set_Texture
+           (Xi.Texture.Create_From_Data ("highlight-square", Texture_Data));
+         Entity.Material.Technique (1).Pass (1).Alpha_Discard
+           (Operator => Xi.Materials.Equal,
+            Value    => 0.0);
+         Entity.Material.Technique (1).Pass (1).Set_Lighting_Enabled (False);
+
+         Model.Highlight_Square.Set_Entity (Entity);
+         --           Model.Highlight_Square.Rotate (45.0, 0.0, 0.0, 1.0);
+      end;
+
+      Base_Model_Created := True;
+
+   end Create_Base_Model;
 
    -------------------
    -- Frame_Started --
@@ -708,14 +766,14 @@ package body Chaos.Xi_UI.Areas is
                          (Mouse_Square);
          begin
 
-            Listener.Model.Highlight_Square.Set_Position
+            Base_Model.Highlight_Square.Set_Position
               (Xi_Float (Pixel.X - Listener.Model.Area.Pixels_Across / 2),
                Xi_Float (Listener.Model.Area.Pixels_Down / 2 - Pixel.Y),
                1.0);
 
-            Listener.Model.Mouse_Cursor.Set_Position
+            Base_Model.Mouse_Cursor.Set_Position
               (World_X + 16.0, World_Y - 16.0, 4.0);
-            Model.Highlight_Square.Set_Visible
+            Base_Model.Highlight_Square.Set_Visible
               (Area.Passable (Mouse_Square));
 
             declare
@@ -743,7 +801,7 @@ package body Chaos.Xi_UI.Areas is
                        .Texture (1);
 
                      Material : constant Xi.Materials.Material.Xi_Material :=
-                                  Listener.Model.Mouse_Cursor.Entity.Material;
+                                  Base_Model.Mouse_Cursor.Entity.Material;
                   begin
                      Material.Technique (1).Pass (1).Set_Texture (Texture);
                      Listener.Model.Cursor_Index := New_Cursor_Index;
@@ -773,9 +831,9 @@ package body Chaos.Xi_UI.Areas is
            Listener.Model.Centre_Y + 5.0;
       end if;
 
-      Listener.Model.Camera.Set_Position
+      Base_Model.Camera.Set_Position
         (Listener.Model.Centre_X, Listener.Model.Centre_Y, 1000.0);
-      Listener.Model.Camera.Look_At
+      Base_Model.Camera.Look_At
         (Listener.Model.Centre_X, Listener.Model.Centre_Y, 0.0);
 
       declare
