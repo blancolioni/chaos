@@ -1,5 +1,29 @@
 package body Chaos.Features is
 
+   ------------------
+   -- Bounding_Box --
+   ------------------
+
+   function Bounding_Box
+     (Feature : Chaos_Feature_Record'Class)
+      return Chaos.Locations.Pixel_Rectangle
+   is
+   begin
+      return Feature.Bounding_Box;
+   end Bounding_Box;
+
+   ------------------
+   -- Cursor_Index --
+   ------------------
+
+   function Cursor_Index
+     (Feature : Chaos_Feature_Record'Class)
+      return Natural
+   is
+   begin
+      return Feature.Cursor_Index;
+   end Cursor_Index;
+
    -------------
    -- Polygon --
    -------------

@@ -24,6 +24,12 @@ package Chaos.Locations is
      (Square_1, Square_2 : Square_Location)
       return Boolean;
 
+   type Pixel_Rectangle is
+      record
+         X1, Y1 : Integer;
+         X2, Y2 : Integer;
+      end record;
+
    type Square_Path is private;
 
    function "&"

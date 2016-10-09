@@ -118,6 +118,41 @@ package Chaos.Resources.Area is
    package Area_Entrance_Vectors is
      new Ada.Containers.Vectors (Positive, Entrance_Entry);
 
+   type Region_Entry is
+      record
+         Name                        : String (1 .. 32);
+         Region_Type                 : Word_16;
+         Bounding_Box                : Rectangle;
+         Vertex_Count                : Word_16;
+         First_Vertex                : Word_32;
+         Trigger_Value               : Word_32;
+         Cursor_Index                : Word_32;
+         Destination_Area            : Resource_Reference;
+         Destination_Entrance        : String (1 .. 32);
+         Flags                       : Word_32;
+         Information_Text            : Word_32;
+         Trap_Detection_Difficulty   : Word_16;
+         Trap_Removal_Difficulty     : Word_16;
+         Is_Trapped                  : Word_16;
+         Trap_Detected               : Word_16;
+         Trap_Launch_X               : Word_16;
+         Trap_Launch_Y               : Word_16;
+         Key_Item                    : Resource_Reference;
+         Region_Script               : Resource_Reference;
+         Alternative_Use_X           : Word_16;
+         Alternative_Use_Y           : Word_16;
+         Unknown_1                   : Word_32;
+         Unknown_2                   : Unused_Bytes (1 .. 32);
+         Sound                       : Resource_Reference;
+         Talk_Location_X             : Word_16;
+         Talk_Location_Y             : Word_16;
+         Name_Reference              : Word_32;
+         Dialog_File                 : Resource_Reference;
+      end record;
+
+   package Area_Region_Vectors is
+     new Ada.Containers.Vectors (Positive, Region_Entry);
+
    type Area_Resource is
      new Chaos_Resource with
       record
@@ -174,6 +209,7 @@ package Chaos.Resources.Area is
          Doors                     : Area_Door_Vectors.Vector;
          Vertices                  : Vertex_Vectors.Vector;
          Entrances                 : Area_Entrance_Vectors.Vector;
+         Regions                   : Area_Region_Vectors.Vector;
       end record;
 
    overriding function Signature

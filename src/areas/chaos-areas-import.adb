@@ -181,15 +181,33 @@ package body Chaos.Areas.Import is
             end;
          end loop;
 
+         for Region_Index in 1 .. Are.Regions.Last_Index loop
+            declare
+               Feature      : constant Chaos.Features.Chaos_Feature :=
+                                Chaos.Features.Import.Import_Region
+                                  (Are, Region_Index);
+               Box          : constant Chaos.Locations.Pixel_Rectangle :=
+                                Feature.Bounding_Box;
+               Pixel_Centre : constant Chaos.Locations.Pixel_Location :=
+                                ((Box.X1 + Box.X2) / 2,
+                                 (Box.Y1 + Box.Y2) / 2);
+               Square_Loc   : constant Chaos.Locations.Square_Location :=
+                                Area.To_Square (Pixel_Centre);
+               Square_Index : constant Positive :=
+                                Area.To_Square_Index (Square_Loc);
+            begin
+               Area.Squares (Square_Index).Feature := Feature;
+            end;
+         end loop;
+
          for Entrance of Are.Entrances loop
             declare
                Square_Loc : constant Chaos.Locations.Square_Location :=
                               Area.To_Square
                                 ((Integer (Entrance.X), Integer (Entrance.Y)));
-               Square     : Square_Type renames
-                              Area.Squares (Area.To_Square_Index (Square_Loc));
             begin
-               Square.Has_Destination := True;
+               Area.Entrances.Append
+                 ((Entrance.Name, Square_Loc));
             end;
          end loop;
 

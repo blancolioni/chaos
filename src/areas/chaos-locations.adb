@@ -2,6 +2,8 @@ with Ada.Containers.Doubly_Linked_Lists;
 
 package body Chaos.Locations is
 
+--     Diagonal : constant Boolean := False;
+
    package List_Of_Squares is
      new Ada.Containers.Doubly_Linked_Lists (Square_Location);
 
@@ -208,35 +210,38 @@ package body Chaos.Locations is
       DX : constant Integer := To.X - From.X;
       DY : constant Integer := To.Y - From.Y;
    begin
-      --  directions look funny because squares are
-      --  rotated 45 degrees from pixels (and actor orientations)
       if abs DX > 2 * abs DY then
          if DX > 0 then
-            return North_East;
+            return East;
          else
-            return South_West;
+            return West;
          end if;
       elsif abs DY > 2 * abs DX then
          if DY > 0 then
-            return South_East;
+            return South;
          else
-            return North_West;
+            return North;
          end if;
       else
          if DX > 0 then
             if DY > 0 then
-               return East;
+               return South_East;
             else
-               return North;
+               return North_East;
             end if;
          else
             if DY > 0 then
-               return South;
+               return South_West;
             else
-               return West;
+               return North_West;
             end if;
          end if;
       end if;
+--
+--        if Diagonal then
+--           --  directions look funny because squares are
+--           --  rotated 45 degrees from pixels (and actor orientations)
+--           if
    end Get_Direction;
 
    ------------

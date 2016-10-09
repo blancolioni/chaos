@@ -66,7 +66,7 @@ package body Chaos.Animations.Actors is
       if Actor.Has_Path then
          return Get_Animation (Actor, "1G1", 1);
       else
-         return Get_Animation (Actor, "1G1", 9);
+         return Get_Animation (Actor, "1G1", 25);
       end if;
    end Get_Animation;
 

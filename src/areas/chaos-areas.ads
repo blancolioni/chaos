@@ -83,6 +83,17 @@ package Chaos.Areas is
       return Chaos.Features.Chaos_Feature
      with Pre => Index <= Area.Feature_Count;
 
+   function Has_Feature
+     (Area     : Chaos_Area_Record'Class;
+      Location : Chaos.Locations.Square_Location)
+      return Boolean;
+
+   function Feature
+     (Area     : Chaos_Area_Record'Class;
+      Location : Chaos.Locations.Square_Location)
+      return Chaos.Features.Chaos_Feature
+     with Pre => Area.Has_Feature (Location);
+
    function Actor_Count
      (Area     : Chaos_Area_Record'Class)
       return Natural;
@@ -92,10 +103,16 @@ package Chaos.Areas is
       Index : Positive)
       return Chaos.Actors.Chaos_Actor;
 
+   function Has_Actor
+     (Area     : Chaos_Area_Record'Class;
+      Location : Chaos.Locations.Square_Location)
+      return Boolean;
+
    function Actor
      (Area     : Chaos_Area_Record'Class;
       Location : Chaos.Locations.Square_Location)
-      return Chaos.Actors.Chaos_Actor;
+      return Chaos.Actors.Chaos_Actor
+     with Pre => Area.Has_Actor (Location);
 
    procedure Add_Actor
      (Area     : Chaos_Area_Record'Class;
@@ -107,11 +124,6 @@ package Chaos.Areas is
       return Boolean;
 
    function Transparent
-     (Area     : Chaos_Area_Record'Class;
-      Location : Chaos.Locations.Square_Location)
-      return Boolean;
-
-   function Has_Destination
      (Area     : Chaos_Area_Record'Class;
       Location : Chaos.Locations.Square_Location)
       return Boolean;
@@ -163,11 +175,10 @@ private
 
    type Square_Type is
       record
-         Actor           : Chaos.Actors.Chaos_Actor;
-         Feature         : Chaos.Features.Chaos_Feature;
-         Passable        : Boolean := True;
-         Transparent     : Boolean := True;
-         Has_Destination : Boolean := False;
+         Actor       : Chaos.Actors.Chaos_Actor;
+         Feature     : Chaos.Features.Chaos_Feature;
+         Passable    : Boolean := True;
+         Transparent : Boolean := True;
       end record;
 
    package Square_Vectors is
@@ -181,6 +192,15 @@ private
    package Tileset_Map_Entry_Vectors is
      new Ada.Containers.Vectors (Positive, Tileset_Map_Entry);
 
+   type Area_Entrance is
+      record
+         Name   : String (1 .. 32);
+         Square : Chaos.Locations.Square_Location;
+      end record;
+
+   package Area_Entrance_Vectors is
+     new Ada.Containers.Vectors (Positive, Area_Entrance);
+
    type Chaos_Area_Record is
      new Chaos.Objects.Root_Chaos_Object_Record
      and Chaos.Commands.Command_Environment_Interface with
@@ -193,6 +213,7 @@ private
          Tiles          : Tileset_Map_Entry_Vectors.Vector;
          Actors         : Actor_Vectors.Vector;
          Features       : Feature_Vectors.Vector;
+         Entrances      : Area_Entrance_Vectors.Vector;
          Visibility     : Chaos.Vision.Chaos_Vision;
          Script         : Chaos.Expressions.Chaos_Expression;
          Environment    : Chaos.Expressions.Chaos_Environment;

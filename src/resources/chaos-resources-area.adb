@@ -116,6 +116,47 @@ package body Chaos.Resources.Area is
          end;
       end loop;
 
+      Area.Set_Offset (Area.Regions_Offset);
+      for I in 1 .. Area.Regions_Count loop
+         declare
+            Region : Region_Entry;
+         begin
+            Area.Get (Region.Name);
+            Area.Get (Region.Region_Type);
+            Area.Get (Region.Bounding_Box.X1);
+            Area.Get (Region.Bounding_Box.Y1);
+            Area.Get (Region.Bounding_Box.X2);
+            Area.Get (Region.Bounding_Box.Y2);
+            Area.Get (Region.Vertex_Count);
+            Area.Get (Region.First_Vertex);
+            Area.Get (Region.Trigger_Value);
+            Area.Get (Region.Cursor_Index);
+            Area.Get (Region.Destination_Area);
+            Area.Get (Region.Destination_Entrance);
+            Area.Get (Region.Flags);
+            Area.Get (Region.Information_Text);
+            Area.Get (Region.Trap_Detection_Difficulty);
+            Area.Get (Region.Trap_Removal_Difficulty);
+            Area.Get (Region.Is_Trapped);
+            Area.Get (Region.Trap_Detected);
+            Area.Get (Region.Trap_Launch_X);
+            Area.Get (Region.Trap_Launch_Y);
+            Area.Get (Region.Key_Item);
+            Area.Get (Region.Region_Script);
+            Area.Get (Region.Alternative_Use_X);
+            Area.Get (Region.Alternative_Use_Y);
+            Area.Get (Region.Unknown_1);
+            Area.Get (Region.Unknown_2);
+            Area.Get (Region.Sound);
+            Area.Get (Region.Talk_Location_X);
+            Area.Get (Region.Talk_Location_Y);
+            Area.Get (Region.Name_Reference);
+            Area.Get (Region.Dialog_File);
+
+            Area.Regions.Append (Region);
+         end;
+      end loop;
+
       Area.Set_Offset (Area.Doors_Offset);
       for I in 1 .. Area.Doors_Count loop
          declare

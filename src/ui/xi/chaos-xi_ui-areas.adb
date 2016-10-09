@@ -272,7 +272,7 @@ package body Chaos.Xi_UI.Areas is
          & Natural'Image (Area.Tiles_Down));
 
       Model.Area := Area;
-      Model.Actor := Chaos.Game.Current_Game.Party.Party_Member (1);
+      Model.Actor := null; -- Chaos.Game.Current_Game.Party.Party_Member (1);
       Model.Scene := Xi.Scene.Create_Scene;
       Model.Camera := Model.Scene.Active_Camera;
       Model.Top := Model.Scene.Create_Node ("top");
@@ -720,13 +720,18 @@ package body Chaos.Xi_UI.Areas is
 
             declare
                use type Chaos.Actors.Chaos_Actor;
+               Square_Cursor_Index : constant Natural :=
+                                       (if Area.Has_Feature (Mouse_Square)
+                                        then Area.Feature (Mouse_Square)
+                                        .Cursor_Index
+                                        else 0);
                New_Cursor_Index : constant Positive :=
                                     (if not Area.Passable (Mouse_Square)
                                      then 8
-                                     elsif Area.Actor (Mouse_Square) /= null
+                                     elsif Area.Has_Actor (Mouse_Square)
                                      then 19
-                                     elsif Area.Has_Destination (Mouse_Square)
-                                     then 31
+                                     elsif Square_Cursor_Index > 0
+                                     then Square_Cursor_Index
                                      else 1);
             begin
                if New_Cursor_Index /= Listener.Model.Cursor_Index then
@@ -806,7 +811,9 @@ package body Chaos.Xi_UI.Areas is
       use type Chaos.Actors.Chaos_Actor;
       Area : constant Chaos.Areas.Chaos_Area := Model.Area;
       Actor : constant Chaos.Actors.Chaos_Actor :=
-                Area.Actor (Square);
+                (if Area.Has_Actor (Square)
+                 then Area.Actor (Square)
+                 else null);
       Pixel_Loc : constant Chaos.Locations.Pixel_Location :=
                     Model.Area.To_Pixels (Square);
       Square_2  : constant Chaos.Locations.Square_Location :=

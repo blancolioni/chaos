@@ -1,6 +1,8 @@
 private with Ada.Containers.Vectors;
 private with Ada.Containers.Indefinite_Vectors;
 
+private with Chaos.Resources;
+
 with Chaos.Locations;
 
 package Chaos.Features is
@@ -26,6 +28,14 @@ package Chaos.Features is
      (Feature : Chaos_Feature_Record'Class)
       return Feature_Polygon;
 
+   function Bounding_Box
+     (Feature : Chaos_Feature_Record'Class)
+      return Chaos.Locations.Pixel_Rectangle;
+
+   function Cursor_Index
+     (Feature : Chaos_Feature_Record'Class)
+      return Natural;
+
 private
 
    package Polygon_Vectors is
@@ -40,9 +50,13 @@ private
 
    type Chaos_Feature_Record is tagged
       record
-         State           : Positive := 1;
-         Polygon_Sets    : Polygon_Set_Vectors.Vector;
-         Sensitive_Areas : Polygon_Vectors.Vector;
+         State                : Positive := 1;
+         Polygon_Sets         : Polygon_Set_Vectors.Vector;
+         Sensitive_Areas      : Polygon_Vectors.Vector;
+         Destination          : Chaos.Resources.Resource_Reference;
+         Destination_Entrance : String (1 .. 32);
+         Bounding_Box         : Chaos.Locations.Pixel_Rectangle;
+         Cursor_Index         : Natural;
       end record;
 
 end Chaos.Features;

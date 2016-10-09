@@ -10,4 +10,9 @@ package Chaos.Features.Import is
       Wed_Index  : Positive)
       return Chaos_Feature;
 
+   function Import_Region
+     (Area       : Chaos.Resources.Area.Area_Resource'Class;
+      Region_Index : Positive)
+      return Chaos_Feature;
+
 end Chaos.Features.Import;

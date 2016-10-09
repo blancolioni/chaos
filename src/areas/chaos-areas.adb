@@ -85,8 +85,7 @@ package body Chaos.Areas is
                       (Actor           => null,
                        Feature         => null,
                        Passable        => False,
-                       Transparent     => False,
-                       Has_Destination => False);
+                       Transparent     => False);
    begin
       Area.Initialize (Identity);
       Area.Pixel_Width := Pixel_Width;
@@ -127,6 +126,19 @@ package body Chaos.Areas is
       return Area.Features.Element (Index);
    end Feature;
 
+   -------------
+   -- Feature --
+   -------------
+
+   function Feature
+     (Area     : Chaos_Area_Record'Class;
+      Location : Chaos.Locations.Square_Location)
+      return Chaos.Features.Chaos_Feature
+   is
+   begin
+      return Area.Squares.Element (Area.To_Square_Index (Location)).Feature;
+   end Feature;
+
    -------------------
    -- Feature_Count --
    -------------------
@@ -153,25 +165,42 @@ package body Chaos.Areas is
       function OK
         (Location : Chaos.Locations.Square_Location)
          return Boolean
-      is (Area.Actor (Location) = null and then Area.Passable (Location));
+      is (not Area.Has_Actor (Location) and then Area.Passable (Location));
    begin
       return Chaos.Locations.Find_Path
         (Start, Finish, Area.Squares_Across - 1, Area.Squares_Down - 1,
          OK'Access);
    end Find_Path;
 
-   ---------------------
-   -- Has_Destination --
-   ---------------------
+   ---------------
+   -- Has_Actor --
+   ---------------
 
-   function Has_Destination
+   function Has_Actor
      (Area     : Chaos_Area_Record'Class;
       Location : Chaos.Locations.Square_Location)
       return Boolean
    is
+      use type Chaos.Actors.Chaos_Actor;
+      Index : constant Positive := Area.To_Square_Index (Location);
    begin
-      return Area.Squares (Area.To_Square_Index (Location)).Has_Destination;
-   end Has_Destination;
+      return Area.Squares.Element (Index).Actor /= null;
+   end Has_Actor;
+
+   -----------------
+   -- Has_Feature --
+   -----------------
+
+   function Has_Feature
+     (Area     : Chaos_Area_Record'Class;
+      Location : Chaos.Locations.Square_Location)
+      return Boolean
+   is
+      use type Chaos.Features.Chaos_Feature;
+   begin
+      return Area.Squares.Element (Area.To_Square_Index (Location)).Feature
+        /= null;
+   end Has_Feature;
 
    ------------
    -- Images --
