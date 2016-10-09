@@ -1,10 +1,8 @@
 with Ada.Text_IO;
 
 with Chaos.Actors;
-with Chaos.Areas.Import;
 with Chaos.Classes;
 with Chaos.Configuration;
-with Chaos.Creatures.Import;
 with Chaos.Creatures.Quick;
 with Chaos.Dice;
 with Chaos.Expressions;
@@ -12,10 +10,7 @@ with Chaos.Expressions.Environments;
 with Chaos.Expressions.Functions;
 with Chaos.Game;
 with Chaos.Localisation;
-with Chaos.Locations;
 with Chaos.Parser;
-with Chaos.Party;
-with Chaos.Powers.Attacks;
 with Chaos.Vision;
 
 --  with Chaos.Classes;
@@ -89,37 +84,6 @@ begin
       begin
          Chaos.UI.Set_Current_UI (UI);
 
-         declare
-            Protagonist    : constant Chaos.Creatures.Chaos_Creature :=
-                               Chaos.Creatures.Quick.Quick_Creature
-                                 ("Aramael",
-                                  Chaos.Races.Get ("eladrin"),
-                                  Chaos.Classes.Get ("wizard"));
-            Area           : constant Chaos.Areas.Chaos_Area :=
-                               Chaos.Areas.Import.Import_Area
-                                 (Chaos.Infinity_Engine.Start_Area);
-            Actor          : constant Chaos.Actors.Chaos_Actor :=
-                               Chaos.Actors.Create_Actor
-                                 (Protagonist, Area,
-                                  Area.To_Square
-                                    (Chaos.Infinity_Engine.Start_Location),
-                                  Chaos.Locations.South);
-            Shank_Creature : constant Chaos.Creatures.Chaos_Creature :=
-                               Chaos.Creatures.Import.Import_Creature
-                                 ("SHANK");
-            Shank_Actor    : constant Chaos.Actors.Chaos_Actor :=
-                               Chaos.Actors.Create_Actor
-                                 (Shank_Creature, Area,
-                                  (98, 100),
-                                  Chaos.Locations.North);
-         begin
-            for I in 1 .. 3 loop
-               Chaos.Powers.Attacks.Attack
-                 (Actor, Shank_Actor,
-                  Chaos.Powers.Get ("magic-missile"));
-            end loop;
-         end;
-
          UI.Stop;
       end;
    else
@@ -138,20 +102,8 @@ begin
                               ("Aramael",
                                Chaos.Races.Get ("eladrin"),
                                Chaos.Classes.Get ("wizard"));
-            Area        : constant Chaos.Areas.Chaos_Area :=
-                            Chaos.Areas.Import.Import_Area
-                              (Chaos.Infinity_Engine.Start_Area);
-            Actor       : constant Chaos.Actors.Chaos_Actor :=
-                            Chaos.Actors.Create_Actor
-                              (Protagonist, Area,
-                               Area.To_Square
-                                 (Chaos.Infinity_Engine.Start_Location),
-                               Chaos.Locations.South);
-            Party       : constant Chaos.Party.Party_Type :=
-                            Chaos.Party.Create_Party;
          begin
-            Party.Add_Party_Member (Actor);
-            Chaos.Game.Create_Game (Area, Party);
+            Chaos.Game.Create_Game (Protagonist);
          end;
 
          UI.Start;

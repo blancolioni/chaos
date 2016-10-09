@@ -1,5 +1,6 @@
 with Chaos.Actors;
 with Chaos.Areas;
+with Chaos.Creatures;
 with Chaos.Dialog;
 with Chaos.Locations;
 with Chaos.Party;
@@ -63,8 +64,7 @@ package Chaos.Game is
    function Current_Game return Chaos_Game;
 
    procedure Create_Game
-     (Area   : Chaos.Areas.Chaos_Area;
-      Party  : Chaos.Party.Party_Type);
+     (Protagonist : Chaos.Creatures.Chaos_Creature);
 
 private
 

@@ -5,6 +5,11 @@ with Chaos.UI;
 with Chaos.Expressions;
 with Chaos.Parser;
 
+with Chaos.Resources.Manager;
+with Chaos.Resources.Tables;
+
+with Chaos.Areas.Import;
+
 with Chaos.Paths;
 
 package body Chaos.Game is
@@ -99,13 +104,30 @@ package body Chaos.Game is
    -----------------
 
    procedure Create_Game
-     (Area   : Chaos.Areas.Chaos_Area;
-      Party  : Chaos.Party.Party_Type)
+     (Protagonist : Chaos.Creatures.Chaos_Creature)
    is
+      Start_Area : Chaos.Resources.Tables.Table_Resource'Class renames
+                     Chaos.Resources.Tables.Table_Resource'Class
+                       (Chaos.Resources.Manager.Load_Resource
+                          ("STARTARE", Chaos.Resources.Table_Resource).all);
+      Area_Resource_Name : constant String :=
+                             Start_Area.Get ("START_AREA", "VALUE");
+      Area_X             : constant Integer :=
+                             Integer'Value
+                               (Start_Area.Get ("START_XPOS", "VALUE"));
+      Area_Y             : constant Integer :=
+                             Integer'Value
+                               (Start_Area.Get ("START_YPOS", "VALUE"));
    begin
       Local_Current_Game := new Chaos_Game_Record;
-      Local_Current_Game.Area := Area;
-      Local_Current_Game.Party := Party;
+      Local_Current_Game.Area :=
+        Chaos.Areas.Import.Import_Area (Area_Resource_Name);
+      Local_Current_Game.Party := Chaos.Party.Create_Party;
+      Local_Current_Game.Party.Add_Party_Member
+        (Chaos.Actors.Create_Actor
+           (Protagonist, Local_Current_Game.Area,
+            Local_Current_Game.Area.To_Square ((Area_X, Area_Y)),
+            Chaos.Locations.South));
    end Create_Game;
 
    ------------------

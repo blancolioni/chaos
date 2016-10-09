@@ -27,14 +27,16 @@ package Chaos.Resources is
 
    type Resource_Type is private;
 
-   Area_Resource     : constant Resource_Type;
-   Bmp_Resource      : constant Resource_Type;
-   Bam_Resource      : constant Resource_Type;
-   Creature_Resource : constant Resource_Type;
-   Dialog_Resource   : constant Resource_Type;
-   Script_Resource   : constant Resource_Type;
-   Tileset_Resource  : constant Resource_Type;
-   Wed_Resource      : constant Resource_Type;
+   Area_Resource       : constant Resource_Type;
+   Bmp_Resource        : constant Resource_Type;
+   Bam_Resource        : constant Resource_Type;
+   Creature_Resource   : constant Resource_Type;
+   Dialog_Resource     : constant Resource_Type;
+   Identifier_Resource : constant Resource_Type;
+   Script_Resource     : constant Resource_Type;
+   Table_Resource      : constant Resource_Type;
+   Tileset_Resource    : constant Resource_Type;
+   Wed_Resource        : constant Resource_Type;
 
    type Chaos_Resource is abstract tagged limited private;
 
@@ -80,14 +82,16 @@ private
 
    type Resource_Type is new Word_16;
 
-   Bmp_Resource      : constant Resource_Type := 16#0001#;
-   Bam_Resource      : constant Resource_Type := 16#03E8#;
-   Wed_Resource      : constant Resource_Type := 16#03E9#;
-   Tileset_Resource  : constant Resource_Type := 16#03EB#;
-   Script_Resource   : constant Resource_Type := 16#03EF#;
-   Creature_Resource : constant Resource_Type := 16#03F1#;
-   Area_Resource     : constant Resource_Type := 16#03F2#;
-   Dialog_Resource   : constant Resource_Type := 16#03F3#;
+   Bmp_Resource        : constant Resource_Type := 16#0001#;
+   Bam_Resource        : constant Resource_Type := 16#03E8#;
+   Wed_Resource        : constant Resource_Type := 16#03E9#;
+   Tileset_Resource    : constant Resource_Type := 16#03EB#;
+   Script_Resource     : constant Resource_Type := 16#03EF#;
+   Identifier_Resource : constant Resource_Type := 16#03F0#;
+   Creature_Resource   : constant Resource_Type := 16#03F1#;
+   Area_Resource       : constant Resource_Type := 16#03F2#;
+   Dialog_Resource     : constant Resource_Type := 16#03F3#;
+   Table_Resource      : constant Resource_Type := 16#03F4#;
 
    package Offset_Stacks is
      new Ada.Containers.Doubly_Linked_Lists (Word_32);

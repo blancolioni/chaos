@@ -52,22 +52,4 @@ package body Chaos.Infinity_Engine is
             raise;
    end Read_Infinity_Config;
 
-   ----------------
-   -- Start_Area --
-   ----------------
-
-   function Start_Area return String is
-   begin
-      return "AR2600";
-   end Start_Area;
-
-   --------------------
-   -- Start_Location --
-   --------------------
-
-   function Start_Location return Chaos.Locations.Pixel_Location is
-   begin
-      return (1080, 530);
-   end Start_Location;
-
 end Chaos.Infinity_Engine;
