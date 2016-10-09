@@ -334,7 +334,7 @@ package body Chaos.Xi_UI.Areas is
          Entity.Material.Technique (1).Pass (1).Set_Lighting_Enabled (False);
 
          Model.Highlight_Square.Set_Entity (Entity);
-         Model.Highlight_Square.Rotate (45.0, 0.0, 0.0, 1.0);
+--           Model.Highlight_Square.Rotate (45.0, 0.0, 0.0, 1.0);
       end;
 
       for Tile_Y in 1 .. Area.Tiles_Down loop
@@ -545,7 +545,7 @@ package body Chaos.Xi_UI.Areas is
       begin
          Result.Base.Set_Entity
            (Xi.Shapes.Square (16.0));
-         Result.Base.Rotate (45.0, 0.0, 0.0, 1.0);
+--           Result.Base.Rotate (45.0, 0.0, 0.0, 1.0);
 
          if Base_Material (Attitude) = null then
             Base_Material (Attitude) :=
@@ -807,7 +807,15 @@ package body Chaos.Xi_UI.Areas is
       Area : constant Chaos.Areas.Chaos_Area := Model.Area;
       Actor : constant Chaos.Actors.Chaos_Actor :=
                 Area.Actor (Square);
+      Pixel_Loc : constant Chaos.Locations.Pixel_Location :=
+                    Model.Area.To_Pixels (Square);
+      Square_2  : constant Chaos.Locations.Square_Location :=
+                    Model.Area.To_Square (Pixel_Loc);
    begin
+      Chaos.Logging.Log
+        ("XI-AREA", Pixel_Loc.X'Img & Pixel_Loc.Y'Img
+         & Square.X'Img & Square.Y'Img
+         & Square_2.X'Img & Square_2.Y'Img);
       if Actor = null then
          if Model.Actor /= null
            and then Area.Passable (Square)

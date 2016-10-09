@@ -385,22 +385,25 @@ package body Chaos.Areas is
       Square_Location : Chaos.Locations.Square_Location)
       return Chaos.Locations.Pixel_Location
    is
-      use Ada.Numerics.Elementary_Functions;
-      Root_2  : constant Float := Sqrt (2.0) / 2.0;
-      Square_X : constant Float :=
-                   Float (Square_Location.X - Area.Squares_Across / 2);
-      Square_Y : constant Float :=
-                   Float (Square_Location.Y - Area.Squares_Down / 2);
-      Rot_X    : constant Float :=
-                   Square_X * Root_2 + Square_Y * Root_2;
-      Rot_Y    : constant Float :=
-                   Square_Y * Root_2 - Square_X * Root_2;
-      Pixel_X  : constant Integer :=
-                   Integer (Rot_X * Float (Pixels_Per_Square))
-                   + Area.Pixel_Width / 2;
-      Pixel_Y  : constant Integer :=
-                   Integer (Rot_Y * Float (Pixels_Per_Square))
-                   + Area.Pixel_Height / 2;
+      pragma Unreferenced (Area);
+--        use Ada.Numerics.Elementary_Functions;
+--        Root_2  : constant Float := Sqrt (2.0) / 2.0;
+--        Square_X : constant Float :=
+--                     Float (Square_Location.X - Area.Squares_Across / 2);
+--        Square_Y : constant Float :=
+--                     Float (Square_Location.Y - Area.Squares_Down / 2);
+--        Rot_X    : constant Float :=
+--                     Square_X * Root_2 + Square_Y * Root_2;
+--        Rot_Y    : constant Float :=
+--                     Square_Y * Root_2 - Square_X * Root_2;
+--        Pixel_X  : constant Integer :=
+--                     Integer (Rot_X * Float (Pixels_Per_Square))
+--                     + Area.Pixel_Width / 2;
+--        Pixel_Y  : constant Integer :=
+--                     Area.Pixel_Height / 2
+--                     - Integer (Rot_Y * Float (Pixels_Per_Square));
+      Pixel_X : constant Natural := Square_Location.X * Pixels_Per_Square;
+      Pixel_Y : constant Natural := Square_Location.Y * Pixels_Per_Square;
    begin
       return (Pixel_X, Pixel_Y);
    end To_Pixels;
@@ -414,24 +417,29 @@ package body Chaos.Areas is
       Pixel_Location : Chaos.Locations.Pixel_Location)
       return Chaos.Locations.Square_Location
    is
-      use Ada.Numerics.Elementary_Functions;
-      Root_2  : constant Float := Sqrt (2.0) / 2.0;
-      Pixel_X : constant Float :=
-                  Float (Pixel_Location.X - Area.Pixels_Across / 2);
-      Pixel_Y : constant Float :=
-                  Float (Pixel_Location.Y - Area.Pixels_Down / 2);
-      Rot_X   : constant Float :=
-                  Pixel_X * Root_2 - Pixel_Y * Root_2;
-      Rot_Y   : constant Float :=
-                  Pixel_Y * Root_2 + Pixel_X * Root_2;
+      pragma Unreferenced (Area);
+--        use Ada.Numerics.Elementary_Functions;
+--        Root_2  : constant Float := Sqrt (2.0) / 2.0;
+--        Pixel_X : constant Float :=
+--                    Float (Pixel_Location.X - Area.Pixels_Across / 2);
+--        Pixel_Y : constant Float :=
+--                    Float (Area.Pixels_Down / 2 - Pixel_Location.Y);
+--        Rot_X   : constant Float :=
+--                    Pixel_X * Root_2 - Pixel_Y * Root_2;
+--        Rot_Y   : constant Float :=
+--                    Pixel_Y * Root_2 + Pixel_X * Root_2;
+--        Square_X : constant Natural :=
+--                     (Integer (Rot_X))
+--                     / Pixels_Per_Square
+--                       + Area.Squares_Across / 2;
+--        Square_Y : constant Natural :=
+--                     (Integer (Rot_Y))
+--                     / Pixels_Per_Square
+--                       + Area.Squares_Down / 2;
       Square_X : constant Natural :=
-                   (Integer (Rot_X))
-                   / Pixels_Per_Square
-                     + Area.Squares_Across / 2;
+                   Pixel_Location.X / Pixels_Per_Square;
       Square_Y : constant Natural :=
-                   (Integer (Rot_Y))
-                   / Pixels_Per_Square
-                     + Area.Squares_Down / 2;
+                   Pixel_Location.Y / Pixels_Per_Square;
    begin
       return (Square_X, Square_Y);
    end To_Square;
