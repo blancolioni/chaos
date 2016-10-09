@@ -126,7 +126,7 @@ package body Chaos.Game is
       Local_Current_Game.Party.Add_Party_Member
         (Chaos.Actors.Create_Actor
            (Protagonist, Local_Current_Game.Area,
-            Local_Current_Game.Area.To_Square ((Area_X, Area_Y)),
+            Local_Current_Game.Area.To_Square ((Area_X, Area_Y + 128)),
             Chaos.Locations.South));
    end Create_Game;
 
