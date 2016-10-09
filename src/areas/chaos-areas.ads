@@ -70,7 +70,7 @@ package Chaos.Areas is
       return Chaos.Locations.Pixel_Location;
 
    function Script
-     (Area : Chaos_Area_Record'class)
+     (Area : Chaos_Area_Record'Class)
       return Chaos.Expressions.Chaos_Expression;
 
    function Feature_Count
@@ -78,7 +78,7 @@ package Chaos.Areas is
       return Natural;
 
    function Feature
-     (Area : Chaos_Area_Record'Class;
+     (Area  : Chaos_Area_Record'Class;
       Index : Positive)
       return Chaos.Features.Chaos_Feature
      with Pre => Index <= Area.Feature_Count;
@@ -107,6 +107,11 @@ package Chaos.Areas is
       return Boolean;
 
    function Transparent
+     (Area     : Chaos_Area_Record'Class;
+      Location : Chaos.Locations.Square_Location)
+      return Boolean;
+
+   function Has_Destination
      (Area     : Chaos_Area_Record'Class;
       Location : Chaos.Locations.Square_Location)
       return Boolean;
@@ -158,10 +163,11 @@ private
 
    type Square_Type is
       record
-         Actor       : Chaos.Actors.Chaos_Actor;
-         Feature     : Chaos.Features.Chaos_Feature;
-         Passable    : Boolean := True;
-         Transparent : Boolean := True;
+         Actor           : Chaos.Actors.Chaos_Actor;
+         Feature         : Chaos.Features.Chaos_Feature;
+         Passable        : Boolean := True;
+         Transparent     : Boolean := True;
+         Has_Destination : Boolean := False;
       end record;
 
    package Square_Vectors is

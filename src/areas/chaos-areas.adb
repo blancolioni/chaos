@@ -82,10 +82,11 @@ package body Chaos.Areas is
                    Sqrt (Float (Pixel_Width / Pixels_Per_Square) ** 2
                          + Float (Pixel_Height / Pixels_Per_Square) ** 2);
       Init_Square : constant Square_Type :=
-                      (Actor       => null,
-                       Feature     => null,
-                       Passable    => False,
-                       Transparent => False);
+                      (Actor           => null,
+                       Feature         => null,
+                       Passable        => False,
+                       Transparent     => False,
+                       Has_Destination => False);
    begin
       Area.Initialize (Identity);
       Area.Pixel_Width := Pixel_Width;
@@ -158,6 +159,19 @@ package body Chaos.Areas is
         (Start, Finish, Area.Squares_Across - 1, Area.Squares_Down - 1,
          OK'Access);
    end Find_Path;
+
+   ---------------------
+   -- Has_Destination --
+   ---------------------
+
+   function Has_Destination
+     (Area     : Chaos_Area_Record'Class;
+      Location : Chaos.Locations.Square_Location)
+      return Boolean
+   is
+   begin
+      return Area.Squares (Area.To_Square_Index (Location)).Has_Destination;
+   end Has_Destination;
 
    ------------
    -- Images --

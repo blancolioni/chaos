@@ -181,6 +181,18 @@ package body Chaos.Areas.Import is
             end;
          end loop;
 
+         for Entrance of Are.Entrances loop
+            declare
+               Square_Loc : constant Chaos.Locations.Square_Location :=
+                              Area.To_Square
+                                ((Integer (Entrance.X), Integer (Entrance.Y)));
+               Square     : Square_Type renames
+                              Area.Squares (Area.To_Square_Index (Square_Loc));
+            begin
+               Square.Has_Destination := True;
+            end;
+         end loop;
+
       end Create;
 
       Area : constant Chaos_Area :=
