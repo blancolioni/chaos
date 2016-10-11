@@ -304,6 +304,12 @@ package body Chaos.Xi_UI.Areas is
            (Create_Actor_Node (Model.all, Model.Area.Actor (I)));
       end loop;
 
+      for Y in Base_Model.Tile_Nodes'Range (2) loop
+         for X in Base_Model.Tile_Nodes'Range (1) loop
+            Base_Model.Tile_Nodes (X, Y).Set_Visible (False);
+         end loop;
+      end loop;
+
       for Y in 1 .. Area.Tiles_Down loop
          for X in 1 .. Area.Tiles_Across loop
             declare
@@ -327,6 +333,7 @@ package body Chaos.Xi_UI.Areas is
                                 (Name, Image);
             begin
                Tile_Node.Entity.Set_Texture (Texture);
+               Tile_Node.Set_Visible (True);
             end;
          end loop;
       end loop;
@@ -597,6 +604,7 @@ package body Chaos.Xi_UI.Areas is
                begin
                   Node.Set_Position (X, Y, 0.0);
                   Node.Set_Entity (Square);
+                  Node.Set_Visible (False);
                   Model.Tile_Nodes (Tile_X, Tile_Y) := Node;
                end;
             end loop;
