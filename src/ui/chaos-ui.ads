@@ -1,5 +1,6 @@
 with Chaos.Actors;
 with Chaos.Animations;
+with Chaos.Areas;
 with Chaos.Battles;
 with Chaos.Images;
 with Chaos.Localisation;
@@ -62,6 +63,11 @@ package Chaos.UI is
      (UI : Root_Chaos_UI)
       return Chaos.Animations.Chaos_Animation
       is abstract;
+
+   procedure Show_Area
+     (UI       : in out Root_Chaos_UI;
+      New_Area : Chaos.Areas.Chaos_Area)
+   is abstract;
 
    type Chaos_UI is access all Root_Chaos_UI'Class;
 

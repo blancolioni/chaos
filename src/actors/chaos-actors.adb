@@ -300,6 +300,18 @@ package body Chaos.Actors is
       Actor.Standard_Action := True;
    end Reset_Actions;
 
+   --------------------------
+   -- Set_Initial_Location --
+   --------------------------
+
+   procedure Set_Initial_Location
+     (Actor    : in out Chaos_Actor_Record'Class;
+      Location : Chaos.Locations.Square_Location)
+   is
+   begin
+      Actor.Location := Location;
+   end Set_Initial_Location;
+
    ------------------
    -- Set_Location --
    ------------------
@@ -308,8 +320,12 @@ package body Chaos.Actors is
      (Actor    : in out Chaos_Actor_Record'Class;
       Location : Chaos.Locations.Square_Location)
    is
+      Old_Location : constant Chaos.Locations.Square_Location :=
+                       Actor.Location;
    begin
       Actor.Location := Location;
+      Actor.Area.After_Actor_Moved
+        (Db.Reference (Actor), From => Old_Location);
    end Set_Location;
 
    ---------------------

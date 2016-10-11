@@ -10,6 +10,7 @@ with Xtk.Panel;
 with Xtk.Text.Buffer;
 with Xtk.Text.View;
 
+with Chaos.Areas;
 with Chaos.Game;
 with Chaos.Images;
 with Chaos.Animations;
@@ -53,6 +54,10 @@ package body Chaos.Xi_UI is
    overriding function Create_Animation
      (UI : Root_Xi_UI)
       return Chaos.Animations.Chaos_Animation;
+
+   overriding procedure Show_Area
+     (UI       : in out Root_Xi_UI;
+      New_Area : Chaos.Areas.Chaos_Area);
 
    ------------
    -- Create --
@@ -122,6 +127,19 @@ package body Chaos.Xi_UI is
    begin
       UI.Log.Append (Text);
    end Put;
+
+   ---------------
+   -- Show_Area --
+   ---------------
+
+   overriding procedure Show_Area
+     (UI       : in out Root_Xi_UI;
+      New_Area : Chaos.Areas.Chaos_Area)
+   is
+   begin
+      UI.Model :=
+        Chaos.Xi_UI.Areas.Area_Model (New_Area);
+   end Show_Area;
 
    -----------
    -- Start --

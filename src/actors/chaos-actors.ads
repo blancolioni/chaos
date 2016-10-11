@@ -46,6 +46,10 @@ package Chaos.Actors is
      (Actor    : in out Chaos_Actor_Record'Class;
       Location : Chaos.Locations.Square_Location);
 
+   procedure Set_Initial_Location
+     (Actor    : in out Chaos_Actor_Record'Class;
+      Location : Chaos.Locations.Square_Location);
+
    function Has_Path
      (Actor : Chaos_Actor_Record'Class)
       return Boolean;

@@ -91,7 +91,10 @@ package body Chaos.Areas.Import is
            (Identity     => Name,
             Pixel_Width  => Natural (Wed.Overlays.First_Element.Width) * 64,
             Pixel_Height => Natural (Wed.Overlays.First_Element.Height) * 64);
-         if Chaos.Resources.Has_Resource (Are.Area_Script) then
+         if Chaos.Resources.Has_Resource (Are.Area_Script)
+           and then Chaos.Resources.Manager.Resource_Exists
+             (Are.Area_Script, Chaos.Resources.Script_Resource)
+         then
             declare
                Script : Chaos.Resources.Bcs.Bcs_Resource'Class renames
                           Chaos.Resources.Bcs.Bcs_Resource'Class

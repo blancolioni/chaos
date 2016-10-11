@@ -1,3 +1,4 @@
+with Ada.Characters.Handling;
 with Ada.Numerics.Elementary_Functions;
 
 with Chaos.Areas.Db;
@@ -68,6 +69,41 @@ package body Chaos.Areas is
       Db.Update (Area.Reference, Add'Access);
    end Add_Actor;
 
+   -----------------------
+   -- After_Actor_Moved --
+   -----------------------
+
+   procedure After_Actor_Moved
+     (Area  : Chaos_Area_Record'Class;
+      Actor : Chaos.Actors.Chaos_Actor;
+      From  : Chaos.Locations.Square_Location)
+   is
+
+      Position : constant Actor_Vectors.Cursor :=
+                   Area.Actors.Find (Actor);
+
+      procedure Move (A : in out Chaos_Area_Record'Class);
+
+      ----------
+      -- Move --
+      ----------
+
+      procedure Move (A : in out Chaos_Area_Record'Class) is
+      begin
+         A.Squares (A.To_Square_Index (From)).Actor := null;
+         A.Squares (A.To_Square_Index (Actor.Location)).Actor := Actor;
+      end Move;
+
+   begin
+      if Actor_Vectors.Has_Element (Position) then
+         Db.Update (Area.Reference, Move'Access);
+      else
+         raise Constraint_Error with
+           "After_Actor_Moved: no such actor " & Actor.Identifier
+           & " in area " & Area.Identifier;
+      end if;
+   end After_Actor_Moved;
+
    ------------
    -- Create --
    ------------
@@ -112,6 +148,63 @@ package body Chaos.Areas is
    begin
       return False;
    end Current_Battle;
+
+   ---------------------
+   -- Entrance_Square --
+   ---------------------
+
+   function Entrance_Square
+     (Area  : Chaos_Area_Record'Class;
+      Name  : String)
+      return Chaos.Locations.Square_Location
+   is
+      function Proper_Name (S : String) return String;
+
+      -----------------
+      -- Proper_Name --
+      -----------------
+
+      function Proper_Name (S : String) return String is
+         use Ada.Characters.Handling;
+         Result : String := S;
+      begin
+         for I in Result'Range loop
+            if Is_Digit (Result (I)) then
+               null;
+            elsif Is_Upper (Result (I)) then
+               Result (I) := To_Lower (Result (I));
+            elsif Is_Lower (Result (I)) then
+               null;
+            else
+               return Result (1 .. I - 1);
+            end if;
+         end loop;
+         return Result;
+      end Proper_Name;
+
+      N : constant String := Proper_Name (Name);
+   begin
+      for Entrance of Area.Entrances loop
+         if Proper_Name (Entrance.Name) = N then
+            return Entrance.Square;
+         end if;
+      end loop;
+      raise Constraint_Error with
+        "Entrance_Square: no such entrance " & Name
+        & " in area " & Area.Identifier;
+   end Entrance_Square;
+
+   ------------
+   -- Exists --
+   ------------
+
+   function Exists
+     (Identity : String)
+      return Boolean
+   is
+   begin
+      return Db.Exists (Identity);
+   end Exists;
 
    -------------
    -- Feature --
@@ -171,6 +264,18 @@ package body Chaos.Areas is
         (Start, Finish, Area.Squares_Across - 1, Area.Squares_Down - 1,
          OK'Access);
    end Find_Path;
+
+   ---------
+   -- Get --
+   ---------
+
+   function Get
+     (Identity : String)
+      return Chaos_Area
+   is
+   begin
+      return Db.Get (Identity);
+   end Get;
 
    ---------------
    -- Has_Actor --
@@ -285,6 +390,40 @@ package body Chaos.Areas is
    begin
       return Area.Pixel_Height;
    end Pixels_Down;
+
+   ------------------
+   -- Remove_Actor --
+   ------------------
+
+   procedure Remove_Actor
+     (Area     : Chaos_Area_Record'Class;
+      Actor    : Chaos.Actors.Chaos_Actor)
+   is
+
+      Position : Actor_Vectors.Cursor :=
+                   Area.Actors.Find (Actor);
+
+      procedure Remove (A : in out Chaos_Area_Record'Class);
+
+      ------------
+      -- Remove --
+      ------------
+
+      procedure Remove (A : in out Chaos_Area_Record'Class) is
+      begin
+         A.Actors.Delete (Position);
+         A.Squares (A.To_Square_Index (Actor.Location)).Actor := null;
+      end Remove;
+
+   begin
+      if Actor_Vectors.Has_Element (Position) then
+         Db.Update (Area.Reference, Remove'Access);
+      else
+         raise Constraint_Error with
+           "no such actor " & Actor.Identifier
+           & " in area " & Area.Identifier;
+      end if;
+   end Remove_Actor;
 
    -------------------------
    -- Scan_Visible_Actors --

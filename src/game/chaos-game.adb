@@ -9,6 +9,7 @@ with Chaos.Resources.Manager;
 with Chaos.Resources.Tables;
 
 with Chaos.Areas.Import;
+with Chaos.Features;
 
 with Chaos.Paths;
 
@@ -96,6 +97,20 @@ package body Chaos.Game is
             when Manipulate =>
                null;
          end case;
+      else
+         if Game.Area.Has_Feature (Actor.Location) then
+            declare
+               Feature : constant Chaos.Features.Chaos_Feature :=
+                           Game.Area.Feature (Actor.Location);
+            begin
+               if Feature.Has_Destination then
+                  Game.Travel
+                    (Destination_Area_Name     => Feature.Destination_Name,
+                     Destination_Entrance_Name =>
+                       Feature.Destination_Entrance_Name);
+               end if;
+            end;
+         end if;
       end if;
    end Arrive;
 
@@ -309,6 +324,55 @@ package body Chaos.Game is
       Game.Show_Dialog_State;
 
    end Start_Dialog;
+
+   ------------
+   -- Travel --
+   ------------
+
+   procedure Travel
+     (Game                      : in out Chaos_Game_Record'Class;
+      Destination_Area_Name     : String;
+      Destination_Entrance_Name : String)
+   is
+      use type Chaos.Actors.Chaos_Actor;
+   begin
+
+      for I in Chaos.Party.Party_Member_Index loop
+         exit when Game.Party.Party_Member (I) = null;
+         Game.Area.Remove_Actor (Game.Party.Party_Member (I));
+      end loop;
+
+      if Chaos.Areas.Exists (Destination_Area_Name) then
+         Game.Area := Chaos.Areas.Get (Destination_Area_Name);
+      else
+         Game.Area := Chaos.Areas.Import.Import_Area (Destination_Area_Name);
+      end if;
+
+      declare
+         procedure Update_Location
+           (Actor : in out Chaos.Actors.Chaos_Actor_Record'Class);
+
+         ---------------------
+         -- Update_Location --
+         ---------------------
+
+         procedure Update_Location
+           (Actor : in out Chaos.Actors.Chaos_Actor_Record'Class)
+         is
+         begin
+            Actor.Set_Initial_Location
+              (Game.Area.Entrance_Square (Destination_Entrance_Name));
+         end Update_Location;
+
+      begin
+         Game.Party.Party_Member (1).Update (Update_Location'Access);
+      end;
+
+      Game.Area.Add_Actor (Game.Party.Party_Member (1));
+
+      Chaos.UI.Current_UI.Show_Area (Game.Area);
+
+   end Travel;
 
    -------------
    -- Walk_To --

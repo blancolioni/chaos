@@ -53,6 +53,11 @@ package Chaos.Game is
       Actor       : Chaos.Actors.Chaos_Actor;
       Destination : Chaos.Locations.Square_Location);
 
+   procedure Travel
+     (Game                      : in out Chaos_Game_Record'Class;
+      Destination_Area_Name     : String;
+      Destination_Entrance_Name : String);
+
    procedure Arrive
      (Game        : in out Chaos_Game_Record'Class;
       Actor       : Chaos.Actors.Chaos_Actor);

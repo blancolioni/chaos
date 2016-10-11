@@ -105,6 +105,7 @@ package body Chaos.Features.Import is
       end;
 
       if Natural (Region.Region_Type) = 2 then
+         Feature.Travel := True;
          Feature.Destination := Region.Destination_Area;
          Feature.Destination_Entrance := Region.Destination_Entrance;
       end if;
