@@ -136,4 +136,37 @@ package body Chaos.Resources.Manager is
 
    end Load_Resource;
 
+   ---------------------
+   -- Resource_Exists --
+   ---------------------
+
+   function Resource_Exists
+     (Reference  : Resource_Reference;
+      Res_Type   : Resource_Type)
+      return Boolean
+   is
+      Key       : constant String := To_Key (Reference, Res_Type);
+      Base_Path : constant String := Chaos.Infinity_Engine.Infinity_Path;
+   begin
+      if not Resource_Map.Contains (Key) then
+         if not Got_Keys then
+            Keys.Open (Base_Path & "chitin.key");
+            Keys.Load;
+            Keys.Close;
+            Got_Keys := True;
+         end if;
+
+         declare
+            Locator  : Word_32;
+            Path     : constant String :=
+                         Keys.Get_Resource_Location
+                           (Reference, Res_Type, Locator);
+         begin
+            return Path /= "";
+         end;
+      else
+         return True;
+      end if;
+   end Resource_Exists;
+
 end Chaos.Resources.Manager;
