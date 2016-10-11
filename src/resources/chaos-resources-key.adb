@@ -43,7 +43,8 @@ package body Chaos.Resources.Key is
       Chaos.Logging.Log
         ("KEY",
          "resource " & String (Reference)
-         & " type " & Res_Type'Img & " not found");
+         & " type "
+         & Hex_Image (Res_Type) & " not found");
       return "";
    end Get_Resource_Location;
 
