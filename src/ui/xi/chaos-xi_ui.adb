@@ -6,6 +6,7 @@ with Xi.Render_Window;
 with Xi.Scene;
 
 with Xtk;
+with Xtk.FPS;
 with Xtk.Panel;
 with Xtk.Text.Buffer;
 with Xtk.Text.View;
@@ -86,6 +87,14 @@ package body Chaos.Xi_UI is
 
       Result.Log_Panel.Show_All;
       Result.Window.Add_Top_Level (Result.Log_Panel);
+
+      declare
+         FPS_Panel : Xtk.Panel.Xtk_Panel;
+      begin
+         Xtk.Panel.Xtk_New (FPS_Panel, Xtk.FPS.Create_FPS_Widget);
+         FPS_Panel.Show_All;
+         Result.Window.Add_Top_Level (FPS_Panel);
+      end;
 
       return new Root_Xi_UI'(Result);
    end Create;
