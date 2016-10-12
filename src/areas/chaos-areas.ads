@@ -216,7 +216,7 @@ private
          Entrances      : Area_Entrance_Vectors.Vector;
          Visibility     : Chaos.Vision.Chaos_Vision;
          Images         : Chaos.Images.Chaos_Image_Container;
-         Script         : Lith.Objects.Object;
+         Script         : Lith.Objects.Object := Lith.Objects.Nil;
       end record;
 
    overriding function Object_Database
@@ -230,6 +230,11 @@ private
    overriding procedure Add_Properties
      (Area : Chaos_Area_Record)
    is null;
+
+   overriding procedure Mark
+     (Area       : in out Chaos_Area_Record;
+      Mark_Value : not null access
+        procedure (Value : in out Lith.Objects.Object));
 
    function To_Square_Index
      (Area     : Chaos_Area_Record'Class;

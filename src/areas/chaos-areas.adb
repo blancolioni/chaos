@@ -214,6 +214,19 @@ package body Chaos.Areas is
       return Area.Images;
    end Images;
 
+   ----------
+   -- Mark --
+   ----------
+
+   overriding procedure Mark
+     (Area       : in out Chaos_Area_Record;
+      Mark_Value : not null access
+        procedure (Value : in out Lith.Objects.Object))
+   is
+   begin
+      Mark_Value (Area.Script);
+   end Mark;
+
    ----------------
    -- Neighbours --
    ----------------
