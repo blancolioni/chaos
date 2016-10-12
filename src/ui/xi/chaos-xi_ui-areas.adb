@@ -756,26 +756,36 @@ package body Chaos.Xi_UI.Areas is
 
       end if;
 
-      if Mouse_X < 50.0 then
-         Listener.Model.Centre_X :=
-           Listener.Model.Centre_X - 5.0;
-      elsif Mouse_X > Event.Render_Target.Width - 50.0 then
-         Listener.Model.Centre_X :=
-           Listener.Model.Centre_X + 5.0;
-      end if;
+      declare
+         Camera_Moved : Boolean := False;
+      begin
+         if Mouse_X < 50.0 then
+            Listener.Model.Centre_X :=
+              Listener.Model.Centre_X - 5.0;
+            Camera_Moved := True;
+         elsif Mouse_X > Event.Render_Target.Width - 50.0 then
+            Listener.Model.Centre_X :=
+              Listener.Model.Centre_X + 5.0;
+            Camera_Moved := True;
+         end if;
 
-      if Mouse_Y < 50.0 then
-         Listener.Model.Centre_Y :=
-           Listener.Model.Centre_Y - 5.0;
-      elsif Mouse_Y > Event.Render_Target.Height - 50.0 then
-         Listener.Model.Centre_Y :=
-           Listener.Model.Centre_Y + 5.0;
-      end if;
+         if Mouse_Y < 50.0 then
+            Listener.Model.Centre_Y :=
+              Listener.Model.Centre_Y - 5.0;
+            Camera_Moved := True;
+         elsif Mouse_Y > Event.Render_Target.Height - 50.0 then
+            Listener.Model.Centre_Y :=
+              Listener.Model.Centre_Y + 5.0;
+            Camera_Moved := True;
+         end if;
 
-      Listener.Model.Camera.Set_Position
-        (Listener.Model.Centre_X, Listener.Model.Centre_Y, 1000.0);
-      Listener.Model.Camera.Look_At
-        (Listener.Model.Centre_X, Listener.Model.Centre_Y, 0.0);
+         if Camera_Moved then
+            Listener.Model.Camera.Set_Position
+              (Listener.Model.Centre_X, Listener.Model.Centre_Y, 1000.0);
+            Listener.Model.Camera.Look_At
+              (Listener.Model.Centre_X, Listener.Model.Centre_Y, 0.0);
+         end if;
+      end;
 
       declare
          use Xi.Mouse;
