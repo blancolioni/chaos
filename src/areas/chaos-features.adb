@@ -24,6 +24,42 @@ package body Chaos.Features is
       return Feature.Cursor_Index;
    end Cursor_Index;
 
+   -------------------------------
+   -- Destination_Entrance_Name --
+   -------------------------------
+
+   function Destination_Entrance_Name
+     (Feature : Chaos_Feature_Record'Class)
+      return String
+   is
+   begin
+      return Feature.Destination_Entrance;
+   end Destination_Entrance_Name;
+
+   ----------------------
+   -- Destination_Name --
+   ----------------------
+
+   function Destination_Name
+     (Feature : Chaos_Feature_Record'Class)
+      return String
+   is
+   begin
+      return Chaos.Resources.To_String (Feature.Destination);
+   end Destination_Name;
+
+   ---------------------
+   -- Has_Destination --
+   ---------------------
+
+   function Has_Destination
+     (Feature : Chaos_Feature_Record'Class)
+      return Boolean
+   is
+   begin
+      return Feature.Travel;
+   end Has_Destination;
+
    -------------
    -- Polygon --
    -------------

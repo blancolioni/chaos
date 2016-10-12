@@ -19,6 +19,7 @@ source_dir = src/objects
 source_dir = src/powers
 source_dir = src/races
 source_dir = src/resources
+source_dir = src/tools
 source_dir = src/ui
 source_dir = src/ui/gtk
 source_dir = src/ui/gtk/character_gen
@@ -34,6 +35,8 @@ depend = { project = Memor version = any }
 depend = { project = Xi version = any }
 main_unit = chaos-driver
 exec_name = chaos
+language = Ada
+language = C
 config_dir = config
 path_unit = { unit = Chaos.Paths path = src/config/chaos-paths.ads }
 builder_option = "-g"

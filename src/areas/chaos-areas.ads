@@ -118,6 +118,20 @@ package Chaos.Areas is
      (Area     : Chaos_Area_Record'Class;
       Actor    : Chaos.Actors.Chaos_Actor);
 
+   procedure Remove_Actor
+     (Area     : Chaos_Area_Record'Class;
+      Actor    : Chaos.Actors.Chaos_Actor);
+
+   procedure After_Actor_Moved
+     (Area  : Chaos_Area_Record'Class;
+      Actor : Chaos.Actors.Chaos_Actor;
+      From  : Chaos.Locations.Square_Location);
+
+   function Entrance_Square
+     (Area  : Chaos_Area_Record'Class;
+      Name  : String)
+      return Chaos.Locations.Square_Location;
+
    function Passable
      (Area     : Chaos_Area_Record'Class;
       Location : Chaos.Locations.Square_Location)
@@ -162,6 +176,14 @@ package Chaos.Areas is
       Start  : Chaos.Locations.Square_Location;
       Finish : Chaos.Locations.Square_Location)
       return Chaos.Locations.Square_Path;
+
+   function Exists
+     (Identity : String)
+      return Boolean;
+
+   function Get
+     (Identity : String)
+      return Chaos_Area;
 
 private
 

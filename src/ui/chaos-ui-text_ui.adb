@@ -44,6 +44,11 @@ package body Chaos.UI.Text_UI is
       return Chaos.Animations.Chaos_Animation
    is (null);
 
+   overriding procedure Show_Area
+     (UI       : in out Chaos_Text_UI;
+      New_Area : Chaos.Areas.Chaos_Area)
+   is null;
+
    ------------
    -- Create --
    ------------

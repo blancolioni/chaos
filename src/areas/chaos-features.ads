@@ -36,6 +36,18 @@ package Chaos.Features is
      (Feature : Chaos_Feature_Record'Class)
       return Natural;
 
+   function Has_Destination
+     (Feature : Chaos_Feature_Record'Class)
+      return Boolean;
+
+   function Destination_Name
+     (Feature : Chaos_Feature_Record'Class)
+      return String;
+
+   function Destination_Entrance_Name
+     (Feature : Chaos_Feature_Record'Class)
+      return String;
+
 private
 
    package Polygon_Vectors is
@@ -53,6 +65,7 @@ private
          State                : Positive := 1;
          Polygon_Sets         : Polygon_Set_Vectors.Vector;
          Sensitive_Areas      : Polygon_Vectors.Vector;
+         Travel               : Boolean := False;
          Destination          : Chaos.Resources.Resource_Reference;
          Destination_Entrance : String (1 .. 32);
          Bounding_Box         : Chaos.Locations.Pixel_Rectangle;
