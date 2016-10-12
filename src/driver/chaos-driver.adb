@@ -86,8 +86,6 @@ begin
    Tlk.Load;
    Tlk.Close;
 
-   Chaos.Expressions.Store.Report_State;
-
    if Test_Only then
       declare
          UI : constant Chaos.UI.Chaos_UI :=
@@ -130,6 +128,8 @@ begin
          UI.Start;
       end;
    end if;
+
+   Chaos.Expressions.Store.Report_State;
 
    Ada.Text_IO.Put_Line
      ("2000: " & Chaos.Localisation.Indexed_Text (2000));
