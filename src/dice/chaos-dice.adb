@@ -2,21 +2,9 @@ with Ada.Characters.Handling;
 
 with WL.Random;
 
-with Chaos.Expressions.Numbers;
-with Chaos.Expressions.Objects;
-with Chaos.Expressions.Primitives;
+with Lith.Objects.Symbols;
 
 package body Chaos.Dice is
-
-   procedure Create_VT (VT : in out Chaos.Expressions.Chaos_Environment);
-
-   package Dice_Expressions is
-     new Chaos.Expressions.Objects (Die_Roll, Show, Create_VT);
-
-   function Primitive_Roll_Dice
-     (Environment : Chaos.Expressions.Chaos_Environment;
-      Arguments   : Chaos.Expressions.Array_Of_Expressions)
-      return Chaos.Expressions.Chaos_Expression;
 
    ------------
    -- Create --
@@ -43,22 +31,6 @@ package body Chaos.Dice is
    begin
       return Create (1, Die, 0);
    end Create;
-
-   ---------------
-   -- Create_VT --
-   ---------------
-
-   procedure Create_VT (VT : in out Chaos.Expressions.Chaos_Environment) is
-   begin
-      Chaos.Expressions.Insert
-        (VT, "roll",
-         Chaos.Expressions.Primitives.Bind_Property
-           (Primitive_Roll_Dice'Access));
-      Chaos.Expressions.Insert
-        (VT, "to_integer",
-         Chaos.Expressions.Primitives.Bind_Property
-           (Primitive_Roll_Dice'Access));
-   end Create_VT;
 
    -----------------
    -- Is_Die_Roll --
@@ -188,19 +160,22 @@ package body Chaos.Dice is
    -------------------------
 
    function Primitive_Roll_Dice
-     (Environment : Chaos.Expressions.Chaos_Environment;
-      Arguments   : Chaos.Expressions.Array_Of_Expressions)
-      return Chaos.Expressions.Chaos_Expression
+     (Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
    is
-      pragma Unreferenced (Environment);
-      pragma Assert (Arguments'Length = 1);
-      pragma Assert (Dice_Expressions.Is_Object (Arguments (Arguments'First)));
-      Dice : constant Die_Roll :=
-               Dice_Expressions.To_Object
-                 (Arguments (Arguments'First));
-      Result : constant Integer := Roll (Dice);
+      pragma Assert (Store.Argument_Count = 1);
+      use Lith.Objects;
+      N, D, P : Integer := 0;
    begin
-      return Chaos.Expressions.Numbers.To_Expression (Result);
+      N := To_Integer (Store.Car (Store.Argument (1)));
+      D := To_Integer (Store.Cadr (Store.Argument (1)));
+      P := To_Integer (Store.Car (Store.Cddr (Store.Argument (1))));
+
+      declare
+         Dice : constant Die_Roll := Create (N, D, P);
+      begin
+         return To_Object (Roll (Dice));
+      end;
    end Primitive_Roll_Dice;
 
    ----------
@@ -283,11 +258,17 @@ package body Chaos.Dice is
    -------------------
 
    function To_Expression
-     (Roll : Die_Roll)
-      return Chaos.Expressions.Chaos_Expression
+     (Store : in out Lith.Objects.Object_Store'Class;
+      Roll  : Die_Roll)
+      return Lith.Objects.Object
    is
    begin
-      return Dice_Expressions.To_Expression (Roll);
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-roll-dice"));
+      Store.Push (Lith.Objects.To_Object (Roll.Count));
+      Store.Push (Lith.Objects.To_Object (Roll.Die));
+      Store.Push (Lith.Objects.To_Object (Roll.Plus));
+      Store.Create_List (4);
+      return Store.Pop;
    end To_Expression;
 
 end Chaos.Dice;

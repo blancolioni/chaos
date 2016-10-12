@@ -45,7 +45,7 @@ package body Chaos.Races is
 
    overriding function Object_Database
      (Object : Chaos_Race_Record)
-      return Memor.Root_Database_Type'Class
+      return Memor.Memor_Database
    is
       pragma Unreferenced (Object);
    begin

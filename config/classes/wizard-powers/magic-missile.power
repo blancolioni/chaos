@@ -6,4 +6,4 @@ attack: int
 defence: refl
 use: at-will
 target: one-creature
-hit-damage: [force, 2d4 + int-mod + (level > 20 => 2d4)]
+hit-damage: [force, 2d4 + int-mod + (if level > 20 then 2d4)]

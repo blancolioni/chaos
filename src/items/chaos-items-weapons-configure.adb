@@ -1,5 +1,7 @@
 with WL.String_Maps;
 
+with Lith.Objects;
+
 with Chaos.Logging;
 with Chaos.Paths;
 
@@ -8,7 +10,6 @@ with Chaos.Parser;
 with Chaos.Items.Weapons.Db;
 
 with Chaos.Expressions.Enumerated;
-with Chaos.Expressions.Numbers;
 with Chaos.Expressions.Vectors;
 
 package body Chaos.Items.Weapons.Configure is
@@ -24,7 +25,7 @@ package body Chaos.Items.Weapons.Configure is
 
    type Configure_Weapon_Handler is access
      procedure (Weapon : in out Chaos_Weapon_Record'Class;
-                Value : Chaos.Expressions.Chaos_Expression);
+                Value : Lith.Objects.Object);
 
    package Configure_Weapon_Maps is
      new WL.String_Maps (Configure_Weapon_Handler);
@@ -39,43 +40,43 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Identity
      (Item   : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression);
+      Value  : Lith.Objects.Object);
 
    procedure Set_Price
      (Item   : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression);
+      Value  : Lith.Objects.Object);
 
    procedure Set_Weight
      (Item   : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression);
+      Value  : Lith.Objects.Object);
 
    procedure Set_Category
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression);
+      Value : Lith.Objects.Object);
 
    procedure Set_Damage
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression);
+      Value  : Lith.Objects.Object);
 
    procedure Set_Group
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression);
+      Value : Lith.Objects.Object);
 
    procedure Set_Proficiency_Bonus
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression);
+      Value  : Lith.Objects.Object);
 
    procedure Set_Properties
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression);
+      Value  : Lith.Objects.Object);
 
    procedure Set_Range
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression);
+      Value  : Lith.Objects.Object);
 
    procedure Set_Two_Handed
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression);
+      Value  : Lith.Objects.Object);
 
    ----------------
    -- Load_Weapon --
@@ -96,8 +97,9 @@ package body Chaos.Items.Weapons.Configure is
       is
 
          procedure Set_Value
-           (Name : String;
-            Value : Chaos.Expressions.Chaos_Expression);
+           (Name  : String;
+            Store : in out Lith.Objects.Object_Store'Class;
+            Value : Lith.Objects.Object);
 
          ---------------
          -- Set_Value --
@@ -105,7 +107,8 @@ package body Chaos.Items.Weapons.Configure is
 
          procedure Set_Value
            (Name  : String;
-            Value : Chaos.Expressions.Chaos_Expression)
+            Store : in out Lith.Objects.Object_Store'Class;
+            Value : Lith.Objects.Object)
          is
          begin
             if Configure_Map.Contains (Name) then
@@ -113,13 +116,13 @@ package body Chaos.Items.Weapons.Configure is
             else
                Chaos.Logging.Log
                  ("CONFIG", "unknown Weapon setting: " & Name
-                  & " = " & Chaos.Expressions.To_String (Value));
+                  & " = " & Store.Show (Value));
             end if;
          end Set_Value;
 
       begin
          Chaos.Parser.Load_Configuration
-           (Path, Set_Value'Access);
+           (Path, Chaos.Expressions.Store.all, Set_Value'Access);
       end Create;
 
    begin
@@ -157,9 +160,14 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Category
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression)
+      Value : Lith.Objects.Object)
    is
    begin
+      if not Weapon_Category_Expressions.Is_Enum (Value) then
+         raise Constraint_Error with
+           "invalid weapon category: "
+           & Chaos.Expressions.Store.Show (Value);
+      end if;
       Weapon.Category := Weapon_Category_Expressions.To_Enum (Value);
    end Set_Category;
 
@@ -169,12 +177,12 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Damage
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression)
+      Value  : Lith.Objects.Object)
    is
    begin
       Weapon.Damage :=
         Chaos.Dice.Parse_Die_Roll
-          (Chaos.Expressions.To_String (Value));
+          (Chaos.Expressions.Store.Show (Value));
    end Set_Damage;
 
    ---------------
@@ -183,7 +191,7 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Group
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression)
+      Value  : Lith.Objects.Object)
    is
    begin
       Weapon.Group := Weapon_Group_Expressions.To_Enum (Value);
@@ -195,11 +203,11 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Identity
      (Item   : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression)
+      Value  : Lith.Objects.Object)
    is
    begin
       Item.Initialize
-        (Chaos.Expressions.To_String (Value));
+        (Chaos.Expressions.Store.Show (Value));
       Item.Log ("new weapon: " & Item.Identifier);
    end Set_Identity;
 
@@ -209,12 +217,12 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Price
      (Item   : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression)
+      Value  : Lith.Objects.Object)
    is
    begin
       Item.Price :=
         Chaos.Coins.To_Coins
-          (Chaos.Expressions.To_String (Value));
+          (Chaos.Expressions.Store.Show (Value));
    end Set_Price;
 
    ---------------------------
@@ -223,10 +231,10 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Proficiency_Bonus
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression)
+      Value  : Lith.Objects.Object)
    is
    begin
-      Weapon.Proficiency := Chaos.Expressions.Numbers.To_Integer (Value);
+      Weapon.Proficiency := Lith.Objects.To_Integer (Value);
    end Set_Proficiency_Bonus;
 
    --------------------
@@ -235,7 +243,7 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Properties
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression)
+      Value  : Lith.Objects.Object)
    is
    begin
       for I in 1 .. Chaos.Expressions.Vectors.Length (Value) loop
@@ -255,10 +263,10 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Range
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression)
+      Value  : Lith.Objects.Object)
    is
       R : constant String :=
-            Chaos.Expressions.To_String (Value);
+            Chaos.Expressions.Store.Show (Value);
    begin
       for I in R'Range loop
          if R (I) = '-' then
@@ -281,7 +289,7 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Two_Handed
      (Weapon : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression)
+      Value  : Lith.Objects.Object)
    is
       pragma Unreferenced (Value);
    begin
@@ -294,12 +302,12 @@ package body Chaos.Items.Weapons.Configure is
 
    procedure Set_Weight
      (Item   : in out Chaos_Weapon_Record'Class;
-      Value  : Chaos.Expressions.Chaos_Expression)
+      Value  : Lith.Objects.Object)
    is
    begin
       Item.Weight :=
         Chaos.Weight.Chaos_Weight'Value
-          (Chaos.Expressions.To_String (Value));
+          (Chaos.Expressions.Store.Show (Value));
    end Set_Weight;
 
    -------------

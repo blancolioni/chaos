@@ -2,11 +2,11 @@ private with Ada.Containers.Vectors;
 
 private with Memor;
 
+with Lith.Objects;
+
 with Chaos.Objects;
 with Chaos.Locations;
 with Chaos.Vision;
-
-with Chaos.Expressions;
 
 with Chaos.Actors;
 with Chaos.Commands;
@@ -71,7 +71,7 @@ package Chaos.Areas is
 
    function Script
      (Area : Chaos_Area_Record'Class)
-      return Chaos.Expressions.Chaos_Expression;
+      return Lith.Objects.Object;
 
    function Feature_Count
      (Area : Chaos_Area_Record'Class)
@@ -215,18 +215,21 @@ private
          Features       : Feature_Vectors.Vector;
          Entrances      : Area_Entrance_Vectors.Vector;
          Visibility     : Chaos.Vision.Chaos_Vision;
-         Script         : Chaos.Expressions.Chaos_Expression;
-         Environment    : Chaos.Expressions.Chaos_Environment;
          Images         : Chaos.Images.Chaos_Image_Container;
+         Script         : Lith.Objects.Object;
       end record;
 
    overriding function Object_Database
      (Object : Chaos_Area_Record)
-      return Memor.Root_Database_Type'Class;
+      return Memor.Memor_Database;
 
    overriding function Current_Battle
      (Area : Chaos_Area_Record)
       return Boolean;
+
+   overriding procedure Add_Properties
+     (Area : Chaos_Area_Record)
+   is null;
 
    function To_Square_Index
      (Area     : Chaos_Area_Record'Class;

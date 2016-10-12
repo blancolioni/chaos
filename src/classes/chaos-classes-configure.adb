@@ -1,5 +1,7 @@
 with Ada.Directories;
 
+with Lith.Objects;
+
 with Chaos.Logging;
 with Chaos.Paths;
 with Chaos.Settings;
@@ -7,9 +9,7 @@ with Chaos.Settings;
 with Chaos.Parser;
 with Chaos.Expressions;
 
-with Chaos.Expressions.Environments;
 with Chaos.Expressions.Maps;
-with Chaos.Expressions.Numbers;
 with Chaos.Expressions.Vectors;
 
 with Chaos.Powers.Configure;
@@ -17,6 +17,8 @@ with Chaos.Powers.Configure;
 with Chaos.Classes.Db;
 
 package body Chaos.Classes.Configure is
+
+   First_Class : Boolean := True;
 
    package Class_Settings is
      new Chaos.Settings (Chaos_Class_Record);
@@ -26,35 +28,35 @@ package body Chaos.Classes.Configure is
 
    procedure Set_Base_Hit_Points
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression);
+      Value : Lith.Objects.Object);
 
    procedure Set_Defences
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression);
+      Value : Lith.Objects.Object);
 
    procedure Set_Healing_Surges
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression);
+      Value : Lith.Objects.Object);
 
    procedure Set_Identity
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression);
+      Value : Lith.Objects.Object);
 
    procedure Set_Key_Abilities
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression);
+      Value : Lith.Objects.Object);
 
    procedure Set_Level_Hit_Points
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression);
+      Value : Lith.Objects.Object);
 
    procedure Set_Power_Source
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression);
+      Value : Lith.Objects.Object);
 
    procedure Set_Role
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression);
+      Value : Lith.Objects.Object);
 
    ------------------
    -- Create_Class --
@@ -63,13 +65,19 @@ package body Chaos.Classes.Configure is
    procedure Create_Class
      (Path : String)
    is
-      procedure Create (Class : in out Chaos_Class_Record'Class);
+      procedure Create (Class : in out Chaos_Class_Record'Class) is null;
+
+      procedure Configure
+        (Class : in out Chaos_Class_Record'Class);
 
       ------------
       -- Create --
       ------------
 
-      procedure Create (Class : in out Chaos_Class_Record'Class) is
+      procedure Configure
+        (Class : in out Chaos_Class_Record'Class)
+      is
+
          use Ada.Directories;
 
          procedure Add_Power (Path : String);
@@ -108,10 +116,20 @@ package body Chaos.Classes.Configure is
             end if;
          end;
 
-      end Create;
+      end Configure;
 
+      New_Class : constant Chaos_Class :=
+                    Db.Create (Create'Access);
    begin
-      Db.Create (Create'Access);
+      New_Class.Save_Object;
+      Db.Update (New_Class.Reference, Configure'Access);
+      New_Class.Define_Object;
+
+      if First_Class then
+         New_Class.Add_Properties;
+         First_Class := False;
+      end if;
+
    end Create_Class;
 
    -----------------
@@ -136,29 +154,6 @@ package body Chaos.Classes.Configure is
         (Chaos.Paths.Config_File ("classes"), "class",
          Create_Class'Access);
 
-      declare
-         Class_Map : constant Chaos.Expressions.Chaos_Expression :=
-                       Chaos.Expressions.Maps.Map_Expression;
-
-         procedure Add_Class (Class : Chaos_Class);
-
-         ---------------
-         -- Add_Class --
-         ---------------
-
-         procedure Add_Class (Class : Chaos_Class) is
-         begin
-            Chaos.Expressions.Maps.Set
-              (Class_Map, Class.Identifier, Class.To_Expression);
-         end Add_Class;
-
-      begin
-         Db.Scan (Add_Class'Access);
-
-         Chaos.Expressions.Environments.Add_Standard_Value
-           ("classes", Class_Map);
-      end;
-
    end Read_Config;
 
    -------------------------
@@ -167,10 +162,10 @@ package body Chaos.Classes.Configure is
 
    procedure Set_Base_Hit_Points
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression)
+      Value : Lith.Objects.Object)
    is
    begin
-      Class.Base_Hit_Points := Chaos.Expressions.Numbers.To_Integer (Value);
+      Class.Base_Hit_Points := Lith.Objects.To_Integer (Value);
    end Set_Base_Hit_Points;
 
    ------------------
@@ -179,20 +174,19 @@ package body Chaos.Classes.Configure is
 
    procedure Set_Defences
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression)
+      Value : Lith.Objects.Object)
    is
       use Chaos.Expressions.Maps;
-      use Chaos.Expressions.Numbers;
    begin
       for D in Chaos.Defences.Defence loop
          declare
-            X : constant Chaos.Expressions.Chaos_Expression :=
+            X : constant Lith.Objects.Object :=
                   Get (Value, D'Img);
          begin
-            if Is_Number (X) then
+            if Lith.Objects.Is_Integer (X) then
                Class.Defences (D) :=
                  Chaos.Defences.Defence_Score_Change
-                   (To_Integer (X));
+                   (Lith.Objects.To_Integer (X));
             end if;
          end;
       end loop;
@@ -204,10 +198,10 @@ package body Chaos.Classes.Configure is
 
    procedure Set_Healing_Surges
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression)
+      Value : Lith.Objects.Object)
    is
    begin
-      Class.Healing_Surges := Chaos.Expressions.Numbers.To_Integer (Value);
+      Class.Healing_Surges := Lith.Objects.To_Integer (Value);
    end Set_Healing_Surges;
 
    ------------------
@@ -216,17 +210,22 @@ package body Chaos.Classes.Configure is
 
    procedure Set_Identity
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression)
+      Value : Lith.Objects.Object)
    is
    begin
-      Class.Initialize (Chaos.Expressions.To_String (Value));
+      Class.Initialize
+        (Chaos.Expressions.Store.Show (Value));
       Chaos.Logging.Log
         ("CONFIG", "new class: " & Class.Identifier);
    end Set_Identity;
 
+   -----------------------
+   -- Set_Key_Abilities --
+   -----------------------
+
    procedure Set_Key_Abilities
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression)
+      Value : Lith.Objects.Object)
    is
       Is_Set : array (Chaos.Abilities.Ability) of Boolean :=
                  (others => False);
@@ -235,7 +234,7 @@ package body Chaos.Classes.Configure is
       for I in 1 .. Chaos.Expressions.Vectors.Length (Value) loop
          declare
             Img : constant String :=
-                    Chaos.Expressions.To_String
+                    Chaos.Expressions.Store.Show
                       (Chaos.Expressions.Vectors.Get (Value, I));
             A   : Chaos.Abilities.Ability;
          begin
@@ -277,11 +276,11 @@ package body Chaos.Classes.Configure is
 
    procedure Set_Level_Hit_Points
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression)
+      Value : Lith.Objects.Object)
    is
    begin
       Class.Level_Hit_Points :=
-        Chaos.Expressions.Numbers.To_Integer (Value);
+        Lith.Objects.To_Integer (Value);
    end Set_Level_Hit_Points;
 
    ----------------------
@@ -290,7 +289,7 @@ package body Chaos.Classes.Configure is
 
    procedure Set_Power_Source
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression)
+      Value : Lith.Objects.Object)
    is
    begin
       Class.Power_Source :=
@@ -303,7 +302,7 @@ package body Chaos.Classes.Configure is
 
    procedure Set_Role
      (Class : in out Chaos_Class_Record'Class;
-      Value : Chaos.Expressions.Chaos_Expression)
+      Value : Lith.Objects.Object)
    is
    begin
       Class.Role :=

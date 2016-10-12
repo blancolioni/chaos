@@ -79,13 +79,11 @@ package body Chaos.Areas.Import is
                   (Reference => Chaos.Resources.To_Reference (Name & "SR"),
                    Res_Type  => Chaos.Resources.Bmp_Resource).all);
 
-      procedure Create (Area : in out Chaos_Area_Record'Class);
+      procedure Create (Area : in out Chaos_Area_Record'Class) is null;
 
-      ------------
-      -- Create --
-      ------------
+      procedure Configure (Area : in out Chaos_Area_Record'Class);
 
-      procedure Create (Area : in out Chaos_Area_Record'Class) is
+      procedure Configure (Area : in out Chaos_Area_Record'Class) is
       begin
          Area.Create
            (Identity     => Name,
@@ -100,7 +98,8 @@ package body Chaos.Areas.Import is
                                 Res_Type  =>
                                   Chaos.Resources.Script_Resource).all);
             begin
-               Area.Script := Chaos.Expressions.Import.Import_Script (Script);
+               Chaos.Expressions.Import.Import_Script (Script);
+               Area.Script := Chaos.Expressions.Store.Pop;
             end;
          end if;
 
@@ -211,12 +210,16 @@ package body Chaos.Areas.Import is
             end;
          end loop;
 
-      end Create;
+      end Configure;
 
       Area : constant Chaos_Area :=
                Db.Create (Create'Access);
 
    begin
+
+      Area.Save_Object;
+
+      Db.Update (Area.Reference, Configure'Access);
 
       for Actor_Entry of Are.Actors loop
          declare

@@ -1,23 +1,33 @@
+with Lith.Objects;
+
 package Chaos.Expressions.Vectors is
 
-   function Vector_Expression return Chaos_Expression;
+   function Create
+     return Lith.Objects.Object;
+
+   function Is_Vector
+     (Value : Lith.Objects.Object)
+      return Boolean;
 
    procedure Append
-     (To_Vector : Chaos_Expression;
-      Value     : Chaos_Expression);
+     (To_Vector : Lith.Objects.Object;
+      Value     : Lith.Objects.Object);
+
+   function Length
+     (Vector    : Lith.Objects.Object)
+      return Natural;
 
    function Get
-     (Vector : Chaos_Expression;
-      Index  : Positive)
-      return Chaos_Expression;
+     (Vector : Lith.Objects.Object;
+      Index     : Positive)
+      return Lith.Objects.Object
+     with Pre => Index <= Length (Vector);
 
    procedure Set
-     (Vector : Chaos_Expression;
-      Index  : Positive;
-      Value  : Chaos_Expression);
-
-   function Length (Vector : Chaos_Expression) return Natural;
-
-   function Is_Vector (Expression : Chaos_Expression) return Boolean;
+     (Vector    : Lith.Objects.Object;
+      Index     : Positive;
+      Value     : Lith.Objects.Object)
+     with Pre => Index <= Length (Vector),
+     Post => Lith.Objects."=" (Get (Vector, Index), Value);
 
 end Chaos.Expressions.Vectors;

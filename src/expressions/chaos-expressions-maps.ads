@@ -1,17 +1,24 @@
+with Lith.Objects;
+
 package Chaos.Expressions.Maps is
 
-   function Map_Expression return Chaos_Expression;
+   function Create return Lith.Objects.Object;
+
+   function Is_Map
+     (Value : Lith.Objects.Object)
+      return Boolean;
 
    function Get
-     (Map : Chaos_Expression;
-      Key : String)
-      return Chaos_Expression;
+     (Map    : Lith.Objects.Object;
+      Key    : String)
+      return Lith.Objects.Object
+     with Pre => Is_Map (Map);
 
    procedure Set
-     (Map    : Chaos_Expression;
+     (Map : Lith.Objects.Object;
       Key    : String;
-      Value  : Chaos_Expression);
-
-   function Is_Map (Expression : Chaos_Expression) return Boolean;
+      Value  : Lith.Objects.Object)
+     with Pre => Is_Map (Map),
+     Post => Lith.Objects."=" (Get (Map, Key), Value);
 
 end Chaos.Expressions.Maps;

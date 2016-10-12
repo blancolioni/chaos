@@ -1,136 +1,105 @@
-with Ada.Containers.Vectors;
+with Lith.Objects.Interfaces;
+with Lith.Objects.Symbols;
+
+with Chaos.Expressions.Maps;
+
+with Chaos.Objects;
+
+with Chaos.Dice;
 
 package body Chaos.Expressions.Primitives is
 
-   package Argument_Vectors is
-     new Ada.Containers.Vectors (Positive, Chaos_Expression);
+   function Evaluate_Chaos_Get
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
 
-   type Primitive_Expression_Record is
-     new Root_Chaos_Expression_Record with
-      record
-         Property  : Boolean;
-         Arg_Count : Natural;
-         Partial   : Argument_Vectors.Vector;
-         Fn        : Primitive_Evaluator;
-      end record;
+   function Evaluate_Chaos_Set
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
 
-   overriding function To_String
-     (Expression : Primitive_Expression_Record)
-      return String
-   is ("[primitive]");
+   function Evaluate_Roll_Dice
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
 
-   overriding function Is_Atom
-     (Expression : Primitive_Expression_Record)
-      return Boolean
-   is (False);
+   -----------------------
+   -- Create_Primitives --
+   -----------------------
 
-   overriding function To_Boolean
-     (Expression : Primitive_Expression_Record)
-      return Boolean
-   is (True);
-
-   overriding function Evaluate
-     (Expression  : Primitive_Expression_Record;
-      Environment : Chaos_Environment)
-      return Chaos_Expression;
-
-   overriding function Apply
-     (Expression  : Primitive_Expression_Record;
-      Argument    : Chaos_Expression;
-      Environment : Chaos_Environment)
-      return Chaos_Expression;
-
-   -----------
-   -- Apply --
-   -----------
-
-   overriding function Apply
-     (Expression  : Primitive_Expression_Record;
-      Argument    : Chaos_Expression;
-      Environment : Chaos_Environment)
-      return Chaos_Expression
-   is
+   procedure Create_Primitives is
+      use Lith.Objects.Interfaces;
    begin
-      if Expression.Partial.Last_Index + 1 = Expression.Arg_Count then
-         declare
-            Args : Array_Of_Expressions (1 .. Expression.Arg_Count);
-         begin
-            for I in 1 .. Expression.Partial.Last_Index loop
-               Args (I) := Expression.Partial.Element (I);
-            end loop;
-            Args (Args'Last) := Argument;
-            return Expression.Fn (Environment, Args);
-         end;
+      Define_Function ("chaos-set-property!", 3, Evaluate_Chaos_Set'Access);
+      Define_Function ("chaos-get-property", 2, Evaluate_Chaos_Get'Access);
+      Define_Function ("chaos-roll-dice", 3, Evaluate_Roll_Dice'Access);
+   end Create_Primitives;
+
+   ------------------------
+   -- Evaluate_Chaos_Get --
+   ------------------------
+
+   function Evaluate_Chaos_Get
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is
+      Map   : constant Lith.Objects.Object :=
+                Store.Argument (1);
+      Name  : constant String :=
+                Lith.Objects.Symbols.Get_Name
+                  (Lith.Objects.To_Symbol (Store.Argument (2)));
+   begin
+      if Chaos.Objects.Is_Object (Map) then
+         return Chaos.Objects.To_Object (Map).Property (Name);
+      elsif Chaos.Expressions.Maps.Is_Map (Map) then
+         return Chaos.Expressions.Maps.Get (Map, Name);
       else
-         declare
-            Copy : Primitive_Expression_Record'Class := Expression;
-         begin
-            Copy.Partial.Append (Argument);
-            return Create (Copy);
-         end;
+         raise Constraint_Error with
+           "chaos-get-property: expected a map, but found "
+           & Store.Show (Map);
       end if;
-   end Apply;
+   end Evaluate_Chaos_Get;
 
-   -------------------
-   -- Bind_Function --
-   -------------------
+   ------------------------
+   -- Evaluate_Chaos_Set --
+   ------------------------
 
-   function Bind_Function
-     (Evaluator      : Primitive_Evaluator;
-      Argument_Count : Natural)
-      return Chaos_Expression
+   function Evaluate_Chaos_Set
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
    is
-      Rec : constant Primitive_Expression_Record :=
-              (Root_Chaos_Expression_Record with
-               False, Argument_Count, Argument_Vectors.Empty_Vector,
-               Evaluator);
+      Map : constant Lith.Objects.Object :=
+              Store.Argument (1);
+      Name : constant String :=
+               Lith.Objects.Symbols.Get_Name
+                 (Lith.Objects.To_Symbol (Store.Argument (2)));
+      Value : constant Lith.Objects.Object :=
+                Store.Argument (3);
    begin
-      return Express (Rec);
-   end Bind_Function;
-
-   -------------------
-   -- Bind_Property --
-   -------------------
-
-   function Bind_Property
-     (Evaluator      : Primitive_Evaluator)
-      return Chaos_Expression
-   is
-      Rec : constant Primitive_Expression_Record :=
-              (Root_Chaos_Expression_Record with
-               True, 1, Argument_Vectors.Empty_Vector, Evaluator);
-   begin
-      return Express (Rec);
-   end Bind_Property;
-
-   --------------
-   -- Evaluate --
-   --------------
-
-   overriding function Evaluate
-     (Expression  : Primitive_Expression_Record;
-      Environment : Chaos_Environment)
-      return Chaos_Expression
-   is
-   begin
-      if Expression.Arg_Count = 0 then
-         return Expression.Fn (Environment, No_Array);
-      else
-         return Create (Expression);
+      if not Chaos.Expressions.Maps.Is_Map (Map) then
+         raise Constraint_Error with
+           "chaos-setg-property!: expected a map, but found "
+           & Store.Show (Map);
       end if;
-   end Evaluate;
+      Chaos.Expressions.Maps.Set
+        (Map, Name, Value);
+      return Value;
+   end Evaluate_Chaos_Set;
 
-   -----------------
-   -- Is_Property --
-   -----------------
+   ------------------------
+   -- Evaluate_Roll_Dice --
+   ------------------------
 
-   function Is_Property
-     (Expression : Chaos_Expression)
-      return Boolean
+   function Evaluate_Roll_Dice
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
    is
+      use Lith.Objects;
+      Count : constant Natural := To_Integer (Store.Argument (1));
+      Die   : constant Natural := To_Integer (Store.Argument (2));
+      Plus  : constant Integer := To_Integer (Store.Argument (3));
+      Dice : constant Chaos.Dice.Die_Roll :=
+                Chaos.Dice.Create (Count, Die, Plus);
    begin
-      return Get (Expression) in Primitive_Expression_Record'Class
-        and then Primitive_Expression_Record'Class (Get (Expression)).Property;
-   end Is_Property;
+      return To_Object (Chaos.Dice.Roll (Dice));
+   end Evaluate_Roll_Dice;
 
 end Chaos.Expressions.Primitives;

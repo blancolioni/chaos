@@ -1,6 +1,18 @@
 with Chaos.Classes.Db;
 
+with Chaos.Objects.Number_Properties;
+
 package body Chaos.Classes is
+
+   package Base_Hit_Point_Properties is
+     new Chaos.Objects.Number_Properties
+       (Chaos_Class_Record, Natural,
+        Base_Hit_Points);
+
+   package Level_Hit_Point_Properties is
+     new Chaos.Objects.Number_Properties
+       (Chaos_Class_Record, Natural,
+        Level_Hit_Points);
 
    ---------------
    -- Add_Power --
@@ -13,6 +25,20 @@ package body Chaos.Classes is
    begin
       Class.Powers.Add_Power (Power);
    end Add_Power;
+
+   --------------------
+   -- Add_Properties --
+   --------------------
+
+   overriding procedure Add_Properties
+     (Object : Chaos_Class_Record)
+   is
+   begin
+      Object.Add_Property ("base-hit-points",
+                           Base_Hit_Point_Properties.Get_Property'Access);
+      Object.Add_Property ("level-hit-points",
+                           Level_Hit_Point_Properties.Get_Property'Access);
+   end Add_Properties;
 
    ---------------------
    -- Base_Hit_Points --
@@ -107,7 +133,7 @@ package body Chaos.Classes is
 
    overriding function Object_Database
      (Object : Chaos_Class_Record)
-      return Memor.Root_Database_Type'Class
+      return Memor.Memor_Database
    is
       pragma Unreferenced (Object);
    begin

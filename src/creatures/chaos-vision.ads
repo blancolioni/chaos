@@ -1,4 +1,4 @@
-with Chaos.Expressions;
+with Lith.Objects;
 
 package Chaos.Vision is
 
@@ -6,10 +6,10 @@ package Chaos.Vision is
 
    function To_Expression
      (Vision : Chaos_Vision)
-      return Chaos.Expressions.Chaos_Expression;
+      return Lith.Objects.Object;
 
    function Is_Vision
-     (Expression : Chaos.Expressions.Chaos_Expression)
+     (Expression : Lith.Objects.Object)
       return Boolean;
 
    type Chaos_Vision_Interface is limited interface;
@@ -24,7 +24,7 @@ package Chaos.Vision is
 
    function Vision
      (Item : Chaos_Vision_Interface'class)
-      return Chaos.Expressions.Chaos_Expression
+      return Lith.Objects.Object
    is (To_Expression (Item.Vision));
 
 end Chaos.Vision;

@@ -1,4 +1,4 @@
-with Chaos.Expressions;
+with Lith.Objects;
 
 package Chaos.Actions is
 
@@ -6,14 +6,15 @@ package Chaos.Actions is
 
    function To_Expression
      (Action : Chaos_Action)
-      return Chaos.Expressions.Chaos_Expression;
+      return Lith.Objects.Object;
 
    function Is_Action
-     (Expression : Chaos.Expressions.Chaos_Expression)
+     (Expression : Lith.Objects.Object)
       return Boolean;
 
    function To_Action
-     (Expression : Chaos.Expressions.Chaos_Expression)
-      return Chaos_Action;
+     (Expression : Lith.Objects.Object)
+      return Chaos_Action
+     with Pre => Is_Action (Expression);
 
 end Chaos.Actions;

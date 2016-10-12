@@ -1,4 +1,4 @@
-with Chaos.Expressions;
+with Lith.Objects;
 
 package Chaos.Dice is
 
@@ -45,8 +45,13 @@ package Chaos.Dice is
       return String;
 
    function To_Expression
-     (Roll : Die_Roll)
-      return Chaos.Expressions.Chaos_Expression;
+     (Store : in out Lith.Objects.Object_Store'Class;
+      Roll  : Die_Roll)
+      return Lith.Objects.Object;
+
+   function Primitive_Roll_Dice
+     (Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
 
 private
 

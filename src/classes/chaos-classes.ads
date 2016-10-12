@@ -88,7 +88,7 @@ private
 
    overriding function Object_Database
      (Object : Chaos_Class_Record)
-      return Memor.Root_Database_Type'Class;
+      return Memor.Memor_Database;
 
    overriding procedure Add_Power
      (Class      : in out Chaos_Class_Record;
@@ -98,6 +98,9 @@ private
      (Class : Chaos_Class_Record)
       return Character
    is (Class.Animation_Code);
+
+   overriding procedure Add_Properties
+     (Object : Chaos_Class_Record);
 
    package Role_Expressions is
      new Chaos.Expressions.Enumerated (Class_Role);

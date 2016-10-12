@@ -1,8 +1,9 @@
 private with Memor;
-private with Chaos.Expressions;
+private with Lith.Objects;
 
 limited with Chaos.Areas;
 
+with Chaos.Abilities;
 with Chaos.Commands;
 with Chaos.Creatures;
 with Chaos.Locations;
@@ -16,6 +17,7 @@ package Chaos.Actors is
 
    type Chaos_Actor_Record is
      new Chaos.Objects.Root_Localised_Object_Record
+     and Chaos.Abilities.Ability_Interface
      and Chaos.Speed.Chaos_Speed_Interface
      and Chaos.Vision.Chaos_Vision_Interface
    with private;
@@ -37,6 +39,12 @@ package Chaos.Actors is
    function Current_Hit_Points
      (Actor : Chaos_Actor_Record'Class)
       return Natural;
+
+   overriding function Ability_Score
+     (Actor   : Chaos_Actor_Record;
+      Ability : Chaos.Abilities.Ability)
+      return Chaos.Abilities.Ability_Score_Range
+   is (Actor.Creature.Ability_Score (Ability));
 
    function Location
      (Actor : Chaos_Actor_Record'Class)
@@ -160,6 +168,7 @@ private
 
    type Chaos_Actor_Record is
      new Chaos.Objects.Root_Localised_Object_Record
+     and Chaos.Abilities.Ability_Interface
      and Chaos.Speed.Chaos_Speed_Interface
      and Chaos.Vision.Chaos_Vision_Interface with
       record
@@ -178,10 +187,9 @@ private
 
    overriding function Object_Database
      (Object : Chaos_Actor_Record)
-      return Memor.Root_Database_Type'Class;
+      return Memor.Memor_Database;
 
-   overriding procedure Create_Method_Table
-     (Actor  : Chaos_Actor_Record;
-      Table  : in out Chaos.Expressions.Chaos_Environment);
+   overriding procedure Add_Properties
+     (Object : Chaos_Actor_Record);
 
 end Chaos.Actors;

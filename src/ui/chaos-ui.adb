@@ -1,6 +1,13 @@
+with Lith.Objects;
+with Lith.Objects.Interfaces;
+
 package body Chaos.UI is
 
    Local_Current_UI : Chaos_UI;
+
+   function Evaluate_UI_Display_String
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
 
    ----------------
    -- Current_UI --
@@ -35,6 +42,23 @@ package body Chaos.UI is
       UI.Put (Chaos.Localisation.Indexed_Text (Index));
    end Display_Localised_Text;
 
+   --------------------------------
+   -- Evaluate_UI_Display_String --
+   --------------------------------
+
+   function Evaluate_UI_Display_String
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is
+   begin
+      Chaos.UI.Current_UI.Put
+        (Chaos.Localisation.Indexed_Text
+           (Chaos.Localisation.Local_Text_Index
+                (Lith.Objects.To_Integer
+                     (Store.Argument (1)))));
+      return Lith.Objects.Undefined;
+   end Evaluate_UI_Display_String;
+
    ----------------
    -- Initialize --
    ----------------
@@ -44,7 +68,9 @@ package body Chaos.UI is
    is
       pragma Unreferenced (UI);
    begin
-      null;
+      Lith.Objects.Interfaces.Define_Function
+        ("ui-display-string", 1,
+         Evaluate_UI_Display_String'Access);
    end Initialize;
 
    --------------

@@ -248,7 +248,7 @@ package body Chaos.Areas is
 
    overriding function Object_Database
      (Object : Chaos_Area_Record)
-      return Memor.Root_Database_Type'Class
+      return Memor.Memor_Database
    is
       pragma Unreferenced (Object);
    begin
@@ -347,8 +347,8 @@ package body Chaos.Areas is
    ------------
 
    function Script
-     (Area : Chaos_Area_Record'class)
-      return Chaos.Expressions.Chaos_Expression
+     (Area : Chaos_Area_Record'Class)
+      return Lith.Objects.Object
    is
    begin
       return Area.Script;

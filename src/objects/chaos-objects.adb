@@ -1,68 +1,63 @@
 with Ada.Characters.Handling;
 
+with WL.String_Maps;
+
+with Lith.Environment;
+with Lith.Objects.Symbols;
+
+with Chaos.Expressions;
+
 with Chaos.Localisation;
 with Chaos.Logging;
 
-with Chaos.Expressions.Classes;
-with Chaos.Expressions.Environments;
-with Chaos.Expressions.Text;
-
 package body Chaos.Objects is
 
-   function To_String
-     (Object : Chaos_Object)
-      return String
-   is (Object.Display_Name);
+   package Property_Maps is
+     new WL.String_Maps (Property_Get_Function);
 
-   function Get_Environment
-     (Object : Chaos_Object)
-      return Chaos.Expressions.Chaos_Environment;
+   package Class_Property_Maps is
+     new WL.String_Maps (Property_Maps.Map, Property_Maps."=");
 
-   package Chaos_Object_Expressions is
-     new Chaos.Expressions.Classes
-       (Class_Data_Type => Chaos_Object,
-        To_String       => To_String,
-        Get_Environment => Get_Environment);
+   Class_Properties : Class_Property_Maps.Map;
 
-   ----------------
-   -- Add_Method --
-   ----------------
+   function Get_Identifier_Property
+     (Object : Root_Chaos_Object_Record'Class)
+      return Lith.Objects.Object
+   is (Chaos.Expressions.Store.To_Object (Object.Identifier));
 
-   procedure Add_Method
+   ------------------
+   -- Add_Property --
+   ------------------
+
+   procedure Add_Property
      (Object         : Root_Chaos_Object_Record'Class;
-      Table          : in out Chaos.Expressions.Chaos_Environment;
       Name           : String;
-      Argument_Count : Natural;
-      Method         : Chaos.Expressions.Primitives.Primitive_Evaluator)
+      Get            : Property_Get_Function)
    is
-      pragma Unreferenced (Object);
+      Class_Name : constant String :=
+                     Object.Object_Database.Database_Class_Name;
    begin
-      if Argument_Count = 0 then
-         Chaos.Expressions.Insert
-           (Table, Name,
-            Chaos.Expressions.Primitives.Bind_Property
-              (Method));
-      else
-         Chaos.Expressions.Insert
-           (Table, Name,
-            Chaos.Expressions.Primitives.Bind_Function
-              (Method, Argument_Count + 1));
+      if not Class_Properties.Contains (Class_Name) then
+         Class_Properties.Insert (Class_Name, Property_Maps.Empty_Map);
+         Class_Properties (Class_Name).Insert
+           ("identifier", Get_Identifier_Property'Access);
       end if;
-   end Add_Method;
 
-   -------------------------
-   -- Create_Method_Table --
-   -------------------------
+      Class_Properties (Class_Name).Insert (Name, Get);
+   end Add_Property;
 
-   procedure Create_Method_Table
-     (Object : Root_Chaos_Object_Record;
-      Table  : in out Chaos.Expressions.Chaos_Environment)
+   -------------------
+   -- Define_Object --
+   -------------------
+
+   procedure Define_Object
+     (Object : Root_Chaos_Object_Record'Class)
    is
    begin
-      Chaos.Expressions.Insert
-        (Table, "identifier",
-         Chaos.Expressions.Text.To_Expression (Object.Identifier));
-   end Create_Method_Table;
+      Lith.Environment.Define
+        (Object.Object_Database.Database_Class_Name & "-" & Object.Identifier,
+         Object.To_Expression);
+   end Define_Object;
 
    ------------------
    -- Display_Name --
@@ -77,20 +72,20 @@ package body Chaos.Objects is
         (Identifier (Object));
    end Display_Name;
 
-   ---------------------
-   -- Get_Environment --
-   ---------------------
+   -----------
+   -- Equal --
+   -----------
 
-   function Get_Environment
-     (Object : Chaos_Object)
-      return Chaos.Expressions.Chaos_Environment
+   overriding function Equal
+     (X, Y  : Object_Record_Interface;
+      Store : Lith.Objects.Object_Store'Class)
+      return Boolean
    is
-      Env : Chaos.Expressions.Chaos_Environment :=
-              Chaos.Expressions.Environments.New_Environment;
+      pragma Unreferenced (Store);
+      use Memor;
    begin
-      Object.Create_Method_Table (Env);
-      return Env;
-   end Get_Environment;
+      return X.Db = Y.Db and then X.Reference = Y.Reference;
+   end Equal;
 
    ----------------
    -- Identifier --
@@ -117,17 +112,19 @@ package body Chaos.Objects is
         Ada.Strings.Unbounded.To_Unbounded_String (Identity);
    end Initialize;
 
-   -----------------------
-   -- Local_Environment --
-   -----------------------
+   ---------------
+   -- Is_Object --
+   ---------------
 
-   function Local_Environment
-     (Object : access constant Root_Chaos_Object_Record'Class)
-      return Chaos.Expressions.Chaos_Environment
+   function Is_Object
+     (Value : Lith.Objects.Object)
+      return Boolean
    is
    begin
-      return Get_Environment (Chaos_Object (Object));
-   end Local_Environment;
+      return Lith.Objects.Is_External_Object (Value)
+        and then Chaos.Expressions.Store.Get_External_Object (Value).all
+      in Object_Record_Interface'Class;
+   end Is_Object;
 
    ---------
    -- Log --
@@ -144,21 +141,147 @@ package body Chaos.Objects is
          Message);
    end Log;
 
+   ----------
+   -- Mark --
+   ----------
+
+   overriding procedure Mark
+     (Item  : in out Object_Record_Interface;
+      Store : in out Lith.Objects.Object_Store'Class;
+      Mark  : not null access
+        procedure (X : in out Lith.Objects.Object))
+   is
+      pragma Unreferenced (Store);
+
+      procedure Mark_Object (Object : in out Memor.Root_Record_Type'Class);
+
+      -----------------
+      -- Mark_Object --
+      -----------------
+
+      procedure Mark_Object (Object : in out Memor.Root_Record_Type'Class) is
+      begin
+         Root_Chaos_Object_Record'Class (Object).Mark (Mark);
+      end Mark_Object;
+
+   begin
+      Item.Db.Update (Item.Reference, Mark_Object'Access);
+   end Mark;
+
+   ----------
+   -- Name --
+   ----------
+
+   overriding function Name
+     (Item : Object_Record_Interface)
+      return String
+   is
+   begin
+      return Item.Db.Database_Class_Name;
+   end Name;
+
+   -----------
+   -- Print --
+   -----------
+
+   overriding function Print
+     (Item  : Object_Record_Interface;
+      Store : in out Lith.Objects.Object_Store'Class)
+      return String
+   is
+      pragma Unreferenced (Store);
+   begin
+      return Item.Db.Database_Class_Name
+        & "-" & Chaos_Object (Item.Db.Element (Item.Reference)).Identifier;
+   end Print;
+
+   --------------
+   -- Property --
+   --------------
+
+   function Property
+     (Object : Root_Chaos_Object_Record'Class;
+      Name   : String)
+      return Lith.Objects.Object
+   is
+      Class_Name : constant String :=
+                     Object.Object_Database.Database_Class_Name;
+   begin
+      if not Class_Properties.Contains (Class_Name) then
+         Class_Properties.Insert (Class_Name, Property_Maps.Empty_Map);
+      end if;
+
+      if not Class_Properties (Class_Name).Contains (Name) then
+         raise Constraint_Error with
+           "no such property '" & Name & "' for class '" & Class_Name & "'";
+      end if;
+
+      declare
+         Get : constant Property_Get_Function :=
+                 Class_Properties.Element (Class_Name).Element (Name);
+      begin
+         return Get (Object);
+      end;
+   end Property;
+
+   -----------------
+   -- Save_Object --
+   -----------------
+
+   procedure Save_Object
+     (Object : not null access constant Root_Chaos_Object_Record'Class)
+   is
+      use Chaos.Expressions;
+      List_Name : constant String :=
+                    "chaos-"
+                    & Object.Object_Database.Database_Class_Name
+                    & "-list";
+      List_Symbol : constant Lith.Objects.Symbol_Type :=
+                      Lith.Objects.Symbols.Get_Symbol (List_Name);
+      List        : Lith.Objects.Object;
+      Have_List   : Boolean;
+   begin
+      Lith.Environment.Get (List_Symbol, List, Have_List);
+      if not Have_List then
+         List := Lith.Objects.Nil;
+         Lith.Environment.Define (List_Symbol, List);
+      end if;
+
+      Store.Push (Object.To_Expression);
+      Store.Push (List);
+      Store.Cons;
+      Lith.Environment.Replace
+        (List_Symbol, Store.Pop);
+   end Save_Object;
+
    -------------------
    -- To_Expression --
    -------------------
 
    function To_Expression
-     (Object : access constant Root_Chaos_Object_Record'Class)
-      return Chaos.Expressions.Chaos_Expression
+     (Object : Root_Chaos_Object_Record'Class)
+      return Lith.Objects.Object
    is
    begin
-      if Object = null then
-         return Chaos.Expressions.Null_Value;
-      else
-         return Chaos_Object_Expressions.To_Expression
-           (Chaos_Object (Object));
-      end if;
+      return Chaos.Expressions.Store.Create_External_Reference
+        (Object_Record_Interface'
+           (Db        => Object.Object_Database,
+            Reference => Object.Reference));
    end To_Expression;
+
+   ---------------
+   -- To_Object --
+   ---------------
+
+   function To_Object
+     (Value : Lith.Objects.Object)
+      return Chaos_Object
+   is
+      Object : Object_Record_Interface'Class renames
+                 Object_Record_Interface'Class
+                   (Chaos.Expressions.Store.Get_External_Object (Value).all);
+   begin
+      return Chaos_Object (Object.Db.Element (Object.Reference));
+   end To_Object;
 
 end Chaos.Objects;

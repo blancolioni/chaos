@@ -45,6 +45,10 @@ package Chaos.Resources is
       return Boolean
    is (False);
 
+   function Name
+     (Resource : Chaos_Resource'Class)
+      return String;
+
    function Signature
      (Resource : Chaos_Resource)
       return String
@@ -60,14 +64,16 @@ package Chaos.Resources is
    is (True);
 
    procedure Open
-     (Resource : in out Chaos_Resource'Class;
-      Path     : String);
+     (Resource  : in out Chaos_Resource'Class;
+      Reference : Resource_Reference;
+      Path      : String);
 
    procedure Open
-     (Resource : in out Chaos_Resource'Class;
-      From     : Chaos_Resource'Class;
-      Start    : WL.Binary_IO.Word_32;
-      Length   : WL.Binary_IO.Word_32);
+     (Resource  : in out Chaos_Resource'Class;
+      Reference : Resource_Reference;
+      From      : Chaos_Resource'Class;
+      Start     : WL.Binary_IO.Word_32;
+      Length    : WL.Binary_IO.Word_32);
 
    procedure Close
      (Resource : in out Chaos_Resource'Class);
@@ -99,6 +105,7 @@ private
    type Chaos_Resource is abstract tagged limited
       record
          File          : WL.Binary_IO.File_Type;
+         Reference     : Resource_Reference;
          Start         : Word_32 := 0;
          Length        : Word_32 := 0;
          Busy          : Boolean := False;

@@ -60,9 +60,10 @@ package body Chaos.Resources.Biff is
    -------------------
 
    procedure Open_Resource
-     (Biff     : Biff_Resource'Class;
-      Resource : in out Chaos_Resource'Class;
-      Locator  : WL.Binary_IO.Word_32)
+     (Biff      : Biff_Resource'Class;
+      Reference : Resource_Reference;
+      Resource  : in out Chaos_Resource'Class;
+      Locator   : WL.Binary_IO.Word_32)
    is
    begin
       if Resource not in Chaos.Resources.Tis.Tis_Resource'Class then
@@ -71,7 +72,8 @@ package body Chaos.Resources.Biff is
                File : File_Entry renames Biff.File_Entries.Element (I);
             begin
                if File.Locator mod 2 ** 20 = Locator then
-                  Resource.Open (Biff, File.Data_Start, File.Data_Length);
+                  Resource.Open (Reference, Biff,
+                                 File.Data_Start, File.Data_Length);
                   return;
                end if;
             end;
@@ -101,7 +103,7 @@ package body Chaos.Resources.Biff is
                      Tis.Tile_Offset := 0;
                      Tis.Tile_Pixel_Count := Tile.Tile_Size - 1024;
 
-                     Tis.Open (Biff, Tile.Data_Start,
+                     Tis.Open (Reference, Biff, Tile.Data_Start,
                                Tile.Tile_Size * Tile.Tile_Count);
                   end;
                   return;

@@ -15,7 +15,7 @@ package body Chaos.Vision is
    ---------------
 
    function Is_Vision
-     (Expression : Chaos.Expressions.Chaos_Expression)
+     (Expression : Lith.Objects.Object)
       return Boolean
    is
    begin
@@ -28,10 +28,10 @@ package body Chaos.Vision is
 
    function To_Expression
      (Vision : Chaos_Vision)
-      return Chaos.Expressions.Chaos_Expression
+      return Lith.Objects.Object
    is
    begin
-      return Vision_Expressions.To_Expression (Vision);
+      return Vision_Expressions.To_Object (Vision);
    end To_Expression;
 
    -------------------

@@ -1,2 +1,3 @@
 GLOBAL.Chapter := -1
-classes.wizard.identifier
+class-wizard.identifier
+GLOBAL.Chapter

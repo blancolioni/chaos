@@ -4,7 +4,7 @@ package body Chaos.Expressions.Import.Objects is
    -- Import_Object --
    -------------------
 
-   function Import_Object
+   procedure Import_Object
      (Team      : Natural;
       Faction   : Natural;
       EA        : Natural;
@@ -20,13 +20,12 @@ package body Chaos.Expressions.Import.Objects is
       Id_4      : Natural;
       Id_5      : Natural;
       Name      : String)
-      return Chaos_Expression
    is
       pragma Unreferenced (Team, Faction, EA, General, Race, Class,
                            Specific, Gender, Alignment,
                            Id_1, Id_2, Id_3, Id_4, Id_5, Name);
    begin
-      return Null_Value;
+      Store.Push (Lith.Objects.Nil, Lith.Objects.Secondary);
    end Import_Object;
 
 end Chaos.Expressions.Import.Objects;

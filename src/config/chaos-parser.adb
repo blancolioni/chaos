@@ -1,18 +1,16 @@
 with Ada.Characters.Handling;
 with Ada.Directories;
+with Ada.Strings.Fixed;
 
 with Chaos.Parser.Tokens;              use Chaos.Parser.Tokens;
 with Chaos.Parser.Lexical;             use Chaos.Parser.Lexical;
 
-with Chaos.Expressions.Conditional;
-with Chaos.Expressions.Functions;
-with Chaos.Expressions.Identifiers;
+with Chaos.Dice;
+
 with Chaos.Expressions.Maps;
-with Chaos.Expressions.Numbers;
-with Chaos.Expressions.Sequences;
 with Chaos.Expressions.Vectors;
 
-with Chaos.Dice;
+with Lith.Objects.Symbols;
 
 package body Chaos.Parser is
 
@@ -21,6 +19,7 @@ package body Chaos.Parser is
    type Precedence_Level is range 1 .. 9;
 
    type Precedence_Table is array (Token) of Precedence_Level;
+   type Name_Table is array (Token) of String (1 .. 6);
 
    Operator_Precedence : constant Precedence_Table :=
                  (Tok_Asterisk => 2, Tok_Forward_Slash => 2,
@@ -32,20 +31,36 @@ package body Chaos.Parser is
                   Tok_Arrow    => 8,
                   others       => 9);
 
-   function Parse_Atomic_Expression
-     return Chaos.Expressions.Chaos_Expression;
+   Operator_Name : constant Name_Table :=
+                     (Tok_Asterisk => "*     ",
+                      Tok_Forward_Slash => "/     ",
+                      Tok_Plus          => "+     ",
+                      Tok_Minus         => "-     ",
+                      Tok_Less          => "<     ",
+                      Tok_Less_Equal    => "<=    ",
+                      Tok_Greater       => ">     ",
+                      Tok_Greater_Equal => ">=    ",
+                      Tok_Equal         => "eq?   ",
+                      Tok_Not_Equal     => "neq?  ",
+                      Tok_And           => "and   ",
+                      Tok_Or            => "or    ",
+                      others            => "      ");
 
-   function Parse_Lambda_Expression
-     return Chaos.Expressions.Chaos_Expression;
+   procedure Parse_Atomic_Expression
+     (Store : in out Lith.Objects.Object_Store'Class);
 
-   function Parse_Expression return Chaos.Expressions.Chaos_Expression;
+   procedure Parse_Lambda_Expression
+     (Store : in out Lith.Objects.Object_Store'Class);
 
-   function Parse_Operator_Expression
-     (Precedence : Precedence_Level)
-      return Chaos.Expressions.Chaos_Expression;
+   procedure Parse_Expression
+     (Store : in out Lith.Objects.Object_Store'Class);
 
-   function Parse_Function_Call_Expression
-      return Chaos.Expressions.Chaos_Expression;
+   procedure Parse_Operator_Expression
+     (Precedence : Precedence_Level;
+      Store      : in out Lith.Objects.Object_Store'Class);
+
+   procedure Parse_Function_Call_Expression
+     (Store : in out Lith.Objects.Object_Store'Class);
 
    function At_Expression return Boolean
    is (Tok = Tok_Left_Paren or else Tok = Tok_Left_Brace
@@ -95,10 +110,12 @@ package body Chaos.Parser is
    ------------------------
 
    procedure Load_Configuration
-     (Path : String;
+     (Path       : String;
+      Store      : in out Lith.Objects.Object_Store'Class;
       On_Setting : not null access
         procedure (Name  : String;
-                   Value : Chaos.Expressions.Chaos_Expression))
+                   Store : in out Lith.Objects.Object_Store'Class;
+                   Value : Lith.Objects.Object))
    is
    begin
       Open (Path);
@@ -106,16 +123,15 @@ package body Chaos.Parser is
          if Tok = Tok_Identifier then
             declare
                Name  : constant String := Tok_Text;
-               Value : Chaos.Expressions.Chaos_Expression;
             begin
                Scan;
                if Tok = Tok_Colon then
                   Scan;
-                  Value := Parse_Expression;
+                  Parse_Expression (Store);
                   if Tok = Tok_Semicolon then
                      Scan;
                   end if;
-                  On_Setting (Name, Value);
+                  On_Setting (Name, Store, Store.Pop);
                else
                   Error ("missing ':'");
                   while Tok /= Tok_End_Of_File
@@ -177,61 +193,74 @@ package body Chaos.Parser is
    -----------------
 
    function Load_Script
-     (Path : String)
-      return Chaos.Expressions.Chaos_Expression
+     (Path  : String;
+      Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
    is
-      Result : constant Chaos.Expressions.Chaos_Expression :=
-                 Chaos.Expressions.Sequences.Sequence_Expression;
+      Count : Natural := 0;
    begin
       Open (Path);
+      Store.Push (Lith.Objects.Symbols.Begin_Symbol);
       while Tok /= Tok_End_Of_File loop
-         declare
-            E : constant Chaos.Expressions.Chaos_Expression :=
-                  Parse_Expression;
-         begin
-            Chaos.Expressions.Sequences.Append (Result, E);
-         end;
+         Parse_Expression (Store);
+         Count := Count + 1;
       end loop;
-      Close;
-      return Result;
+
+      Store.Create_List (Count + 1);
+
+      return Result : constant Lith.Objects.Object := Store.Pop do
+         Close;
+      end return;
+
    end Load_Script;
 
    -----------------------------
    -- Parse_Atomic_Expression --
    -----------------------------
 
-   function Parse_Atomic_Expression
-     return Chaos.Expressions.Chaos_Expression
+   procedure Parse_Atomic_Expression
+     (Store : in out Lith.Objects.Object_Store'Class)
    is
-      E : Chaos.Expressions.Chaos_Expression;
    begin
+      if Tok_Line > 0 then
+         Store.Set_Context (Tok_File_Name, Tok_Line - 1);
+      end if;
+
       if Tok = Tok_Identifier then
          if Tok_Text = "always" then
-            E := Chaos.Expressions.Always;
+            Store.Push (Lith.Objects.True_Value);
          elsif Tok_Text = "never" then
-            E := Chaos.Expressions.Never;
+            Store.Push (Lith.Objects.False_Value);
          elsif Tok_Text = "null" then
-            E := Chaos.Expressions.Null_Value;
+            Store.Push (Lith.Objects.Nil);
          elsif Tok_Text = "undefined" then
-            E := Chaos.Expressions.Undefined_Value;
+            Store.Push (Lith.Objects.Nil);
          elsif Chaos.Dice.Is_Die_Roll (Tok_Text) then
-            E :=
-              Chaos.Dice.To_Expression
-                (Chaos.Dice.Parse_Die_Roll (Tok_Text));
+            Store.Push (Chaos.Dice.To_Expression
+                        (Store, Chaos.Dice.Parse_Die_Roll (Tok_Text)));
          elsif Is_Number (Tok_Text) then
-            E := Chaos.Expressions.Numbers.To_Expression
-              (Integer'Value (Tok_Text));
+            Store.Push (Lith.Objects.To_Object
+                        (Integer'Value (Tok_Text)));
          else
-            E := Chaos.Expressions.Identifiers.To_Expression (Tok_Text);
+            Store.Push
+              (Lith.Objects.To_Object
+                 (Lith.Objects.Symbols.Get_Symbol (Tok_Text)));
          end if;
          Scan;
       elsif Tok = Tok_Left_Bracket then
          Scan;
-         E := Chaos.Expressions.Vectors.Vector_Expression;
+         Store.Push (Chaos.Expressions.Vectors.Create);
 
          while At_Expression loop
-            Chaos.Expressions.Vectors.Append
-              (E, Parse_Expression);
+            Parse_Expression (Store);
+            declare
+               Value : constant Lith.Objects.Object :=
+                         Store.Pop;
+            begin
+               Chaos.Expressions.Vectors.Append
+                 (Store.Top, Value);
+            end;
+
             if Tok = Tok_Comma then
                Scan;
             end if;
@@ -245,7 +274,7 @@ package body Chaos.Parser is
 
       elsif Tok = Tok_Left_Brace then
          Scan;
-         E := Chaos.Expressions.Maps.Map_Expression;
+         Store.Push (Chaos.Expressions.Maps.Create);
 
          while Tok = Tok_Identifier loop
             declare
@@ -263,8 +292,12 @@ package body Chaos.Parser is
                end if;
 
                if At_Expression then
-                  Chaos.Expressions.Maps.Set
-                    (E, Key, Parse_Expression);
+                  Parse_Expression (Store);
+                  declare
+                     Value : constant Lith.Objects.Object := Store.Pop;
+                  begin
+                     Chaos.Expressions.Maps.Set (Store.Top, Key, Value);
+                  end;
                end if;
 
                if Tok = Tok_Comma then
@@ -286,7 +319,7 @@ package body Chaos.Parser is
 
       elsif Tok = Tok_Left_Paren then
          Scan;
-         E := Parse_Expression;
+         Parse_Expression (Store);
          if Tok = Tok_Right_Paren then
             Scan;
          else
@@ -294,33 +327,43 @@ package body Chaos.Parser is
          end if;
       else
          Error ("expected an expression");
-         E := Chaos.Expressions.Undefined_Value;
+         Store.Push (Lith.Objects.Undefined);
          Scan;
       end if;
+
       while Tok = Tok_Dot loop
          Scan;
          if Tok = Tok_Identifier then
             if Next_Tok = Tok_Assign then
-               declare
-                  Name : constant String := Tok_Text;
-                  Value : Chaos.Expressions.Chaos_Expression;
-               begin
-                  Scan;
-                  Scan;
-                  Value := Parse_Expression;
-                  E :=
-                    Chaos.Expressions.Functions.Assign
-                      (E, Name, Value);
-               end;
+               Store.Push
+                 (Lith.Objects.Symbols.Get_Symbol ("chaos-set-property!"));
+               Store.Swap;
+               Store.Push (Lith.Objects.Symbols.Quote_Symbol);
+               Store.Push (Lith.Objects.Symbols.Get_Symbol (Tok_Text));
+               Store.Create_List (2);
+
+               Scan;
+               Scan;
+               Parse_Expression (Store);
+
+               Store.Push (Lith.Objects.Nil);
+               Store.Cons;
+               Store.Cons;
+               Store.Cons;
+               Store.Cons;
             else
-               declare
-                  Name : constant String := Tok_Text;
-               begin
-                  Scan;
-                  E :=
-                    Chaos.Expressions.Functions.Object_Method
-                      (E, Name);
-               end;
+               Store.Push
+                 (Lith.Objects.Symbols.Get_Symbol ("chaos-get-property"));
+               Store.Swap;
+               Store.Push (Lith.Objects.Symbols.Quote_Symbol);
+               Store.Push (Lith.Objects.Symbols.Get_Symbol (Tok_Text));
+               Store.Create_List (2);
+               Scan;
+
+               Store.Push (Lith.Objects.Nil);
+               Store.Cons;
+               Store.Cons;
+               Store.Cons;
             end if;
          else
             Error ("missing identifier");
@@ -328,44 +371,46 @@ package body Chaos.Parser is
             exit;
          end if;
       end loop;
-
-      return E;
    end Parse_Atomic_Expression;
 
    ----------------------
    -- Parse_Expression --
    ----------------------
 
-   function Parse_Expression return Chaos.Expressions.Chaos_Expression is
+   procedure Parse_Expression
+     (Store : in out Lith.Objects.Object_Store'Class)
+   is
    begin
+      if Tok_Line > 0 then
+         Store.Set_Context (Tok_File_Name, Tok_Line - 1);
+      end if;
+
       if Tok = Tok_If then
-         declare
-            Condition,
-            True_Part,
-            False_Part : Chaos.Expressions.Chaos_Expression;
-         begin
+         Store.Push (Lith.Objects.Symbols.Get_Symbol ("if"));
+         Scan;
+         Parse_Expression (Store);
+
+         if Tok = Tok_Then then
             Scan;
-            Condition := Parse_Expression;
-            if Tok = Tok_Then then
-               Scan;
-            else
-               Error ("missing 'then'");
-            end if;
-            True_Part := Parse_Expression;
-            if Tok = Tok_Else then
-               Scan;
-               False_Part := Parse_Expression;
-            else
-               False_Part := Chaos.Expressions.Null_Value;
-            end if;
-            return Chaos.Expressions.Conditional.Create_Conditional
-              (Condition, True_Part, False_Part);
-         end;
+         else
+            Error ("missing 'then'");
+         end if;
+
+         Parse_Expression (Store);
+
+         if Tok = Tok_Else then
+            Scan;
+            Parse_Expression (Store);
+         else
+            Store.Push (0);
+         end if;
+
+         Store.Create_List (4);
       elsif Tok = Tok_Lambda then
          Scan;
-         return Parse_Lambda_Expression;
+         Parse_Lambda_Expression (Store);
       else
-         return Parse_Operator_Expression (Precedence_Level'Last);
+         Parse_Operator_Expression (Precedence_Level'Last, Store);
       end if;
    end Parse_Expression;
 
@@ -374,57 +419,89 @@ package body Chaos.Parser is
    ----------------------
 
    function Parse_Expression
-     (Text : String)
-      return Chaos.Expressions.Chaos_Expression
+     (Text  : String;
+      Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
    is
-      Result : Chaos.Expressions.Chaos_Expression;
+   begin
+      Parse_Expression (Text, Store);
+      return Store.Pop;
+   end Parse_Expression;
+
+   ----------------------
+   -- Parse_Expression --
+   ----------------------
+
+   procedure Parse_Expression
+     (Text  : String;
+      Store : in out Lith.Objects.Object_Store'Class)
+   is
    begin
       Open_String (Text);
-      Result := Parse_Expression;
+      Parse_Expression (Store);
       Close;
-      return Result;
    end Parse_Expression;
 
    ------------------------------------
    -- Parse_Function_Call_Expression --
    ------------------------------------
 
-   function Parse_Function_Call_Expression
-     return Chaos.Expressions.Chaos_Expression
+   procedure Parse_Function_Call_Expression
+     (Store : in out Lith.Objects.Object_Store'Class)
    is
-      Indent : constant Positive := Tok_Indent;
-      E : Chaos.Expressions.Chaos_Expression := Parse_Atomic_Expression;
+      Indent    : constant Positive := Tok_Indent;
+      Arguments : Natural := 0;
    begin
+      Parse_Atomic_Expression (Store);
       while Tok_Indent > Indent and then At_Expression loop
-         E := Chaos.Expressions.Apply (E, Parse_Atomic_Expression);
+         Parse_Atomic_Expression (Store);
+         Arguments := Arguments + 1;
       end loop;
-      return E;
+
+      if Arguments > 0 then
+         Store.Push (Lith.Objects.Nil);
+         for I in 1 .. Arguments loop
+            Store.Cons;
+         end loop;
+         Store.Cons;
+      end if;
+
    end Parse_Function_Call_Expression;
 
    -----------------------------
    -- Parse_Lambda_Expression --
    -----------------------------
 
-   function Parse_Lambda_Expression
-     return Chaos.Expressions.Chaos_Expression
+   procedure Parse_Lambda_Expression
+     (Store : in out Lith.Objects.Object_Store'Class)
    is
-      Argument : constant String := Tok_Text;
+      Indent : constant Positive := Tok_Indent;
+      Argument_Count : Natural := 0;
    begin
-      Scan;
-      if Tok = Tok_Identifier then
-         return Chaos.Expressions.Functions.Lambda
-           (Argument, Parse_Lambda_Expression);
-      elsif Tok = Tok_Arrow then
+      Store.Push (Lith.Objects.Symbols.Lambda_Symbol);
+
+      while Tok = Tok_Identifier loop
+         Store.Push (Lith.Objects.Symbols.Get_Symbol (Tok_Text));
          Scan;
-         return Chaos.Expressions.Functions.Lambda
-           (Argument, Parse_Expression);
+         Argument_Count := Argument_Count + 1;
+      end loop;
+
+      Store.Create_List (Argument_Count);
+
+      if Tok = Tok_Arrow
+        or else (At_Expression and then Tok_Indent >= Indent)
+      then
+         if Tok = Tok_Arrow then
+            Scan;
+         else
+            Error ("inserted '=>'");
+         end if;
+
+         Parse_Expression (Store);
+         Store.Create_List (3);
       else
          Error ("expected an identifier or '=>'");
-         if At_Expression then
-            return Parse_Expression;
-         else
-            return Chaos.Expressions.Null_Value;
-         end if;
+         Store.Push_Nil;
       end if;
    end Parse_Lambda_Expression;
 
@@ -432,16 +509,15 @@ package body Chaos.Parser is
    -- Parse_Operator_Expression --
    -------------------------------
 
-   function Parse_Operator_Expression
-     (Precedence : Precedence_Level)
-      return Chaos.Expressions.Chaos_Expression
+   procedure Parse_Operator_Expression
+     (Precedence : Precedence_Level;
+      Store      : in out Lith.Objects.Object_Store'Class)
    is
-      Result : Chaos.Expressions.Chaos_Expression;
    begin
       if Precedence = 1 then
-         Result := Parse_Function_Call_Expression;
+         Parse_Function_Call_Expression (Store);
       else
-         Result := Parse_Operator_Expression (Precedence - 1);
+         Parse_Operator_Expression (Precedence - 1, Store);
       end if;
 
 --        if Tok /= Tok_End_Of_File then
@@ -450,34 +526,20 @@ package body Chaos.Parser is
 --        end if;
 
       while At_Operator and then Operator_Precedence (Tok) = Precedence loop
-         declare
-            Op    : constant Token := Tok;
-            Name  : constant String := Tok_Text;
-            Right : Chaos.Expressions.Chaos_Expression;
-         begin
-            Scan;
-            if Precedence = 1 then
-               Right := Parse_Function_Call_Expression;
-            else
-               Right := Parse_Operator_Expression (Precedence - 1);
-            end if;
+         Store.Push
+           (Lith.Objects.Symbols.Get_Symbol
+              (Ada.Strings.Fixed.Trim
+                   (Operator_Name (Tok), Ada.Strings.Right)));
+         Store.Swap;
+         Scan;
+         if Precedence = 1 then
+            Parse_Function_Call_Expression (Store);
+         else
+            Parse_Operator_Expression (Precedence - 1, Store);
+         end if;
 
-            if Op = Tok_Arrow then
-               Result :=
-                 Chaos.Expressions.Conditional.Create_Conditional
-                   (Result, Right, Chaos.Expressions.Null_Value);
-            else
-               Result :=
-                 Chaos.Expressions.Apply
-                   (Chaos.Expressions.Apply
-                      (Chaos.Expressions.Identifiers.To_Expression (Name),
-                       Result),
-                    Right);
-            end if;
-         end;
+         Store.Create_List (3);
       end loop;
-
-      return Result;
 
    end Parse_Operator_Expression;
 

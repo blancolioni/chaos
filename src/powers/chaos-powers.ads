@@ -2,6 +2,8 @@ private with Ada.Containers.Vectors;
 
 private with Memor;
 
+private with Lith.Objects;
+
 private with Chaos.Expressions.Enumerated;
 
 limited with Chaos.Actors;
@@ -38,6 +40,10 @@ package Chaos.Powers is
    function Class
      (Power : Chaos_Power_Record'Class)
       return Power_Class;
+
+   function Source
+     (Power : Chaos_Power_Record'Class)
+      return Power_Source;
 
    function Use_Class
      (Power : Chaos_Power_Record'Class)
@@ -103,32 +109,36 @@ package Chaos.Powers is
 
 private
 
-   package Power_Effect_Vectors is
-     new Ada.Containers.Vectors
-       (Positive, Chaos.Expressions.Chaos_Expression,
-        Chaos.Expressions."=");
-
    type Chaos_Power_Record is
      new Chaos.Objects.Root_Localised_Object_Record with
       record
-         Class       : Power_Class;
-         Source      : Power_Source;
-         Use_Class   : Power_Use_Class;
-         Implement   : Power_Implement;
-         Action      : Chaos.Actions.Chaos_Action;
-         Target      : Power_Attack_Target;
-         Target_Size : Natural := 1;
-         Short_Range : Natural := 1;
-         Long_Range  : Natural := 1;
-         Attack      : Chaos.Expressions.Chaos_Expression;
-         Defence     : Chaos.Expressions.Chaos_Expression;
-         Hit         : Power_Effect_Vectors.Vector;
-         Miss        : Power_Effect_Vectors.Vector;
+         Class        : Power_Class;
+         Source       : Power_Source;
+         Use_Class    : Power_Use_Class;
+         Implement    : Power_Implement;
+         Action       : Chaos.Actions.Chaos_Action;
+         Target       : Power_Attack_Target;
+         Target_Size  : Natural := 1;
+         Short_Range  : Natural := 1;
+         Long_Range   : Natural := 1;
+         Attack       : Lith.Objects.Object;
+         Defence      : Lith.Objects.Object;
+         Hit_Effects  : Lith.Objects.Object := Lith.Objects.Nil;
+         Miss_Effects : Lith.Objects.Object := Lith.Objects.Nil;
+         Effects      : Lith.Objects.Object := Lith.Objects.Nil;
       end record;
 
    overriding function Object_Database
      (Object : Chaos_Power_Record)
-      return Memor.Root_Database_Type'Class;
+      return Memor.Memor_Database;
+
+   overriding procedure Add_Properties
+     (Object : Chaos_Power_Record);
+
+   overriding procedure Mark
+     (Power      : in out Chaos_Power_Record;
+      Mark_Value : not null access
+        procedure (Value : in out Lith.Objects.Object));
 
    package Power_Vectors is new Ada.Containers.Vectors (Positive, Chaos_Power);
 
@@ -154,13 +164,38 @@ private
      new Chaos.Expressions.Enumerated (Power_Damage_Type);
 
    function Is_Power_Damage_Type
-     (E : Chaos.Expressions.Chaos_Expression)
+     (E : Lith.Objects.Object)
       return Boolean
    is (Power_Damage_Type_Expressions.Is_Enum (E));
 
    function Get_Power_Damage_Type
-     (E : Chaos.Expressions.Chaos_Expression)
+     (E : Lith.Objects.Object)
       return Power_Damage_Type
    is (Power_Damage_Type_Expressions.To_Enum (E));
+
+   function Attack_Setting
+     (Power : Chaos_Power_Record'Class)
+      return String
+   is (Power.Global_Setting_Name ("attack"));
+
+   function Defence_Setting
+     (Power : Chaos_Power_Record'Class)
+      return String
+   is (Power.Global_Setting_Name ("defence"));
+
+   function Hit_DamageSetting
+     (Power : Chaos_Power_Record'Class)
+      return String
+   is (Power.Global_Setting_Name ("hit"));
+
+   function Miss_Setting
+     (Power : Chaos_Power_Record'Class)
+      return String
+   is (Power.Global_Setting_Name ("miss"));
+
+   function Effect_Setting
+     (Power : Chaos_Power_Record'Class)
+      return String
+   is (Power.Global_Setting_Name ("effect"));
 
 end Chaos.Powers;

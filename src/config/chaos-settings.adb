@@ -1,5 +1,6 @@
 with WL.String_Maps;
 
+with Chaos.Expressions;
 with Chaos.Logging;
 with Chaos.Parser;
 
@@ -20,7 +21,8 @@ package body Chaos.Settings is
    is
       procedure Set_Value
         (Name  : String;
-         Value : Chaos.Expressions.Chaos_Expression);
+         Store : in out Lith.Objects.Object_Store'Class;
+         Value : Lith.Objects.Object);
 
       ---------------
       -- Set_Value --
@@ -28,7 +30,8 @@ package body Chaos.Settings is
 
       procedure Set_Value
         (Name  : String;
-         Value : Chaos.Expressions.Chaos_Expression)
+         Store : in out Lith.Objects.Object_Store'Class;
+         Value : Lith.Objects.Object)
       is
       begin
          if Configure_Map.Contains (Name) then
@@ -36,13 +39,17 @@ package body Chaos.Settings is
          else
             Chaos.Logging.Log
               ("CONFIG", "unknown setting: " & Name
-               & " = " & Chaos.Expressions.To_String (Value));
+               & " = "
+               & Store.Show (Value));
          end if;
       end Set_Value;
 
    begin
+
       Chaos.Parser.Load_Configuration
-        (Settings_Path, Set_Value'Access);
+        (Settings_Path, Chaos.Expressions.Store.all,
+         Set_Value'Access);
+
    end Load_Object;
 
    -------------

@@ -6,6 +6,6 @@ implement: arcane
 attack: int
 defence: fort
 target: one-creature
-hit: { damage: [cold, 1d6 + int-mod + (if level > 20 then 2d4 else 0)],
+hit: { damage: [cold, 1d6 + int-mod + (if level > 20 then 1d6)],
        effect: target.set-condition { condition: slowed, ends: actor.end-of-next-turn }
      }

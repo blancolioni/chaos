@@ -1,4 +1,5 @@
-with Chaos.Expressions;
+with Lith.Objects;
+
 with Chaos.Objects;
 
 generic
@@ -7,7 +8,7 @@ package Chaos.Settings is
 
    type Setting_Handler is access
      procedure (Object : in out Object_Type'Class;
-                Value  : Chaos.Expressions.Chaos_Expression);
+                Value  : Lith.Objects.Object);
 
    procedure Setting (Name : String;
                       Handler : Setting_Handler);

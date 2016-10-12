@@ -33,6 +33,10 @@ private
 
    overriding function Object_Database
      (Object : Chaos_Team_Record)
-      return Memor.Root_Database_Type'Class;
+      return Memor.Memor_Database;
+
+   overriding procedure Add_Properties
+     (Team : Chaos_Team_Record)
+   is null;
 
 end Chaos.Teams;

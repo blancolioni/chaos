@@ -6,9 +6,10 @@ package Chaos.Resources.Biff is
      new Chaos_Resource with private;
 
    procedure Open_Resource
-     (Biff     : Biff_Resource'Class;
-      Resource : in out Chaos_Resource'Class;
-      Locator  : WL.Binary_IO.Word_32);
+     (Biff      : Biff_Resource'Class;
+      Reference : Resource_Reference;
+      Resource  : in out Chaos_Resource'Class;
+      Locator   : WL.Binary_IO.Word_32);
 
 private
 

@@ -3,11 +3,7 @@ with Ada.Text_IO;
 
 with WL.Binary_IO;                     use WL.Binary_IO;
 
-with Chaos.Expressions.Conditional;
-with Chaos.Expressions.Identifiers;
-with Chaos.Expressions.Numbers;
-with Chaos.Expressions.Sequences;
-with Chaos.Expressions.Vectors;
+with Lith.Objects.Symbols;
 
 with Chaos.Expressions.Import.Actions;
 with Chaos.Expressions.Import.Objects;
@@ -43,40 +39,33 @@ package body Chaos.Expressions.Import is
       Index : in out Positive)
       return String;
 
-   function Import_SC
+   procedure Import_SC
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
-      Index    : in out Positive)
-      return Chaos_Expression;
+      Index    : in out Positive);
 
-   function Import_CR
+   procedure Import_CR
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
-      Index    : in out Positive)
-      return Chaos_Expression;
+      Index    : in out Positive);
 
-   function Import_CO
+   procedure Import_CO
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
-      Index    : in out Positive)
-      return Chaos_Expression;
+      Index    : in out Positive);
 
-   function Import_TR
+   procedure Import_TR
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
-      Index    : in out Positive)
-      return Chaos_Expression;
+      Index    : in out Positive);
 
-   function Import_RS
+   procedure Import_RS
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
-      Index    : in out Positive)
-      return Chaos_Expression;
+      Index    : in out Positive);
 
-   function Import_AC
+   procedure Import_AC
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
-      Index    : in out Positive)
-      return Chaos_Expression;
+      Index    : in out Positive);
 
-   function Import_OB
+   procedure Import_OB
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
-      Index    : in out Positive)
-      return Chaos_Expression;
+      Index    : in out Positive);
 
    -----------
    -- Error --
@@ -93,28 +82,25 @@ package body Chaos.Expressions.Import is
    -- Import_AC --
    ---------------
 
-   function Import_AC
+   procedure Import_AC
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
       Index    : in out Positive)
-      return Chaos_Expression
    is
-      Action_Id : Word_32;
-      Object_1  : Chaos_Expression;
-      Object_2  : Chaos_Expression;
-      Object_3  : Chaos_Expression;
+      Action_Id  : Word_32;
       Integer_1  : Integer;
       Integer_2  : Integer;
       Integer_3  : Integer;
       X, Y       : Integer;
    begin
       Skip_Line (Resource, "AC", Index, End_Of_Line_Tag => True);
+
       declare
          Line_Index : Positive := 1;
       begin
          Action_Id := Scan_Word (Resource.Line (Index), Line_Index);
-         Object_1 := Import_OB (Resource, Index);
-         Object_2 := Import_OB (Resource, Index);
-         Object_3 := Import_OB (Resource, Index);
+         Import_OB (Resource, Index);
+         Import_OB (Resource, Index);
+         Import_OB (Resource, Index);
 
          Line_Index := 1;
          Integer_1 := Scan_Integer (Resource.Line (Index), Line_Index);
@@ -129,12 +115,17 @@ package body Chaos.Expressions.Import is
                          Scan_String (Resource.Line (Index), Line_Index);
          begin
             Skip_Line (Resource, "AC", Index, End_Of_Line_Tag => True);
-            return Chaos.Expressions.Import.Actions.Import_Action
+
+            Chaos.Expressions.Import.Actions.Import_Action
               (Action_Id,
-               Object_1, Object_2, Object_3,
+               Store.Top (3, Lith.Objects.Secondary),
+               Store.Top (2, Lith.Objects.Secondary),
+               Store.Top (1, Lith.Objects.Secondary),
                Integer_1, Integer_2, Integer_3,
                X, Y,
                String_1, String_2);
+
+            Store.Drop (3, Lith.Objects.Secondary);
          end;
       end;
    end Import_AC;
@@ -143,64 +134,55 @@ package body Chaos.Expressions.Import is
    -- Import_CO --
    ---------------
 
-   function Import_CO
+   procedure Import_CO
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
       Index    : in out Positive)
-      return Chaos_Expression
    is
-      First  : Boolean := True;
-      Result : Chaos_Expression := Null_Value;
+      Count  : Natural := 0;
    begin
       Skip_Line (Resource, "CO", Index);
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("and"));
       while Resource.Line (Index) = "TR" loop
-         declare
-            TR : constant Chaos_Expression := Import_TR (Resource, Index);
-         begin
-            if First then
-               Result := TR;
-               First := False;
-            else
-               Result :=
-                 Chaos.Expressions.Apply
-                   (Chaos.Expressions.Apply
-                      (Chaos.Expressions.Identifiers.To_Expression ("and"),
-                       Result),
-                    TR);
-            end if;
-         end;
+         Import_TR (Resource, Index);
+         Count := Count + 1;
       end loop;
+
+      if Count > 1 then
+         Store.Create_List (Count + 1);
+      elsif Count = 1 then
+         Store.Swap;
+         Store.Drop;
+      else
+         Store.Drop;
+         Store.Push (Lith.Objects.True_Value);
+      end if;
       Skip_Line (Resource, "CO", Index);
-      return Result;
    end Import_CO;
 
    ---------------
    -- Import_CR --
    ---------------
 
-   function Import_CR
+   procedure Import_CR
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
       Index    : in out Positive)
-      return Chaos_Expression
    is
-      Condition : Chaos_Expression;
-      Response  : Chaos_Expression;
    begin
       Skip_Line (Resource, "CR", Index);
-      Condition := Import_CO (Resource, Index);
-      Response  := Import_RS (Resource, Index);
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("if"));
+      Import_CO (Resource, Index);
+      Import_RS (Resource, Index);
       Skip_Line (Resource, "CR", Index);
-      return Chaos.Expressions.Conditional.Create_Conditional
-        (Condition, Response, Null_Value);
+      Store.Create_List (3);
    end Import_CR;
 
    ---------------
    -- Import_OB --
    ---------------
 
-   function Import_OB
+   procedure Import_OB
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
       Index    : in out Positive)
-      return Chaos_Expression
    is
       EA        : Natural;
       General   : Natural;
@@ -238,7 +220,7 @@ package body Chaos.Expressions.Import is
             Name : constant String := Scan_String (Line, Line_Index);
          begin
             Skip_Line (Resource, "OB", Index, End_Of_Line_Tag => True);
-            return Chaos.Expressions.Import.Objects.Import_Object
+            Chaos.Expressions.Import.Objects.Import_Object
               (0, 0, EA, General, Race, Class, Specific, Gender, Alignment,
                Id_1, Id_2, Id_3, Id_4, Id_5, Name);
          end;
@@ -250,14 +232,10 @@ package body Chaos.Expressions.Import is
    -- Import_RS --
    ---------------
 
-   function Import_RS
+   procedure Import_RS
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
       Index    : in out Positive)
-      return Chaos_Expression
    is
-      Max_Responses  : constant := 20;
-      Probabilities  : array (1 .. Max_Responses) of Natural;
-      Responses      : array (1 .. Max_Responses) of Chaos_Expression;
       Response_Count : Natural := 0;
    begin
       Skip_Line (Resource, "RS", Index);
@@ -265,44 +243,46 @@ package body Chaos.Expressions.Import is
          Skip_Line (Resource, "RE", Index);
          declare
             Line_Index  : Positive := 1;
-            Probability : constant Integer :=
-                            Scan_Integer (Resource.Line (Index), Line_Index);
-            Actions     : constant Chaos_Expression :=
-                            Chaos.Expressions.Sequences.Sequence_Expression;
+            Action_Count : Natural := 0;
+            Probability  : constant Integer :=
+                             Scan_Integer (Resource.Line (Index), Line_Index);
          begin
+            Store.Push (Probability);
+            Store.Push (Lith.Objects.Symbols.Begin_Symbol);
             while Resource.Line (Index) /= "RE" loop
-               Chaos.Expressions.Sequences.Append
-                 (Actions, Import_AC (Resource, Index));
+               Import_AC (Resource, Index);
+               Action_Count := Action_Count + 1;
             end loop;
+            if Action_Count > 1 then
+               Store.Create_List (Action_Count + 1);
+            elsif Action_Count = 1 then
+               Store.Swap;
+               Store.Drop;
+            else
+               raise Constraint_Error with "expected at least one action";
+            end if;
+
             Skip_Line (Resource, "RE", Index);
             Response_Count := Response_Count + 1;
-            Probabilities (Response_Count) := Probability;
-            Responses (Response_Count) := Actions;
          end;
       end loop;
 
       Skip_Line (Resource, "RS", Index);
 
       if Response_Count = 1 then
-         return Responses (1);
+         Store.Swap;
+         Store.Drop;
       else
-         declare
-            Result : constant Chaos.Expressions.Chaos_Expression :=
-                       Chaos.Expressions.Identifiers.To_Expression
-                         ("random-choice");
-            Args   : constant Chaos.Expressions.Chaos_Expression :=
-                       Chaos.Expressions.Vectors.Vector_Expression;
-         begin
-            for I in 1 .. Response_Count loop
-               Chaos.Expressions.Vectors.Append
-                 (Args, Chaos.Expressions.Numbers.To_Expression
-                    (Probabilities (I)));
-               Chaos.Expressions.Vectors.Append
-                 (Args, Responses (I));
-            end loop;
-            return Chaos.Expressions.Apply
-              (Result, Args);
-         end;
+         Store.Push_Nil;
+         for I in 1 .. Response_Count loop
+            Store.Push (Store.Pop, Lith.Objects.Secondary);
+            Store.Cons;
+            Store.Push (Store.Pop (Lith.Objects.Secondary));
+            Store.Cons;
+         end loop;
+         Store.Push (Lith.Objects.Symbols.Get_Symbol ("random-choice"));
+         Store.Swap;
+         Store.Cons;
       end if;
    end Import_RS;
 
@@ -310,54 +290,44 @@ package body Chaos.Expressions.Import is
    -- Import_SC --
    ---------------
 
-   function Import_SC
+   procedure Import_SC
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
       Index    : in out Positive)
-      return Chaos_Expression
    is
-      Expr  : constant Chaos_Expression :=
-                Chaos.Expressions.Sequences.Sequence_Expression;
+      Count : Natural := 0;
    begin
       Skip_Line (Resource, "SC", Index);
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("begin"));
       while Resource.Line (Index) = "CR" loop
-         declare
-            E : constant Chaos_Expression :=
-                  Import_CR (Resource, Index);
-         begin
-            Chaos.Expressions.Sequences.Append (Expr, E);
-         end;
+         Import_CR (Resource, Index);
+         Count := Count + 1;
       end loop;
+      Store.Create_List (Count + 1);
       Skip_Line (Resource, "SC", Index);
-      return Expr;
    end Import_SC;
 
    -------------------
    -- Import_Script --
    -------------------
 
-   function Import_Script
+   procedure Import_Script
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class)
-      return Chaos_Expression
    is
       Start : Integer := 1;
    begin
-      return Result : constant Chaos_Expression :=
-        Import_SC (Resource, Start)
-      do
-         Ada.Text_IO.Put_Line (To_String (Result));
-      end return;
+      Import_SC (Resource, Start);
+      Ada.Text_IO.Put_Line
+        (Store.Show (Store.Top));
    end Import_Script;
 
    ---------------
    -- Import_TR --
    ---------------
 
-   function Import_TR
+   procedure Import_TR
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
       Index    : in out Positive)
-      return Chaos_Expression
    is
-      Result : Chaos_Expression;
    begin
       Skip_Line (Resource, "TR", Index);
       declare
@@ -381,13 +351,11 @@ package body Chaos.Expressions.Import is
          pragma Unreferenced (Unknown);
          Skip_Line (Resource, "OB", Index, End_Of_Line_Tag => True);
          Skip_Line (Resource, "OB", Index, End_Of_Line_Tag => True);
-         Result :=
-           Chaos.Expressions.Import.Triggers.Import_Trigger
-             (Trigger_Id, Integer_1, Flags, Integer_2,
-              Text_1, Text_2);
+         Chaos.Expressions.Import.Triggers.Import_Trigger
+           (Trigger_Id, Integer_1, Flags, Integer_2,
+            Text_1, Text_2);
       end;
       Skip_Line (Resource, "TR", Index);
-      return Result;
    end Import_TR;
 
    ------------------
@@ -501,6 +469,7 @@ package body Chaos.Expressions.Import is
             end if;
          end if;
       end if;
+      Store.Set_Context (Resource.Name, Line_Number);
    end Skip_Line;
 
    -----------------

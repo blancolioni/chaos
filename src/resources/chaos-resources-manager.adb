@@ -1,3 +1,5 @@
+with Ada.Strings.Fixed;
+
 with WL.String_Maps;
 
 --  with Chaos.Configuration;
@@ -93,7 +95,7 @@ package body Chaos.Resources.Manager is
    begin
       if not Resource_Map.Contains (Key) then
          if not Got_Keys then
-            Keys.Open (Base_Path & "chitin.key");
+            Keys.Open ("CHITIN  ", Base_Path & "chitin.key");
             Keys.Load;
             Keys.Close;
             Got_Keys := True;
@@ -114,16 +116,20 @@ package body Chaos.Resources.Manager is
             Resource := Create_Resource (Res_Type);
             if not Biff_Map.Contains (Path) then
                declare
+                  use Ada.Strings.Fixed;
+                  Reference : constant String :=
+                                Path (Index (Path, "/") + 1 .. Path'Last);
                   Biff : constant Biff_Resource_Access :=
                            new Chaos.Resources.Biff.Biff_Resource;
                begin
-                  Biff.Open (Base_Path & Path);
+                  Biff.Open (To_Reference (Reference), Base_Path & Path);
                   Biff.Load;
                   Biff_Map.Insert (Path, Biff);
                end;
             end if;
 
-            Biff_Map.Element (Path).Open_Resource (Resource.all, Locator);
+            Biff_Map.Element (Path).Open_Resource
+              (Reference, Resource.all, Locator);
 
             Resource.Load;
 

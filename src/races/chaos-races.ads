@@ -78,10 +78,14 @@ private
 
    overriding function Object_Database
      (Object : Chaos_Race_Record)
-      return Memor.Root_Database_Type'Class;
+      return Memor.Memor_Database;
 
    overriding function Animation_Code
      (Race : Chaos_Race_Record)
       return Character;
+
+   overriding procedure Add_Properties
+     (Race : Chaos_Race_Record)
+   is null;
 
 end Chaos.Races;

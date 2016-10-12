@@ -678,10 +678,9 @@ package body Chaos.Xi_UI.Areas is
       Mouse_Y := Xi.Mouse.Current_Mouse.State.Y;
 
       if Now - Listener.Last_Script_Execution > Scripts_Delay then
-         Chaos.Expressions.Execute
+         Chaos.Expressions.Store.Evaluate
            (Listener.Model.Area.Script);
          Listener.Last_Script_Execution := Now;
-
       end if;
 
       for I in 1 .. Listener.Model.Actors.Last_Index loop

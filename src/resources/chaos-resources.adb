@@ -308,12 +308,25 @@ package body Chaos.Resources is
    end Has_Resource;
 
    ----------
+   -- Name --
+   ----------
+
+   function Name
+     (Resource : Chaos_Resource'Class)
+      return String
+   is
+   begin
+      return To_String (Resource.Reference);
+   end Name;
+
+   ----------
    -- Open --
    ----------
 
    procedure Open
-     (Resource : in out Chaos_Resource'Class;
-      Path     : String)
+     (Resource  : in out Chaos_Resource'Class;
+      Reference : Resource_Reference;
+      Path      : String)
    is
       Required : constant String := Resource.Signature;
       Found    : String (Required'Range);
@@ -322,6 +335,7 @@ package body Chaos.Resources is
    begin
       Chaos.Logging.Log
         ("RESOURCE", "loading: " & Path);
+      Resource.Reference := Reference;
       Open (Resource.File, In_File, Path);
 
       if Resource.Has_Header then
@@ -352,15 +366,17 @@ package body Chaos.Resources is
    ----------
 
    procedure Open
-     (Resource : in out Chaos_Resource'Class;
-      From     : Chaos_Resource'Class;
-      Start    : WL.Binary_IO.Word_32;
-      Length   : WL.Binary_IO.Word_32)
+     (Resource  : in out Chaos_Resource'Class;
+      Reference : Resource_Reference;
+      From      : Chaos_Resource'Class;
+      Start     : WL.Binary_IO.Word_32;
+      Length    : WL.Binary_IO.Word_32)
    is
       Required : constant String := Resource.Signature;
       Found    : String (Required'Range);
       X   : Word_8;
    begin
+      Resource.Reference := Reference;
       Resource.File := View (From.File);
       Resource.Start := Start;
       Resource.Length := Length;
@@ -438,6 +454,7 @@ package body Chaos.Resources is
         (others => Character'Val (0))
       do
          for I in Value'Range loop
+            exit when I - Value'First + 1 > Reference'Last;
             Reference (I - Value'First + 1) := Value (I);
          end loop;
       end return;

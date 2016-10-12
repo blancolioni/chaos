@@ -1,6 +1,14 @@
 with Chaos.Creatures.Db;
+with Chaos.Abilities.Able_Objects;
+with Chaos.Defences.Defender_Objects;
 
 package body Chaos.Creatures is
+
+   package Ability_Properties is
+     new Chaos.Abilities.Able_Objects (Chaos_Creature_Record);
+
+   package Defence_Properties is
+     new Chaos.Defences.Defender_Objects (Chaos_Creature_Record);
 
    -------------------
    -- Ability_Score --
@@ -51,6 +59,18 @@ package body Chaos.Creatures is
    begin
       Creature.Powers.Add_Power (Power);
    end Add_Power;
+
+   --------------------
+   -- Add_Properties --
+   --------------------
+
+   overriding procedure Add_Properties
+     (Object : Chaos_Creature_Record)
+   is
+   begin
+      Ability_Properties.Add_Ability_Properties (Object);
+      Defence_Properties.Add_Defence_Properties (Object);
+   end Add_Properties;
 
    -----------
    -- Alive --
@@ -277,7 +297,7 @@ package body Chaos.Creatures is
 
    overriding function Object_Database
      (Object : Chaos_Creature_Record)
-      return Memor.Root_Database_Type'Class
+      return Memor.Memor_Database
    is
       pragma Unreferenced (Object);
    begin

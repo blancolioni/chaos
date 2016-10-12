@@ -74,6 +74,10 @@ private
 
    overriding function Object_Database
      (Object : Chaos_Weapon_Record)
-      return Memor.Root_Database_Type'Class;
+      return Memor.Memor_Database;
+
+   overriding procedure Add_Properties
+     (Weapon : Chaos_Weapon_Record)
+   is null;
 
 end Chaos.Items.Weapons;

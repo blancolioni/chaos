@@ -215,6 +215,9 @@ private
 
    overriding function Object_Database
      (Object : Chaos_Creature_Record)
-      return Memor.Root_Database_Type'Class;
+      return Memor.Memor_Database;
+
+   overriding procedure Add_Properties
+     (Object : Chaos_Creature_Record);
 
 end Chaos.Creatures;

@@ -43,7 +43,7 @@ package body Chaos.Things is
 
    overriding function Object_Database
      (Object : Chaos_Thing_Record)
-      return Memor.Root_Database_Type'Class
+      return Memor.Memor_Database
    is
       pragma Unreferenced (Object);
    begin

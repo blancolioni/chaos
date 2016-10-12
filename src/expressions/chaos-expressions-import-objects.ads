@@ -1,6 +1,6 @@
 package Chaos.Expressions.Import.Objects is
 
-   function Import_Object
+   procedure Import_Object
      (Team      : Natural;
       Faction   : Natural;
       EA        : Natural;
@@ -15,7 +15,6 @@ package Chaos.Expressions.Import.Objects is
       Id_3      : Natural;
       Id_4      : Natural;
       Id_5      : Natural;
-      Name      : String)
-      return Chaos_Expression;
+      Name      : String);
 
 end Chaos.Expressions.Import.Objects;

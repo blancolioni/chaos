@@ -1,94 +1,91 @@
 with Ada.Characters.Handling;
 
+with WL.String_Maps;
+
+with Lith.Objects.Symbols;
+
 package body Chaos.Expressions.Enumerated is
 
-   type Enum_Expression_Record is
-     new Constant_Chaos_Expression_Record with
-      record
-         Value : Enum;
-      end record;
+   package Enum_Maps is
+     new WL.String_Maps (Enum);
 
-   overriding function To_String
-     (Expression  : Enum_Expression_Record)
-      return String;
+   Enum_Values : Enum_Maps.Map;
+   Got_Values  : Boolean := False;
+
+   function To_Name (Value : Enum) return String;
+
+   procedure Create_Enum_Values;
 
    ------------------------
-   -- Add_To_Environment --
+   -- Create_Enum_Values --
    ------------------------
 
-   procedure Add_To_Environment
-     (Target : in out Chaos_Environment)
-   is
+   procedure Create_Enum_Values is
    begin
-      for Value in Enum loop
-         declare
-            E : constant Chaos_Expression := To_Expression (Value);
-         begin
-            Insert (Target, To_String (E), E);
-         end;
+      for E in Enum loop
+         Enum_Values.Insert
+           (To_Name (E), E);
       end loop;
-   end Add_To_Environment;
+      Got_Values := True;
+   end Create_Enum_Values;
 
    -------------
    -- Is_Enum --
    -------------
 
-   function Is_Enum (Expression : Chaos_Expression) return Boolean is
+   function Is_Enum (Value : Lith.Objects.Object) return Boolean is
    begin
-      return Get (Expression) in Enum_Expression_Record'Class;
+      if not Got_Values then
+         Create_Enum_Values;
+      end if;
+      return Lith.Objects.Is_Symbol (Value)
+        and then Enum_Values.Contains
+          (Lith.Objects.Symbols.Get_Name
+             (Lith.Objects.To_Symbol (Value)));
    end Is_Enum;
 
    -------------
    -- To_Enum --
    -------------
 
-   function To_Enum (Expression : Chaos_Expression) return Enum is
+   function To_Enum (Value : Lith.Objects.Object) return Enum is
    begin
-      if Is_Enum (Expression) then
-         return Enum_Expression_Record (Get (Expression)).Value;
-      else
-         declare
-            Image : String := To_String (Expression);
-         begin
-            for I in Image'Range loop
-               if Image (I) = '-' then
-                  Image (I) := '_';
-               end if;
-            end loop;
-            return Enum'Value (Image);
-         end;
-      end if;
+      return Enum_Values.Element
+        (Lith.Objects.Symbols.Get_Name
+           (Lith.Objects.To_Symbol (Value)));
    end To_Enum;
+
+   -------------
+   -- To_Name --
+   -------------
+
+   function To_Name (Value : Enum) return String is
+      Image : String :=
+                Ada.Characters.Handling.To_Lower
+                  (Enum'Image (Value));
+   begin
+      for I in Image'Range loop
+         if Image (I) = '_' then
+            Image (I) := '-';
+         end if;
+      end loop;
+      return Image;
+   end To_Name;
 
    -------------------
    -- To_Expression --
    -------------------
 
-   function To_Expression (Value : Enum) return Chaos_Expression is
-      Rec : constant Enum_Expression_Record :=
-              (Constant_Chaos_Expression_Record with Value);
+   function To_Object (Value : Enum) return Lith.Objects.Object is
    begin
-      return Express (Rec);
-   end To_Expression;
+      if not Got_Values then
+         Create_Enum_Values;
+      end if;
 
-   ---------------
-   -- To_String --
-   ---------------
+      return Lith.Objects.To_Object
+        (Lith.Objects.Symbols.Get_Symbol (To_Name (Value)));
+   end To_Object;
 
-   overriding function To_String
-     (Expression  : Enum_Expression_Record)
-      return String
-   is
-      Result : String :=
-                 Ada.Characters.Handling.To_Lower
-                   (Enum'Image (Expression.Value));
-   begin
-      for I in Result'Range loop
-         if Result (I) = '_' then
-            Result (I) := '-';
-         end if;
-      end loop;
-      return Result;
-   end To_String;
-
+begin
+   Create_Enum_Values;
 end Chaos.Expressions.Enumerated;

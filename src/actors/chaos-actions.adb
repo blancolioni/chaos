@@ -10,7 +10,7 @@ package body Chaos.Actions is
    ---------------
 
    function Is_Action
-     (Expression : Chaos.Expressions.Chaos_Expression)
+     (Expression : Lith.Objects.Object)
       return Boolean
    is
    begin
@@ -22,7 +22,7 @@ package body Chaos.Actions is
    ---------------
 
    function To_Action
-     (Expression : Chaos.Expressions.Chaos_Expression)
+     (Expression : Lith.Objects.Object)
       return Chaos_Action
    is
    begin
@@ -35,10 +35,10 @@ package body Chaos.Actions is
 
    function To_Expression
      (Action : Chaos_Action)
-      return Chaos.Expressions.Chaos_Expression
+      return Lith.Objects.Object
    is
    begin
-      return Action_Expressions.To_Expression (Action);
+      return Action_Expressions.To_Object (Action);
    end To_Expression;
 
 end Chaos.Actions;

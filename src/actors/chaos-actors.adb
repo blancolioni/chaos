@@ -6,7 +6,23 @@ with Chaos.Actors.Db;
 
 with Chaos.Areas;
 
+with Chaos.Abilities.Able_Objects;
+
 package body Chaos.Actors is
+
+   package Ability_Properties is
+     new Chaos.Abilities.Able_Objects (Chaos_Actor_Record);
+
+   --------------------
+   -- Add_Properties --
+   --------------------
+
+   overriding procedure Add_Properties
+     (Object : Chaos_Actor_Record)
+   is
+   begin
+      Ability_Properties.Add_Ability_Properties (Object);
+   end Add_Properties;
 
    ----------
    -- Area --
@@ -83,19 +99,6 @@ package body Chaos.Actors is
       Area.Add_Actor (Result);
       return Result;
    end Create_Actor;
-
-   -------------------------
-   -- Create_Method_Table --
-   -------------------------
-
-   overriding procedure Create_Method_Table
-     (Actor  : Chaos_Actor_Record;
-      Table  : in out Chaos.Expressions.Chaos_Environment)
-   is
-   begin
-      Actor.Creature.Insert_Abilities (Table);
-      Actor.Creature.Insert_Defences (Table);
-   end Create_Method_Table;
 
    --------------
    -- Creature --
@@ -258,7 +261,7 @@ package body Chaos.Actors is
 
    overriding function Object_Database
      (Object : Chaos_Actor_Record)
-      return Memor.Root_Database_Type'Class
+      return Memor.Memor_Database
    is
       pragma Unreferenced (Object);
    begin

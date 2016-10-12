@@ -1,12 +1,14 @@
-with Chaos.Expressions;
+with Lith.Objects;
 
 package Chaos.Parser is
 
    procedure Load_Configuration
-     (Path : String;
+     (Path       : String;
+      Store      : in out Lith.Objects.Object_Store'Class;
       On_Setting : not null access
         procedure (Name  : String;
-                   Value : Chaos.Expressions.Chaos_Expression));
+                   Store : in out Lith.Objects.Object_Store'Class;
+                   Value : Lith.Objects.Object));
 
    procedure Load_Directory
      (Path      : String;
@@ -15,11 +17,17 @@ package Chaos.Parser is
         procedure (Path : String));
 
    function Load_Script
-     (Path : String)
-      return Chaos.Expressions.Chaos_Expression;
+     (Path  : String;
+      Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
+
+   procedure Parse_Expression
+     (Text  : String;
+      Store : in out Lith.Objects.Object_Store'Class);
 
    function Parse_Expression
-     (Text : String)
-      return Chaos.Expressions.Chaos_Expression;
+     (Text  : String;
+      Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
 
 end Chaos.Parser;

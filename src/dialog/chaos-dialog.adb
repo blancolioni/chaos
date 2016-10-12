@@ -64,7 +64,7 @@ package body Chaos.Dialog is
 
    overriding function Object_Database
      (Object : Chaos_Dialog_Record)
-      return Memor.Root_Database_Type'Class
+      return Memor.Memor_Database
    is
       pragma Unreferenced (Object);
    begin

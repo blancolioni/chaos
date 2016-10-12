@@ -1,5 +1,7 @@
 with Ada.Text_IO;
 
+with Lith.Objects;
+
 with Chaos.UI;
 
 with Chaos.Expressions;
@@ -239,9 +241,12 @@ package body Chaos.Game is
       pragma Unreferenced (Game);
    begin
       Ada.Text_IO.Put_Line
-        (Chaos.Expressions.To_String
-           (Chaos.Parser.Load_Script
-                (Chaos.Paths.Config_File ("start.script"))));
+        (Chaos.Expressions.Store.Show
+           (Chaos.Expressions.Store.Evaluate
+                (Chaos.Parser.Load_Script
+                     (Chaos.Paths.Config_File ("start.script"),
+                      Chaos.Expressions.Store.all),
+                 Lith.Objects.Nil)));
    end Start;
 
    ------------------

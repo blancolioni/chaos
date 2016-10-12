@@ -1,6 +1,16 @@
 with Chaos.Powers.Db;
 
+with Chaos.Objects.Enum_Properties;
+
 package body Chaos.Powers is
+
+   package Power_Class_Properties is
+     new Chaos.Objects.Enum_Properties
+       (Chaos_Power_Record, Power_Class, Class);
+
+   package Power_Source_Properties is
+     new Chaos.Objects.Enum_Properties
+       (Chaos_Power_Record, Power_Source, Source);
 
    ---------------
    -- Add_Power --
@@ -13,6 +23,20 @@ package body Chaos.Powers is
    begin
       Collection.Powers.Append (Power);
    end Add_Power;
+
+   --------------------
+   -- Add_Properties --
+   --------------------
+
+   overriding procedure Add_Properties
+     (Object : Chaos_Power_Record)
+   is
+   begin
+      Object.Add_Property ("class",
+                           Power_Class_Properties.Get_Property'Access);
+      Object.Add_Property ("source",
+                           Power_Source_Properties.Get_Property'Access);
+   end Add_Properties;
 
    ------------
    -- Attack --
@@ -92,13 +116,30 @@ package body Chaos.Powers is
       return Power.Long_Range;
    end Long_Range;
 
+   ----------
+   -- Mark --
+   ----------
+
+   overriding procedure Mark
+     (Power      : in out Chaos_Power_Record;
+      Mark_Value : not null access
+        procedure (Value : in out Lith.Objects.Object))
+   is
+   begin
+      Mark_Value (Power.Attack);
+      Mark_Value (Power.Defence);
+      Mark_Value (Power.Hit_Effects);
+      Mark_Value (Power.Miss_Effects);
+      Mark_Value (Power.Effects);
+   end Mark;
+
    ---------------------
    -- Object_Database --
    ---------------------
 
    overriding function Object_Database
      (Object : Chaos_Power_Record)
-      return Memor.Root_Database_Type'Class
+      return Memor.Memor_Database
    is
       pragma Unreferenced (Object);
    begin
@@ -125,6 +166,18 @@ package body Chaos.Powers is
    begin
       return Power.Short_Range;
    end Short_Range;
+
+   ------------
+   -- Source --
+   ------------
+
+   function Source
+     (Power : Chaos_Power_Record'Class)
+      return Power_Source
+   is
+   begin
+      return Power.Source;
+   end Source;
 
    ---------------
    -- Use_Class --

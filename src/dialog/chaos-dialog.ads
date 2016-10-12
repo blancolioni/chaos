@@ -2,7 +2,6 @@ private with Ada.Containers.Vectors;
 
 private with Memor;
 
-private with Chaos.Expressions;
 private with Chaos.Localisation;
 
 with Chaos.Objects;
@@ -57,8 +56,6 @@ private
          Done_Quest            : Boolean := False;
          Transition_Text_Index : Chaos.Localisation.Local_Text_Index;
          Journal_Text_Index    : Chaos.Localisation.Local_Text_Index;
-         Trigger               : Chaos.Expressions.Chaos_Expression;
-         Action                : Chaos.Expressions.Chaos_Expression;
          Next_State            : Natural;
       end record;
 
@@ -82,6 +79,10 @@ private
 
    overriding function Object_Database
      (Object : Chaos_Dialog_Record)
-      return Memor.Root_Database_Type'Class;
+      return Memor.Memor_Database;
+
+   overriding procedure Add_Properties
+     (Dialog : Chaos_Dialog_Record)
+   is null;
 
 end Chaos.Dialog;

@@ -1,13 +1,13 @@
 with Ada.Text_IO;
 
+with Lith.Objects;
+
 with Chaos.Actors;
 with Chaos.Classes;
 with Chaos.Configuration;
 with Chaos.Creatures.Quick;
 with Chaos.Dice;
 with Chaos.Expressions;
-with Chaos.Expressions.Environments;
-with Chaos.Expressions.Functions;
 with Chaos.Game;
 with Chaos.Localisation;
 with Chaos.Parser;
@@ -36,46 +36,57 @@ procedure Chaos.Driver is
    Test_Only : constant Boolean := False;
    Text_UI : constant Boolean := False;
 
-   Expr : constant Chaos.Expressions.Chaos_Expression :=
-            Chaos.Vision.To_Expression (Chaos.Vision.Low_Light);
-   Roll : constant Chaos.Expressions.Chaos_Expression :=
-            Chaos.Dice.To_Expression
-              (Chaos.Dice.Parse_Die_Roll ("1d6+1"));
    Tlk  : Chaos.Resources.Tlk.Tlk_Resource;
 begin
+   Chaos.Expressions.Create_Environment;
+
    Chaos.Infinity_Engine.Read_Infinity_Config;
    Chaos.Configuration.Read_Configuration;
 
    declare
-      Start : constant Chaos.Expressions.Chaos_Expression :=
+      Start : constant Lith.Objects.Object :=
                 Chaos.Parser.Load_Script
-                  (Chaos.Paths.Config_File ("start.script"));
+                  (Chaos.Paths.Config_File ("start.script"),
+                   Chaos.Expressions.Store.all);
    begin
       Ada.Text_IO.Put_Line
-        (Chaos.Expressions.To_String (Start));
+        (Chaos.Expressions.Store.Show (Start));
       Ada.Text_IO.Put_Line
-        (Chaos.Expressions.To_String
-           (Chaos.Expressions.Evaluate
-                (Start, Chaos.Expressions.Environments.Standard_Environment)));
+        (Chaos.Expressions.Store.Show
+           (Chaos.Expressions.Store.Evaluate
+                (Start, Lith.Objects.Nil)));
    end;
 
-   Ada.Text_IO.Put_Line
-     (Chaos.Expressions.To_String (Expr));
-   Ada.Text_IO.Put_Line
-     (Chaos.Expressions.To_String (Roll));
-   for I in 1 .. 10 loop
-      Ada.Text_IO.Put
-        (Chaos.Expressions.To_String
-           (Chaos.Expressions.Evaluate
-                (Chaos.Expressions.Functions.Object_Method
-                   (Roll, "roll"))));
-      Ada.Text_IO.Put (" ");
-   end loop;
+   declare
+      Expr : constant Lith.Objects.Object :=
+               Chaos.Vision.To_Expression (Chaos.Vision.Low_Light);
+      Roll : constant Lith.Objects.Object :=
+               Chaos.Dice.To_Expression
+                 (Chaos.Expressions.Store.all,
+                  Chaos.Dice.Parse_Die_Roll ("1d6+1"));
+   begin
+      Ada.Text_IO.Put_Line
+        (Chaos.Expressions.Store.Show (Expr));
+      Ada.Text_IO.Put_Line
+        (Chaos.Expressions.Store.Show (Roll));
+      for I in 1 .. 10 loop
+         declare
+            use Chaos.Expressions;
+         begin
+            Ada.Text_IO.Put
+              (Store.Show (Store.Evaluate (Roll, Lith.Objects.Nil)) & " ");
+         end;
+      end loop;
+   end;
+
    Ada.Text_IO.New_Line;
-   Tlk.Open (Chaos.Infinity_Engine.Infinity_Path
+   Tlk.Open ("DIALOG  ",
+             Chaos.Infinity_Engine.Infinity_Path
              & "dialog.tlk");
    Tlk.Load;
    Tlk.Close;
+
+   Chaos.Expressions.Store.Report_State;
 
    if Test_Only then
       declare
@@ -83,6 +94,16 @@ begin
                 Chaos.UI.Text_UI.Create;
       begin
          Chaos.UI.Set_Current_UI (UI);
+
+         declare
+            Protagonist : constant Chaos.Creatures.Chaos_Creature :=
+                            Chaos.Creatures.Quick.Quick_Creature
+                              ("Aramael",
+                               Chaos.Races.Get ("eladrin"),
+                               Chaos.Classes.Get ("wizard"));
+         begin
+            Chaos.Game.Create_Game (Protagonist);
+         end;
 
          UI.Stop;
       end;

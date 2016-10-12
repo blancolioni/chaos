@@ -52,6 +52,10 @@ private
 
    overriding function Object_Database
      (Object : Chaos_Thing_Record)
-      return Memor.Root_Database_Type'Class;
+      return Memor.Memor_Database;
+
+   overriding procedure Add_Properties
+     (Thing : Chaos_Thing_Record)
+   is null;
 
 end Chaos.Things;

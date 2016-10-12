@@ -6,7 +6,6 @@ with Chaos.Game;
 
 with Chaos.Images;
 
-with Chaos.Expressions;
 with Chaos.Resources.Tis;
 
 package body Chaos.UI.Text_UI is

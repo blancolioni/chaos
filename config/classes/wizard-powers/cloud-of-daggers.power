@@ -7,7 +7,7 @@ target: burst
 target-size: 1
 attack: int
 defence: refl
-hit: { damage: [force, id6 + int-mod + (if level > 20 then 1d6 else 0)],
+hit: { damage: [force, id6 + int-mod + (if level > 20 then 1d6)],
        add-token: { target: this.target,
                     ends: actor.end-of-next-turn,
                     handler: this.target.on-enter (\ x => x.take-damage [force, max actor.wis-mod 1])
