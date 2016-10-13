@@ -3,6 +3,7 @@ with Ada.Text_IO;
 with Lith.Objects;
 
 with Chaos.Actors;
+with Chaos.Areas;
 with Chaos.Classes;
 with Chaos.Configuration;
 with Chaos.Creatures.Quick;
@@ -33,7 +34,7 @@ with Chaos.Paths;
 with Chaos.Infinity_Engine;
 
 procedure Chaos.Driver is
-   Test_Only : constant Boolean := True;
+   Test_Only : constant Boolean := False;
    Text_UI : constant Boolean := False;
 
    Tlk  : Chaos.Resources.Tlk.Tlk_Resource;
@@ -101,6 +102,13 @@ begin
             Chaos.Game.Create_Game (Protagonist);
          end;
 
+         UI.Start;
+
+         for I in 1 .. 3 loop
+            Ada.Text_IO.Put_Line ("area script" & I'Img);
+            Chaos.Game.Current_Game.Area.Execute_Script
+              (Chaos.Game.Current_Game.Area.Script);
+         end loop;
          UI.Stop;
       end;
    else
