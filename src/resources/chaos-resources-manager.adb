@@ -156,7 +156,7 @@ package body Chaos.Resources.Manager is
    begin
       if not Resource_Map.Contains (Key) then
          if not Got_Keys then
-            Keys.Open (Base_Path & "chitin.key");
+            Keys.Open ("CHITIN  ", Base_Path & "chitin.key");
             Keys.Load;
             Keys.Close;
             Got_Keys := True;
