@@ -79,6 +79,7 @@ package body Chaos.UI.Text_UI is
      (UI : in out Chaos_Text_UI)
    is
    begin
+      Chaos_Text_UI'Class (UI).Initialize;
       UI.Put_Line ("Starting text interface ...");
       Chaos.Game.Current_Game.Start;
    end Start;
