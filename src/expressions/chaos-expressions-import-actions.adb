@@ -48,9 +48,19 @@ package body Chaos.Expressions.Import.Actions is
               ("chaos-set-timer this " & Integer'Image (Integer_1)
                & Integer'Image (Integer_2));
          when Set_Global_Timer =>
-            Chaos.Parser.Parse_Expression
-              ("chaos-set-timer " & Text_1
-               & Integer'Image (Integer_1));
+            Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-set-timer"));
+            Store.Push (Lith.Objects.Symbols.Quote_Symbol);
+            Store.Push
+              (Lith.Objects.Symbols.Get_Symbol
+                 (Text_1 (Text_1'First .. Text_1'First + 5)));
+            Store.Create_List (2);
+            Store.Push (Lith.Objects.Symbols.Quote_Symbol);
+            Store.Push
+              (Lith.Objects.Symbols.Get_Symbol
+                 (Text_1 (Text_1'First + 6 .. Text_1'Last)));
+            Store.Create_List (2);
+            Store.Push (Integer_1);
+            Store.Create_List (4);
          when Display_String_Action =>
             Store.Push (Lith.Objects.Symbols.Get_Symbol ("ui-display-string"));
             Store.Push (Integer_1);
