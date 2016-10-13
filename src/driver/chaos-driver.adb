@@ -33,7 +33,7 @@ with Chaos.Paths;
 with Chaos.Infinity_Engine;
 
 procedure Chaos.Driver is
-   Test_Only : constant Boolean := False;
+   Test_Only : constant Boolean := True;
    Text_UI : constant Boolean := False;
 
    Tlk  : Chaos.Resources.Tlk.Tlk_Resource;
@@ -46,8 +46,7 @@ begin
    declare
       Start : constant Lith.Objects.Object :=
                 Chaos.Parser.Load_Script
-                  (Chaos.Paths.Config_File ("start.script"),
-                   Chaos.Expressions.Store.all);
+                  (Chaos.Paths.Config_File ("start.script"));
    begin
       Ada.Text_IO.Put_Line
         (Chaos.Expressions.Store.Show (Start));
@@ -62,8 +61,7 @@ begin
                Chaos.Vision.To_Expression (Chaos.Vision.Low_Light);
       Roll : constant Lith.Objects.Object :=
                Chaos.Dice.To_Expression
-                 (Chaos.Expressions.Store.all,
-                  Chaos.Dice.Parse_Die_Roll ("1d6+1"));
+                 (Chaos.Dice.Parse_Die_Roll ("1d6+1"));
    begin
       Ada.Text_IO.Put_Line
         (Chaos.Expressions.Store.Show (Expr));

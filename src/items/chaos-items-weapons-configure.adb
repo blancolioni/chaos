@@ -98,7 +98,6 @@ package body Chaos.Items.Weapons.Configure is
 
          procedure Set_Value
            (Name  : String;
-            Store : in out Lith.Objects.Object_Store'Class;
             Value : Lith.Objects.Object);
 
          ---------------
@@ -107,7 +106,6 @@ package body Chaos.Items.Weapons.Configure is
 
          procedure Set_Value
            (Name  : String;
-            Store : in out Lith.Objects.Object_Store'Class;
             Value : Lith.Objects.Object)
          is
          begin
@@ -116,13 +114,13 @@ package body Chaos.Items.Weapons.Configure is
             else
                Chaos.Logging.Log
                  ("CONFIG", "unknown Weapon setting: " & Name
-                  & " = " & Store.Show (Value));
+                  & " = " & Chaos.Expressions.Store.Show (Value));
             end if;
          end Set_Value;
 
       begin
          Chaos.Parser.Load_Configuration
-           (Path, Chaos.Expressions.Store.all, Set_Value'Access);
+           (Path, Set_Value'Access);
       end Create;
 
    begin

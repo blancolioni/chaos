@@ -349,11 +349,11 @@ package body Chaos.Expressions.Import is
                         Scan_String (Line, Line_Index);
       begin
          pragma Unreferenced (Unknown);
-         Skip_Line (Resource, "OB", Index, End_Of_Line_Tag => True);
-         Skip_Line (Resource, "OB", Index, End_Of_Line_Tag => True);
+         Import_OB (Resource, Index);
          Chaos.Expressions.Import.Triggers.Import_Trigger
            (Trigger_Id, Integer_1, Flags, Integer_2,
             Text_1, Text_2);
+         Store.Drop (1, Lith.Objects.Secondary);
       end;
       Skip_Line (Resource, "TR", Index);
    end Import_TR;

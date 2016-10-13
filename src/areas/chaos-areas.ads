@@ -10,6 +10,7 @@ with Chaos.Vision;
 
 with Chaos.Actors;
 with Chaos.Commands;
+with Chaos.Creatures;
 with Chaos.Images;
 
 with Chaos.Features;
@@ -93,6 +94,16 @@ package Chaos.Areas is
       Location : Chaos.Locations.Square_Location)
       return Chaos.Features.Chaos_Feature
      with Pre => Area.Has_Feature (Location);
+
+   function Has_Actor
+     (Area : Chaos_Area_Record'Class;
+      Creature : Chaos.Creatures.Chaos_Creature)
+      return Boolean;
+
+   function Actor
+     (Area     : Chaos_Area_Record'Class;
+      Creature : Chaos.Creatures.Chaos_Creature)
+      return Chaos.Actors.Chaos_Actor;
 
    function Actor_Count
      (Area     : Chaos_Area_Record'Class)

@@ -25,6 +25,11 @@ package body Chaos.Objects is
       return Lith.Objects.Object
    is (Chaos.Expressions.Store.To_Object (Object.Identifier));
 
+   function Get_Script_Executed_Property
+     (Object : Root_Chaos_Object_Record'Class)
+      return Lith.Objects.Object
+   is (Lith.Objects.To_Object (Object.Script_Executed));
+
    ------------------
    -- Add_Property --
    ------------------
@@ -41,6 +46,8 @@ package body Chaos.Objects is
          Class_Properties.Insert (Class_Name, Property_Maps.Empty_Map);
          Class_Properties (Class_Name).Insert
            ("identifier", Get_Identifier_Property'Access);
+         Class_Properties (Class_Name).Insert
+           ("script-executed", Get_Script_Executed_Property'Access);
       end if;
 
       Class_Properties (Class_Name).Insert (Name, Get);
@@ -86,6 +93,41 @@ package body Chaos.Objects is
    begin
       return X.Db = Y.Db and then X.Reference = Y.Reference;
    end Equal;
+
+   --------------------
+   -- Execute_Script --
+   --------------------
+
+   procedure Execute_Script
+     (Object : Root_Chaos_Object_Record'Class;
+      Script : Lith.Objects.Object)
+   is
+      use Chaos.Expressions;
+
+      procedure Set_Script_Executed
+        (Item : in out Memor.Root_Record_Type'Class);
+
+      -------------------------
+      -- Set_Script_Executed --
+      -------------------------
+
+      procedure Set_Script_Executed
+        (Item : in out Memor.Root_Record_Type'Class)
+      is
+      begin
+         Root_Chaos_Object_Record'Class (Item).Script_Executed := True;
+      end Set_Script_Executed;
+
+   begin
+      Store.Push_Empty_Environment;
+      Store.Env_Insert
+        (This_Symbol, Object.To_Expression);
+      Store.Evaluate (Script, Store.Pop);
+      if not Object.Script_Executed then
+         Object.Object_Database.Update
+           (Object.Reference, Set_Script_Executed'Access);
+      end if;
+   end Execute_Script;
 
    ----------------
    -- Identifier --

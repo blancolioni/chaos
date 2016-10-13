@@ -32,6 +32,27 @@ package body Chaos.Areas is
       return Area.Actors.Element (Index);
    end Actor;
 
+   -----------
+   -- Actor --
+   -----------
+
+   function Actor
+     (Area     : Chaos_Area_Record'Class;
+      Creature : Chaos.Creatures.Chaos_Creature)
+      return Chaos.Actors.Chaos_Actor
+   is
+      use type Chaos.Creatures.Chaos_Creature;
+   begin
+      for Actor of Area.Actors loop
+         if Actor.Creature = Creature then
+            return Actor;
+         end if;
+      end loop;
+      raise Constraint_Error with
+        Area.Identifier & ": no actor found with creature "
+        & Creature.Identifier;
+   end Actor;
+
    -----------------
    -- Actor_Count --
    -----------------
@@ -290,6 +311,25 @@ package body Chaos.Areas is
       Index : constant Positive := Area.To_Square_Index (Location);
    begin
       return Area.Squares.Element (Index).Actor /= null;
+   end Has_Actor;
+
+   ---------------
+   -- Has_Actor --
+   ---------------
+
+   function Has_Actor
+     (Area     : Chaos_Area_Record'Class;
+      Creature : Chaos.Creatures.Chaos_Creature)
+      return Boolean
+   is
+      use type Chaos.Creatures.Chaos_Creature;
+   begin
+      for Actor of Area.Actors loop
+         if Actor.Creature = Creature then
+            return True;
+         end if;
+      end loop;
+      return False;
    end Has_Actor;
 
    -----------------

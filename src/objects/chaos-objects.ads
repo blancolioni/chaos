@@ -81,6 +81,10 @@ package Chaos.Objects is
    procedure Define_Object
      (Object : Root_Chaos_Object_Record'Class);
 
+   procedure Execute_Script
+     (Object : Root_Chaos_Object_Record'Class;
+      Script : Lith.Objects.Object);
+
    type Root_Localised_Object_Record is
      abstract limited new Root_Chaos_Object_Record with private;
 
@@ -94,7 +98,8 @@ private
      abstract limited new Memor.Root_Record_Type
      and Memor.Identifier_Record_Type with
       record
-         Identity : Ada.Strings.Unbounded.Unbounded_String;
+         Identity        : Ada.Strings.Unbounded.Unbounded_String;
+         Script_Executed : Boolean := False;
       end record;
 
    type Object_Record_Interface is

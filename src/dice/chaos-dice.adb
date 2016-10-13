@@ -4,6 +4,8 @@ with WL.Random;
 
 with Lith.Objects.Symbols;
 
+with Chaos.Expressions;
+
 package body Chaos.Dice is
 
    ------------
@@ -258,10 +260,10 @@ package body Chaos.Dice is
    -------------------
 
    function To_Expression
-     (Store : in out Lith.Objects.Object_Store'Class;
-      Roll  : Die_Roll)
+     (Roll  : Die_Roll)
       return Lith.Objects.Object
    is
+      use Chaos.Expressions;
    begin
       Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-roll-dice"));
       Store.Push (Lith.Objects.To_Object (Roll.Count));

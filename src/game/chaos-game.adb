@@ -259,8 +259,7 @@ package body Chaos.Game is
         (Chaos.Expressions.Store.Show
            (Chaos.Expressions.Store.Evaluate
                 (Chaos.Parser.Load_Script
-                     (Chaos.Paths.Config_File ("start.script"),
-                      Chaos.Expressions.Store.all),
+                     (Chaos.Paths.Config_File ("start.script")),
                  Lith.Objects.Nil)));
    end Start;
 

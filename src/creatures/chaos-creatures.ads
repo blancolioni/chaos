@@ -162,6 +162,10 @@ package Chaos.Creatures is
 
    type Chaos_Creature is access constant Chaos_Creature_Record'Class;
 
+   function Get
+     (Identifier : String)
+      return Chaos_Creature;
+
    procedure Update
      (Creature : Chaos_Creature;
       Updater  : not null access
