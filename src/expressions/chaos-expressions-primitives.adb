@@ -1,13 +1,26 @@
+with Ada.Calendar;
+with WL.String_Maps;
+
 with Lith.Objects.Interfaces;
 with Lith.Objects.Symbols;
 
-with Chaos.Expressions.Maps;
-
 with Chaos.Objects;
+
+with Chaos.Expressions.Maps;
 
 with Chaos.Dice;
 
 package body Chaos.Expressions.Primitives is
+
+   package Timeout_Maps is new
+     WL.String_Maps (Ada.Calendar.Time, Ada.Calendar."=");
+
+   Timeouts : Timeout_Maps.Map;
+
+   function Timeout_Key
+     (Timeout_Target : Lith.Objects.Object;
+      Timeout_Name   : Lith.Objects.Object)
+      return String;
 
    function Evaluate_Chaos_Get
      (Store       : in out Lith.Objects.Object_Store'Class)
@@ -21,6 +34,14 @@ package body Chaos.Expressions.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
 
+   function Evaluate_Set_Timer
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
+
+   function Evaluate_Timer_Expired
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
+
    -----------------------
    -- Create_Primitives --
    -----------------------
@@ -31,6 +52,9 @@ package body Chaos.Expressions.Primitives is
       Define_Function ("chaos-set-property!", 3, Evaluate_Chaos_Set'Access);
       Define_Function ("chaos-get-property", 2, Evaluate_Chaos_Get'Access);
       Define_Function ("chaos-roll-dice", 3, Evaluate_Roll_Dice'Access);
+      Define_Function ("chaos-set-timer", 3, Evaluate_Set_Timer'Access);
+      Define_Function ("chaos-timer-expired", 2,
+                       Evaluate_Timer_Expired'Access);
    end Create_Primitives;
 
    ------------------------
@@ -101,5 +125,77 @@ package body Chaos.Expressions.Primitives is
    begin
       return To_Object (Chaos.Dice.Roll (Dice));
    end Evaluate_Roll_Dice;
+
+   ------------------------
+   -- Evaluate_Set_Timer --
+   ------------------------
+
+   function Evaluate_Set_Timer
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is
+      use type Ada.Calendar.Time;
+      Target   : constant Lith.Objects.Object := Store.Argument (1);
+      Timer_Id : constant Lith.Objects.Object := Store.Argument (2);
+      Timeout  : constant Natural :=
+                   Lith.Objects.To_Integer (Store.Argument (3));
+      Key      : constant String :=
+                   Timeout_Key (Target, Timer_Id);
+   begin
+      if Timeouts.Contains (Key) then
+         Timeouts.Delete (Key);
+      end if;
+      Timeouts.Insert
+        (Key,
+         Ada.Calendar.Clock + Duration (Timeout));
+      return Timer_Id;
+   end Evaluate_Set_Timer;
+
+   ----------------------------
+   -- Evaluate_Timer_Expired --
+   ----------------------------
+
+   function Evaluate_Timer_Expired
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is
+      use type Ada.Calendar.Time;
+      Target   : constant Lith.Objects.Object := Store.Argument (1);
+      Timer_Id : constant Lith.Objects.Object := Store.Argument (2);
+      Key      : constant String :=
+                   Timeout_Key (Target, Timer_Id);
+   begin
+      if not Timeouts.Contains (Key) then
+         return Lith.Objects.True_Value;
+      elsif Ada.Calendar.Clock >= Timeouts.Element (Key) then
+         Timeouts.Delete (Key);
+         return Lith.Objects.True_Value;
+      else
+         return Lith.Objects.False_Value;
+      end if;
+   end Evaluate_Timer_Expired;
+
+   -----------------
+   -- Timeout_Key --
+   -----------------
+
+   function Timeout_Key
+     (Timeout_Target : Lith.Objects.Object;
+      Timeout_Name   : Lith.Objects.Object)
+      return String
+   is
+   begin
+      if Chaos.Objects.Is_Object (Timeout_Target) then
+         declare
+            Obj : constant Chaos.Objects.Chaos_Object :=
+                    Chaos.Objects.To_Object (Timeout_Target);
+         begin
+            return Obj.Global_Setting_Name (Store.Show (Timeout_Name));
+         end;
+      else
+         return Store.Show (Timeout_Target)
+           & "-" & Store.Show (Timeout_Name);
+      end if;
+   end Timeout_Key;
 
 end Chaos.Expressions.Primitives;

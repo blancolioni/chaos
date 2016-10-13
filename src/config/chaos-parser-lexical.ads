@@ -16,7 +16,7 @@ private package Chaos.Parser.Lexical is
                  Tok_Integer        => Tok_None,
                  Tok_Float          => Tok_None,
                  First_Keyword      => Tok_If,
-                 Keywords           => "if then else and or not -",
+                 Keywords           => "if then else and or -",
                  First_Symbol       => Tok_Left_Brace,
                  Symbols            => "{ } [ ] ( ) , : ; . & / * # @ "
                                      & " + := => \ "

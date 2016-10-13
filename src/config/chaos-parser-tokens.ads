@@ -4,7 +4,7 @@ private package Chaos.Parser.Tokens is
       (Tok_None, Tok_End_Of_File, Tok_Bad_Character,
        Tok_Identifier, Tok_String_Constant,
 
-       Tok_If, Tok_Then, Tok_Else, Tok_And, Tok_Or, Tok_Not, Tok_Minus,
+       Tok_If, Tok_Then, Tok_Else, Tok_And, Tok_Or, Tok_Minus,
 
        Tok_Left_Brace, Tok_Right_Brace,
        Tok_Left_Bracket, Tok_Right_Bracket,

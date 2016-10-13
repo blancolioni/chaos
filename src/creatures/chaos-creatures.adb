@@ -180,6 +180,18 @@ package body Chaos.Creatures is
       return Creature.Dialog;
    end Dialog;
 
+   ---------
+   -- Get --
+   ---------
+
+   function Get
+     (Identifier : String)
+      return Chaos_Creature
+   is
+   begin
+      return Db.Get (Identifier);
+   end Get;
+
    ---------------
    -- Get_Power --
    ---------------

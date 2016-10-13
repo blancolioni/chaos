@@ -8,6 +8,8 @@ with Chaos.Powers.Configure;
 with Chaos.Races.Configure;
 with Chaos.Teams.Configure;
 
+with Chaos.Areas.Primitives;
+
 package body Chaos.Configuration is
 
    Chaos_Config : Tropos.Configuration;
@@ -18,6 +20,8 @@ package body Chaos.Configuration is
 
    procedure Read_Configuration is
    begin
+      Chaos.Areas.Primitives.Create_Primitives;
+
       Chaos_Config :=
         Tropos.Reader.Read_Config
           (Chaos.Paths.Config_File ("chaos.config"));

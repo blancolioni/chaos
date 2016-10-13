@@ -8,7 +8,10 @@ package body Chaos.Expressions.Import.Triggers is
 
    use WL.Binary_IO;
 
-   Global_Trigger : constant Word_32 := 16#400F#;
+   Exists_Trigger      : constant Word_32 := 16#400D#;
+   Global_Trigger      : constant Word_32 := 16#400F#;
+   Local_Timer_Expired : constant Word_32 := 16#0022#;
+   On_Creation_Trigger : constant Word_32 := 16#0036#;
 
    --------------------
    -- Import_Trigger --
@@ -26,20 +29,33 @@ package body Chaos.Expressions.Import.Triggers is
       pragma Unreferenced (Text_2);
    begin
       case Trigger_Id is
+         when Exists_Trigger =>
+            Store.Push
+              (Lith.Objects.Symbols.Get_Symbol
+                 ("chaos-object-exists?"));
+            Store.Push
+              (Store.Top (1, Lith.Objects.Secondary));
+            Store.Create_List (2);
          when Global_Trigger =>
             if Text_1'Length > 6 then
                Chaos.Parser.Parse_Expression
                  (Text_1 (Text_1'First .. Text_1'First + 5) & "."
                   & Text_1 (Text_1'First + 6 .. Text_1'Last)
-                  & " = " & Integer'Image (Integer_1),
-                  Store.all);
+                  & " = " & Integer'Image (Integer_1));
             else
                Chaos.Parser.Parse_Expression
-                 (Text_1 & " = " & Integer'Image (Integer_1),
-                  Store.all);
+                 (Text_1 & " = " & Integer'Image (Integer_1));
             end if;
+         when Local_Timer_Expired =>
+            Chaos.Parser.Parse_Expression
+              ("chaos-timer-expired this " & Integer'Image (Integer_1));
+         when On_Creation_Trigger =>
+            Chaos.Parser.Parse_Expression
+              ("not this.script-executed");
          when others =>
-            Chaos.Logging.Log ("SCRIPT", "unknown trigger" & Trigger_Id'Img);
+            Chaos.Logging.Log ("SCRIPT", "unknown trigger "
+                               & WL.Binary_IO.Hex_Image
+                                 (WL.Binary_IO.Word_16 (Trigger_Id)));
             if Flags mod 2 = 1 then
                Store.Push (Lith.Objects.True_Value);
             else

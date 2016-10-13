@@ -29,8 +29,6 @@ with Chaos.Xi_UI.Images;
 with Chaos.Locations;
 with Chaos.Game;
 
-with Chaos.Expressions;
-
 with Chaos.Logging;
 
 with Chaos.Actors;
@@ -678,7 +676,7 @@ package body Chaos.Xi_UI.Areas is
       Mouse_Y := Xi.Mouse.Current_Mouse.State.Y;
 
       if Now - Listener.Last_Script_Execution > Scripts_Delay then
-         Chaos.Expressions.Store.Evaluate
+         Listener.Model.Area.Execute_Script
            (Listener.Model.Area.Script);
          Listener.Last_Script_Execution := Now;
       end if;

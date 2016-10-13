@@ -21,7 +21,6 @@ package body Chaos.Settings is
    is
       procedure Set_Value
         (Name  : String;
-         Store : in out Lith.Objects.Object_Store'Class;
          Value : Lith.Objects.Object);
 
       ---------------
@@ -30,7 +29,6 @@ package body Chaos.Settings is
 
       procedure Set_Value
         (Name  : String;
-         Store : in out Lith.Objects.Object_Store'Class;
          Value : Lith.Objects.Object)
       is
       begin
@@ -40,15 +38,14 @@ package body Chaos.Settings is
             Chaos.Logging.Log
               ("CONFIG", "unknown setting: " & Name
                & " = "
-               & Store.Show (Value));
+               & Chaos.Expressions.Store.Show (Value));
          end if;
       end Set_Value;
 
    begin
 
       Chaos.Parser.Load_Configuration
-        (Settings_Path, Chaos.Expressions.Store.all,
-         Set_Value'Access);
+        (Settings_Path, Set_Value'Access);
 
    end Load_Object;
 

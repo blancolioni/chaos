@@ -52,7 +52,7 @@ package body Chaos.Powers.Attacks is
          Store.Env_Insert
            (Get_Symbol ("weapon"),
             Chaos.Dice.To_Expression
-              (Store.all, Actor.Creature.Active_Weapon.Damage));
+              (Actor.Creature.Active_Weapon.Damage));
       end if;
 
       declare

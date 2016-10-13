@@ -121,8 +121,8 @@ private
          Target_Size  : Natural := 1;
          Short_Range  : Natural := 1;
          Long_Range   : Natural := 1;
-         Attack       : Lith.Objects.Object;
-         Defence      : Lith.Objects.Object;
+         Attack       : Lith.Objects.Object := Lith.Objects.Nil;
+         Defence      : Lith.Objects.Object := Lith.Objects.Nil;
          Hit_Effects  : Lith.Objects.Object := Lith.Objects.Nil;
          Miss_Effects : Lith.Objects.Object := Lith.Objects.Nil;
          Effects      : Lith.Objects.Object := Lith.Objects.Nil;
