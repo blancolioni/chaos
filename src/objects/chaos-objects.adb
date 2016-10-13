@@ -41,9 +41,10 @@ package body Chaos.Objects is
    is
       Class_Name : constant String :=
                      Object.Object_Database.Database_Class_Name;
+      Empty_Map  : Property_Maps.Map;
    begin
       if not Class_Properties.Contains (Class_Name) then
-         Class_Properties.Insert (Class_Name, Property_Maps.Empty_Map);
+         Class_Properties.Insert (Class_Name, Empty_Map);
          Class_Properties (Class_Name).Insert
            ("identifier", Get_Identifier_Property'Access);
          Class_Properties (Class_Name).Insert
@@ -119,10 +120,13 @@ package body Chaos.Objects is
       end Set_Script_Executed;
 
    begin
+      Store.Push (Script, Lith.Objects.Secondary);
+      Store.Push (Object.To_Expression, Lith.Objects.Secondary);
       Store.Push_Empty_Environment;
       Store.Env_Insert
-        (This_Symbol, Object.To_Expression);
-      Store.Evaluate (Script, Store.Pop);
+        (This_Symbol, Store.Pop (Lith.Objects.Secondary));
+      Store.Commit_Environment;
+      Store.Evaluate (Store.Pop (Lith.Objects.Secondary), Store.Pop);
       if not Object.Script_Executed then
          Object.Object_Database.Update
            (Object.Reference, Set_Script_Executed'Access);
@@ -248,9 +252,15 @@ package body Chaos.Objects is
    is
       Class_Name : constant String :=
                      Object.Object_Database.Database_Class_Name;
+      Empty_Map  : Property_Maps.Map;
    begin
       if not Class_Properties.Contains (Class_Name) then
-         Class_Properties.Insert (Class_Name, Property_Maps.Empty_Map);
+         Class_Properties.Insert (Class_Name, Empty_Map);
+         Class_Properties (Class_Name).Insert
+           ("identifier", Get_Identifier_Property'Access);
+         Class_Properties (Class_Name).Insert
+           ("script-executed", Get_Script_Executed_Property'Access);
+         Object.Add_Properties;
       end if;
 
       if not Class_Properties (Class_Name).Contains (Name) then
