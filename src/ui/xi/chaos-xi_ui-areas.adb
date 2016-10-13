@@ -844,9 +844,9 @@ package body Chaos.Xi_UI.Areas is
          end if;
 
          if Camera_Moved then
-            Listener.Model.Camera.Set_Position
+            Base_Model.Camera.Set_Position
               (Listener.Model.Centre_X, Listener.Model.Centre_Y, 1000.0);
-            Listener.Model.Camera.Look_At
+            Base_Model.Camera.Look_At
               (Listener.Model.Centre_X, Listener.Model.Centre_Y, 0.0);
          end if;
       end;
