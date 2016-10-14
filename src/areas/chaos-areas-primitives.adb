@@ -1,7 +1,10 @@
 with Lith.Objects.Interfaces;
 with Lith.Objects.Symbols;
 
+with Chaos.Logging;
+
 with Chaos.Creatures;
+with Chaos.Creatures.Import;
 
 package body Chaos.Areas.Primitives is
 
@@ -42,7 +45,9 @@ package body Chaos.Areas.Primitives is
       Facing   : constant Integer :=
                    Lith.Objects.To_Integer (Store.Argument (5));
       Creature : constant Chaos.Creatures.Chaos_Creature :=
-                   Chaos.Creatures.Get (Code);
+                   (if Chaos.Creatures.Exists (Code)
+                    then Chaos.Creatures.Get (Code)
+                    else Chaos.Creatures.Import.Import_Creature (Code));
       Actor    : constant Chaos.Actors.Chaos_Actor :=
                    Chaos.Actors.Create_Actor
                      (Creature, Area,
@@ -50,6 +55,8 @@ package body Chaos.Areas.Primitives is
                       Chaos.Locations.Orientation'Val
                         (Facing / 2));
    begin
+      Chaos.Logging.Log
+        ("AREA", "created " & Code & " at" & X'Img & Y'Img);
       return Actor.To_Expression;
    end Evaluate_Create_Actor;
 
