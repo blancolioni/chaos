@@ -53,8 +53,7 @@ begin
         (Chaos.Expressions.Store.Show (Start));
       Ada.Text_IO.Put_Line
         (Chaos.Expressions.Store.Show
-           (Chaos.Expressions.Store.Evaluate
-                (Start, Lith.Objects.Nil)));
+           (Chaos.Expressions.Store.Evaluate (Start)));
    end;
 
    declare
@@ -73,7 +72,7 @@ begin
             use Chaos.Expressions;
          begin
             Ada.Text_IO.Put
-              (Store.Show (Store.Evaluate (Roll, Lith.Objects.Nil)) & " ");
+              (Store.Show (Store.Evaluate (Roll)) & " ");
          end;
       end loop;
    end;

@@ -37,19 +37,20 @@ package body Chaos.Powers.Attacks is
       Normal_Damage   : Integer := 0;
       Damage_Type     : Power_Damage_Type := Normal;
    begin
-      Store.Push_Empty_Environment;
-      Store.Env_Insert (Get_Symbol ("actor"), Actor.To_Expression);
-      Store.Env_Insert (Get_Symbol ("defender"), Defender.To_Expression);
-      Store.Env_Insert (Get_Symbol ("power"), Power.To_Expression);
-      Store.Env_Insert (Get_Symbol ("roll"), Lith.Objects.To_Object (Roll));
+      Store.New_Environment;
+      Store.Create_Binding (Get_Symbol ("actor"), Actor.To_Expression);
+      Store.Create_Binding (Get_Symbol ("defender"), Defender.To_Expression);
+      Store.Create_Binding (Get_Symbol ("power"), Power.To_Expression);
+      Store.Create_Binding
+        (Get_Symbol ("roll"), Lith.Objects.To_Object (Roll));
 
-      Store.Env_Insert (Get_Symbol ("hit"),
+      Store.Create_Binding (Get_Symbol ("hit"),
                         Lith.Objects.To_Object (Hit));
-      Store.Env_Insert (Get_Symbol ("critical"),
+      Store.Create_Binding (Get_Symbol ("critical"),
                         Lith.Objects.To_Object (Critical));
 
       if Power.Implement = Weapon then
-         Store.Env_Insert
+         Store.Create_Binding
            (Get_Symbol ("weapon"),
             Chaos.Dice.To_Expression
               (Actor.Creature.Active_Weapon.Damage));
@@ -63,8 +64,7 @@ package body Chaos.Powers.Attacks is
             declare
                Effect : constant Object :=
                           Store.Evaluate
-                            (Store.Car (Store.Top (1, Secondary)),
-                             Store.Top);
+                            (Store.Car (Store.Top (1, Secondary)));
             begin
                if Is_Power_Damage_Type (Effect) then
                   Damage_Type := Get_Power_Damage_Type (Effect);
@@ -98,6 +98,7 @@ package body Chaos.Powers.Attacks is
               ("takes-damage",
                Defender.Short_Name, Normal_Damage'Img));
       end if;
+      Store.Pop_Environment;
    end Apply_Power_Effects;
 
    ------------
@@ -122,11 +123,11 @@ package body Chaos.Powers.Attacks is
 
       Attack_Value :=
         Lith.Objects.To_Integer
-          (Store.Evaluate (Power.Attack, Store.Top));
+          (Store.Evaluate (Power.Attack));
 
       Defence_Value :=
         Lith.Objects.To_Integer
-          (Store.Evaluate (Power.Defence, Store.Top));
+          (Store.Evaluate (Power.Defence));
 
       declare
          use Chaos.Localisation;

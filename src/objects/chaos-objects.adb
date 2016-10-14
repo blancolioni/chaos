@@ -122,15 +122,20 @@ package body Chaos.Objects is
    begin
       Store.Push (Script, Lith.Objects.Secondary);
       Store.Push (Object.To_Expression, Lith.Objects.Secondary);
-      Store.Push_Empty_Environment;
-      Store.Env_Insert
+      Store.New_Environment;
+      Store.Create_Binding
         (This_Symbol, Store.Pop (Lith.Objects.Secondary));
-      Store.Commit_Environment;
-      Store.Evaluate (Store.Pop (Lith.Objects.Secondary), Store.Pop);
+      Store.Evaluate (Store.Pop (Lith.Objects.Secondary));
+      Store.Pop_Environment;
       if not Object.Script_Executed then
          Object.Object_Database.Update
            (Object.Reference, Set_Script_Executed'Access);
       end if;
+--     exception
+--        when others =>
+--           Chaos.Logging.Log
+--             (Object.Global_Setting_Name ("script"),
+--              "script failed");
    end Execute_Script;
 
    ----------------
