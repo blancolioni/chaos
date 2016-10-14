@@ -60,7 +60,8 @@ package body Chaos.Parser is
    function At_Expression return Boolean
    is (Tok = Tok_Left_Paren or else Tok = Tok_Left_Brace
        or else Tok = Tok_Left_Bracket or else Tok = Tok_Identifier
-       or else Tok = Tok_Lambda or else Tok = Tok_If);
+       or else Tok = Tok_Lambda or else Tok = Tok_If
+       or else Tok = Tok_Quote);
 
    function At_Operator return Boolean is
      (Tok <= +(Tok_Asterisk, Tok_Forward_Slash, Tok_Plus, Tok_Minus,
@@ -240,6 +241,17 @@ package body Chaos.Parser is
                  (Lith.Objects.Symbols.Get_Symbol (Tok_Text)));
          end if;
          Scan;
+      elsif Tok = Tok_Quote then
+         Scan;
+         if Tok = Tok_Identifier then
+            Store.Push (Lith.Objects.Symbols.Quote_Symbol);
+            Store.Push (Lith.Objects.Symbols.Get_Symbol (Tok_Text));
+            Store.Create_List (2);
+            Scan;
+         else
+            Error ("missing identifier");
+            Store.Push (Lith.Objects.False_Value);
+         end if;
       elsif Tok = Tok_Left_Bracket then
          Scan;
          Store.Push (Chaos.Expressions.Vectors.Create);

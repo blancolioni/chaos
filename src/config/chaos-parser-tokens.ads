@@ -11,7 +11,7 @@ private package Chaos.Parser.Tokens is
        Tok_Left_Paren, Tok_Right_Paren,
        Tok_Comma, Tok_Colon, Tok_Semicolon,
        Tok_Dot, Tok_Ampersand, Tok_Forward_Slash,
-       Tok_Asterisk, Tok_Hash, Tok_At,
+       Tok_Asterisk, Tok_Hash, Tok_At, Tok_Quote,
        Tok_Plus, Tok_Assign, Tok_Arrow, Tok_Lambda,
        Tok_Equal, Tok_Not_Equal,
        Tok_Less_Equal, Tok_Less, Tok_Greater_Equal, Tok_Greater

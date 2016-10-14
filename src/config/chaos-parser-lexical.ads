@@ -18,7 +18,7 @@ private package Chaos.Parser.Lexical is
                  First_Keyword      => Tok_If,
                  Keywords           => "if then else and or -",
                  First_Symbol       => Tok_Left_Brace,
-                 Symbols            => "{ } [ ] ( ) , : ; . & / * # @ "
+                 Symbols            => "{ } [ ] ( ) , : ; . & / * # @ ' "
                                      & " + := => \ "
                                      & " = /= <= < >= >",
                  Identifier_Start   => "abcdefghijklmnopqrstuvwxyz" &
@@ -32,5 +32,5 @@ private package Chaos.Parser.Lexical is
                  Line_Comment_Start => "--",
                  Block_Comment_Start => "/*",
                  Block_Comment_End   => "*/",
-                 Properties         => (GCS.Styles.Multi_Characters => True,
+                 Properties         => (GCS.Styles.Single_Quote_Token => True,
                                         others => False));
