@@ -34,7 +34,7 @@ package body Chaos.Expressions.Import.Actions is
       case Action_Id is
          when Create_Creature_Action =>
             Chaos.Parser.Parse_Expression
-              ("chaos-create-actor this " & Text_1 & " "
+              ("chaos-create-actor this '" & Text_1 & " "
                & Integer'Image (X)
                & " "
                & Integer'Image (Y)
