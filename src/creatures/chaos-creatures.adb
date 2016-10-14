@@ -180,6 +180,18 @@ package body Chaos.Creatures is
       return Creature.Dialog;
    end Dialog;
 
+   ------------
+   -- Exists --
+   ------------
+
+   function Exists
+     (Identifier : String)
+      return Boolean
+   is
+   begin
+      return Db.Exists (Identifier);
+   end Exists;
+
    ---------
    -- Get --
    ---------
