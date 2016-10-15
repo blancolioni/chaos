@@ -37,10 +37,6 @@ package Chaos.Resources.Cre is
 
    type String_Ref_List is array (1 .. 100) of String_Reference;
 
-   type Creature_Script is (Overide, Class, Race, General, Default);
-
-   type Script_Array is array (Creature_Script) of Resource_Reference;
-
    type Ability is (Str, Str_Bonus, Int, Wis, Dex, Con, Cha);
 
    type Ability_Array is array (Ability) of Word_8;

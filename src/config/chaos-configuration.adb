@@ -9,6 +9,11 @@ with Chaos.Races.Configure;
 with Chaos.Teams.Configure;
 
 with Chaos.Areas.Primitives;
+with Chaos.Game.Primitives;
+with Chaos.Expressions;
+with Chaos.Objects.Primitives;
+
+with Chaos.Expressions.Import.Triggers;
 
 package body Chaos.Configuration is
 
@@ -20,7 +25,12 @@ package body Chaos.Configuration is
 
    procedure Read_Configuration is
    begin
+      Chaos.Expressions.Create_Environment;
       Chaos.Areas.Primitives.Create_Primitives;
+      Chaos.Game.Primitives.Add_Primitives;
+      Chaos.Objects.Primitives.Add_Primitives;
+
+      Chaos.Expressions.Import.Triggers.Load_Triggers;
 
       Chaos_Config :=
         Tropos.Reader.Read_Config

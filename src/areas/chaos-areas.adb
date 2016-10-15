@@ -369,7 +369,7 @@ package body Chaos.Areas is
         procedure (Value : in out Lith.Objects.Object))
    is
    begin
-      Mark_Value (Area.Script);
+      Chaos.Objects.Root_Chaos_Object_Record (Area).Mark (Mark_Value);
    end Mark;
 
    ----------------
@@ -533,18 +533,6 @@ package body Chaos.Areas is
          end;
       end loop;
    end Scan_Visible_To_Actors;
-
-   ------------
-   -- Script --
-   ------------
-
-   function Script
-     (Area : Chaos_Area_Record'Class)
-      return Lith.Objects.Object
-   is
-   begin
-      return Area.Script;
-   end Script;
 
    --------------------
    -- Squares_Across --

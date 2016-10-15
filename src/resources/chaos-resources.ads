@@ -18,6 +18,17 @@ package Chaos.Resources is
      (Reference : Resource_Reference)
       return Boolean;
 
+   type Script_Level is
+     (Override_Script,
+      Area_Script,
+      Specific_Script,
+      Class_Script,
+      Race_Script,
+      General_Script,
+      Default_Script);
+
+   type Script_Array is array (Script_Level) of Resource_Reference;
+
    type Resource_Color is
       record
          B, G, R, A : WL.Binary_IO.Word_8;

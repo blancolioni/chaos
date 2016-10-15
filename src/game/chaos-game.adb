@@ -208,6 +208,40 @@ package body Chaos.Game is
       return Game.Party;
    end Party;
 
+   -----------------
+   -- Script_Flag --
+   -----------------
+
+   function Script_Flag
+     (Game  : in out Chaos_Game_Record'Class;
+      Actor : not null access constant
+        Chaos.Objects.Root_Chaos_Object_Record'Class;
+      Group : String;
+      Name  : String)
+      return Boolean
+   is
+      Key : constant String :=
+              Actor.Identifier
+              & "-" & Group
+              & "-" & Name;
+   begin
+      return Game.Script_Flags.Contains (Key)
+        and then Game.Script_Flags.Element (Key);
+   end Script_Flag;
+
+   ------------------
+   -- Script_Round --
+   ------------------
+
+   procedure Script_Round (Game : in out Chaos_Game_Record'Class) is
+   begin
+      Game.Script_Flags.Clear;
+      Game.Area.Execute_Script;
+      for I in 1 .. Game.Area.Actor_Count loop
+         Game.Area.Actor (I).Execute_Script;
+      end loop;
+   end Script_Round;
+
    -------------------
    -- Select_Option --
    -------------------
@@ -225,6 +259,29 @@ package body Chaos.Game is
          Game.Show_Dialog_State;
       end if;
    end Select_Option;
+
+   ---------------------
+   -- Set_Script_Flag --
+   ---------------------
+
+   procedure Set_Script_Flag
+     (Game  : in out Chaos_Game_Record'Class;
+      Actor : not null access constant
+        Chaos.Objects.Root_Chaos_Object_Record'Class;
+      Group : String;
+      Name  : String)
+   is
+      Key : constant String :=
+              Actor.Identifier
+              & "-" & Group
+              & "-" & Name;
+   begin
+      if Game.Script_Flags.Contains (Key) then
+         Game.Script_Flags.Replace (Key, True);
+      else
+         Game.Script_Flags.Insert (Key, True);
+      end if;
+   end Set_Script_Flag;
 
    -----------------------
    -- Show_Dialog_State --

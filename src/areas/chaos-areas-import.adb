@@ -1,7 +1,6 @@
 with WL.Binary_IO;
 
 with Chaos.Resources.Area;
-with Chaos.Resources.Bcs;
 with Chaos.Resources.Bmp;
 with Chaos.Resources.Tis;
 with Chaos.Resources.Wed;
@@ -93,17 +92,8 @@ package body Chaos.Areas.Import is
            and then Chaos.Resources.Manager.Resource_Exists
              (Are.Area_Script, Chaos.Resources.Script_Resource)
          then
-            declare
-               Script : Chaos.Resources.Bcs.Bcs_Resource'Class renames
-                          Chaos.Resources.Bcs.Bcs_Resource'Class
-                            (Chaos.Resources.Manager.Load_Resource
-                               (Reference => Are.Area_Script,
-                                Res_Type  =>
-                                  Chaos.Resources.Script_Resource).all);
-            begin
-               Chaos.Expressions.Import.Import_Script (Script);
-               Area.Script := Chaos.Expressions.Store.Pop;
-            end;
+            Chaos.Expressions.Import.Import_Script (Are.Area_Script);
+            Area.Set_Script (Chaos.Expressions.Store.Pop);
          end if;
 
          declare

@@ -1,8 +1,11 @@
-with Chaos.Resources.Bcs;
+with Chaos.Resources;
 
 package Chaos.Expressions.Import is
 
    procedure Import_Script
-     (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class);
+     (Reference : Chaos.Resources.Resource_Reference);
+
+   procedure Import_Scripts
+     (Scripts : Chaos.Resources.Script_Array);
 
 end Chaos.Expressions.Import;

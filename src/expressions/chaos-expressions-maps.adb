@@ -40,6 +40,19 @@ package body Chaos.Expressions.Maps is
       return access Map_Expression'Class
    is (Map_Expression (Store.Get_External_Object (Item).all)'Access);
 
+   --------------
+   -- Contains --
+   --------------
+
+   function Contains
+     (Map    : Lith.Objects.Object;
+      Key    : String)
+      return Boolean
+   is
+   begin
+      return Fetch (Map).M.Contains (Key);
+   end Contains;
+
    ------------
    -- Create --
    ------------

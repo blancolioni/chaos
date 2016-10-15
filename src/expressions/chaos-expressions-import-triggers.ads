@@ -2,6 +2,8 @@ with WL.Binary_IO;
 
 package Chaos.Expressions.Import.Triggers is
 
+   procedure Load_Triggers;
+
    procedure Import_Trigger
      (Trigger_Id : WL.Binary_IO.Word_32;
       Integer_1  : Integer;

@@ -34,13 +34,11 @@ with Chaos.Paths;
 with Chaos.Infinity_Engine;
 
 procedure Chaos.Driver is
-   Test_Only : constant Boolean := False;
+   Test_Only : constant Boolean := True;
    Text_UI : constant Boolean := False;
 
    Tlk  : Chaos.Resources.Tlk.Tlk_Resource;
 begin
-   Chaos.Expressions.Create_Environment;
-
    Chaos.Infinity_Engine.Read_Infinity_Config;
    Chaos.Configuration.Read_Configuration;
 
@@ -105,8 +103,7 @@ begin
 
          for I in 1 .. 3 loop
             Ada.Text_IO.Put_Line ("area script" & I'Img);
-            Chaos.Game.Current_Game.Area.Execute_Script
-              (Chaos.Game.Current_Game.Area.Script);
+            Chaos.Game.Current_Game.Script_Round;
          end loop;
          UI.Stop;
       end;

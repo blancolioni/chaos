@@ -1,4 +1,5 @@
 private with Ada.Strings.Unbounded;
+private with WL.String_Maps;
 
 with Memor;
 
@@ -37,8 +38,7 @@ package Chaos.Objects is
    procedure Mark
      (Object : in out Root_Chaos_Object_Record;
       Mark_Value : not null access
-        procedure (Value : in out Lith.Objects.Object))
-   is null;
+        procedure (Value : in out Lith.Objects.Object));
 
    function To_Expression
      (Object : Root_Chaos_Object_Record'Class)
@@ -75,15 +75,35 @@ package Chaos.Objects is
       Name   : String)
       return Lith.Objects.Object;
 
+   function Flag
+     (Object : Root_Chaos_Object_Record'Class;
+      Name   : String)
+      return Boolean;
+
+   procedure Set_Flag
+     (Object : in out Root_Chaos_Object_Record'Class;
+      Name   : String);
+
+   procedure Clear_Flag
+     (Object : in out Root_Chaos_Object_Record'Class;
+      Name   : String);
+
    procedure Save_Object
      (Object : not null access constant Root_Chaos_Object_Record'Class);
 
    procedure Define_Object
      (Object : Root_Chaos_Object_Record'Class);
 
-   procedure Execute_Script
-     (Object : Root_Chaos_Object_Record'Class;
+   function Script
+     (Object : Root_Chaos_Object_Record'Class)
+      return Lith.Objects.Object;
+
+   procedure Set_Script
+     (Object : in out Root_Chaos_Object_Record'Class;
       Script : Lith.Objects.Object);
+
+   procedure Execute_Script
+     (Object : Root_Chaos_Object_Record'Class);
 
    type Root_Localised_Object_Record is
      abstract limited new Root_Chaos_Object_Record with private;
@@ -94,12 +114,16 @@ package Chaos.Objects is
 
 private
 
+   package Flag_Maps is
+     new WL.String_Maps (Boolean);
+
    type Root_Chaos_Object_Record is
      abstract limited new Memor.Root_Record_Type
      and Memor.Identifier_Record_Type with
       record
-         Identity        : Ada.Strings.Unbounded.Unbounded_String;
-         Script_Executed : Boolean := False;
+         Identity  : Ada.Strings.Unbounded.Unbounded_String;
+         Flags     : Flag_Maps.Map;
+         Script    : Lith.Objects.Object;
       end record;
 
    type Object_Record_Interface is

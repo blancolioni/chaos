@@ -76,9 +76,15 @@ package body Chaos.Resources.Cre is
       Cre.Get (Cre.Racial_Enemy);
       Cre.Get (Cre.Morale_Recovery_Time);
       Cre.Get (Cre.Kit);
-      for I in Cre.Scripts'Range loop
-         Cre.Get (Cre.Scripts (I));
-      end loop;
+
+      Cre.Scripts := (others => (others => Character'Val (0)));
+
+      Cre.Get (Cre.Scripts (Override_Script));
+      Cre.Get (Cre.Scripts (Class_Script));
+      Cre.Get (Cre.Scripts (Race_Script));
+      Cre.Get (Cre.Scripts (General_Script));
+      Cre.Get (Cre.Scripts (Default_Script));
+
       for I in Cre.Ids'Range loop
          Cre.Get (Cre.Ids (I));
       end loop;

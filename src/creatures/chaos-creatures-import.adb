@@ -6,6 +6,7 @@ with Chaos.Logging;
 with Chaos.Resources.Cre;
 with Chaos.Resources.Manager;
 
+with Chaos.Expressions.Import;
 with Chaos.Classes.Import;
 with Chaos.Races.Import;
 
@@ -29,13 +30,12 @@ package body Chaos.Creatures.Import is
                    (Reference => Chaos.Resources.To_Reference (Name),
                     Res_Type  => Chaos.Resources.Creature_Resource).all);
 
-      procedure Create (Creature : in out Chaos_Creature_Record'Class);
+      procedure Create (Creature : in out Chaos_Creature_Record'Class)
+      is null;
 
-      ------------
-      -- Create --
-      ------------
+      procedure Configure (Creature : in out Chaos_Creature_Record'Class);
 
-      procedure Create (Creature : in out Chaos_Creature_Record'Class) is
+      procedure Configure (Creature : in out Chaos_Creature_Record'Class) is
          use type WL.Binary_IO.Word_32;
          use Chaos.Resources.Cre;
       begin
@@ -53,6 +53,9 @@ package body Chaos.Creatures.Import is
                    (Chaos.Localisation.Local_Text_Index
                         (Cre.Long_Name)))
             else Creature.Short_Name);
+
+         Chaos.Expressions.Import.Import_Scripts (Cre.Scripts);
+         Creature.Script := Chaos.Expressions.Store.Pop;
 
          Creature.Race :=
            Chaos.Races.Import.Import_Race (Natural (Cre.Ids (Race)));
@@ -94,31 +97,31 @@ package body Chaos.Creatures.Import is
 
          Creature.Team := Chaos.Teams.Get ("neutral");
 
-         declare
-            Dlg : constant String :=
-                    Chaos.Resources.To_String
-                      (Cre.Dialog_Ref);
-         begin
-            if Dlg'Length > 0
-              and then Dlg /= "NONE"
-            then
-               begin
-                  Creature.Dialog :=
-                    Chaos.Dialog.Import.Import_Dialog (Dlg);
-               exception
-                  when others =>
-                     Chaos.Logging.Log
-                       ("IMPORT",
-                        "cannot import dialog " & Dlg
-                        & " for creature " & Name);
-               end;
-            end if;
-         end;
+         if Chaos.Resources.Has_Resource (Cre.Dialog_Ref) then
+            begin
+               Creature.Dialog :=
+                 Chaos.Dialog.Import.Import_Dialog
+                   (Resources.To_String (Cre.Dialog_Ref));
+            exception
+               when others =>
+                  Chaos.Logging.Log
+                    ("IMPORT",
+                     "cannot import dialog "
+                     & Resources.To_String (Cre.Dialog_Ref)
+                     & " for creature " & Name);
+            end;
+         end if;
 
-      end Create;
+      end Configure;
 
+      Creature : constant Chaos_Creature :=
+                   Db.Create (Create'Access);
    begin
-      return Db.Create (Create'Access);
+      Chaos.Logging.Log
+        ("CREATURE", Name);
+      Creature.Save_Object;
+      Creature.Update (Configure'Access);
+      return Creature;
    end Import_Creature;
 
 end Chaos.Creatures.Import;

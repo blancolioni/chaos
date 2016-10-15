@@ -221,14 +221,14 @@ package body Chaos.Parser is
       end if;
 
       if Tok = Tok_Identifier then
-         if Tok_Text = "always" then
+         if Tok_Text = "true" then
             Store.Push (Lith.Objects.True_Value);
-         elsif Tok_Text = "never" then
+         elsif Tok_Text = "false" then
             Store.Push (Lith.Objects.False_Value);
          elsif Tok_Text = "null" then
             Store.Push (Lith.Objects.Nil);
          elsif Tok_Text = "undefined" then
-            Store.Push (Lith.Objects.Nil);
+            Store.Push (Lith.Objects.Undefined);
          elsif Chaos.Dice.Is_Die_Roll (Tok_Text) then
             Store.Push (Chaos.Dice.To_Expression
                         (Chaos.Dice.Parse_Die_Roll (Tok_Text)));
@@ -341,7 +341,7 @@ package body Chaos.Parser is
          if Tok = Tok_Identifier then
             if Next_Tok = Tok_Assign then
                Store.Push
-                 (Lith.Objects.Symbols.Get_Symbol ("chaos-set-property!"));
+                 (Lith.Objects.Symbols.Get_Symbol ("chaos-set-property"));
                Store.Swap;
                Store.Push (Lith.Objects.Symbols.Quote_Symbol);
                Store.Push (Lith.Objects.Symbols.Get_Symbol (Tok_Text));

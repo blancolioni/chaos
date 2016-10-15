@@ -1,13 +1,12 @@
 with Ada.Characters.Handling;
 
-with WL.String_Maps;
-
 with Lith.Environment;
 with Lith.Objects.Symbols;
 
 with Chaos.Expressions;
 
 with Chaos.Localisation;
+
 with Chaos.Logging;
 
 package body Chaos.Objects is
@@ -24,11 +23,6 @@ package body Chaos.Objects is
      (Object : Root_Chaos_Object_Record'Class)
       return Lith.Objects.Object
    is (Chaos.Expressions.Store.To_Object (Object.Identifier));
-
-   function Get_Script_Executed_Property
-     (Object : Root_Chaos_Object_Record'Class)
-      return Lith.Objects.Object
-   is (Lith.Objects.To_Object (Object.Script_Executed));
 
    ------------------
    -- Add_Property --
@@ -47,12 +41,24 @@ package body Chaos.Objects is
          Class_Properties.Insert (Class_Name, Empty_Map);
          Class_Properties (Class_Name).Insert
            ("identifier", Get_Identifier_Property'Access);
-         Class_Properties (Class_Name).Insert
-           ("script-executed", Get_Script_Executed_Property'Access);
       end if;
 
       Class_Properties (Class_Name).Insert (Name, Get);
    end Add_Property;
+
+   ----------------
+   -- Clear_Flag --
+   ----------------
+
+   procedure Clear_Flag
+     (Object : in out Root_Chaos_Object_Record'Class;
+      Name   : String)
+   is
+   begin
+      if Object.Flags.Contains (Name) then
+         Object.Flags.Delete (Name);
+      end if;
+   end Clear_Flag;
 
    -------------------
    -- Define_Object --
@@ -100,9 +106,9 @@ package body Chaos.Objects is
    --------------------
 
    procedure Execute_Script
-     (Object : Root_Chaos_Object_Record'Class;
-      Script : Lith.Objects.Object)
+     (Object : Root_Chaos_Object_Record'Class)
    is
+      use type Lith.Objects.Object;
       use Chaos.Expressions;
 
       procedure Set_Script_Executed
@@ -116,20 +122,18 @@ package body Chaos.Objects is
         (Item : in out Memor.Root_Record_Type'Class)
       is
       begin
-         Root_Chaos_Object_Record'Class (Item).Script_Executed := True;
+         Root_Chaos_Object_Record'Class (Item).Set_Flag ("script-executed");
       end Set_Script_Executed;
 
    begin
-      Store.Push (Script, Lith.Objects.Secondary);
-      Store.Push (Object.To_Expression, Lith.Objects.Secondary);
-      Store.New_Environment;
-      Store.Create_Binding
-        (This_Symbol, Store.Pop (Lith.Objects.Secondary));
-      Store.Evaluate (Store.Pop (Lith.Objects.Secondary));
-      Store.Pop_Environment;
-      if not Object.Script_Executed then
-         Object.Object_Database.Update
-           (Object.Reference, Set_Script_Executed'Access);
+      if Object.Script /= Lith.Objects.Nil then
+         Store.Evaluate (Object.Script,
+                         Lith.Objects.Symbols.Get_Symbol ("this"),
+                         Object.To_Expression);
+         if not Object.Flag ("script_executed") then
+            Object.Object_Database.Update
+              (Object.Reference, Set_Script_Executed'Access);
+         end if;
       end if;
 --     exception
 --        when others =>
@@ -137,6 +141,20 @@ package body Chaos.Objects is
 --             (Object.Global_Setting_Name ("script"),
 --              "script failed");
    end Execute_Script;
+
+   ----------
+   -- Flag --
+   ----------
+
+   function Flag
+     (Object : Root_Chaos_Object_Record'Class;
+      Name   : String)
+      return Boolean
+   is
+   begin
+      return Object.Flags.Contains (Name)
+        and then Object.Flags.Element (Name);
+   end Flag;
 
    ----------------
    -- Identifier --
@@ -220,6 +238,19 @@ package body Chaos.Objects is
    end Mark;
 
    ----------
+   -- Mark --
+   ----------
+
+   procedure Mark
+     (Object     : in out Root_Chaos_Object_Record;
+      Mark_Value : not null access
+        procedure (Value : in out Lith.Objects.Object))
+   is
+   begin
+      Mark_Value (Object.Script);
+   end Mark;
+
+   ----------
    -- Name --
    ----------
 
@@ -263,9 +294,6 @@ package body Chaos.Objects is
          Class_Properties.Insert (Class_Name, Empty_Map);
          Class_Properties (Class_Name).Insert
            ("identifier", Get_Identifier_Property'Access);
-         Class_Properties (Class_Name).Insert
-           ("script-executed", Get_Script_Executed_Property'Access);
-         Object.Add_Properties;
       end if;
 
       if not Class_Properties (Class_Name).Contains (Name) then
@@ -310,6 +338,46 @@ package body Chaos.Objects is
       Lith.Environment.Replace
         (List_Symbol, Store.Pop);
    end Save_Object;
+
+   ------------
+   -- Script --
+   ------------
+
+   function Script
+     (Object : Root_Chaos_Object_Record'Class)
+      return Lith.Objects.Object
+   is
+   begin
+      return Object.Script;
+   end Script;
+
+   --------------
+   -- Set_Flag --
+   --------------
+
+   procedure Set_Flag
+     (Object : in out Root_Chaos_Object_Record'Class;
+      Name   : String)
+   is
+   begin
+      if Object.Flags.Contains (Name) then
+         Object.Flags.Replace (Name, True);
+      else
+         Object.Flags.Insert (Name, True);
+      end if;
+   end Set_Flag;
+
+   ----------------
+   -- Set_Script --
+   ----------------
+
+   procedure Set_Script
+     (Object : in out Root_Chaos_Object_Record'Class;
+      Script : Lith.Objects.Object)
+   is
+   begin
+      Object.Script := Script;
+   end Set_Script;
 
    -------------------
    -- To_Expression --

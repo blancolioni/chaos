@@ -19,7 +19,7 @@ package body Chaos.Resources.Area is
          Area.Get (Area.Neighbours (I).Transition_Flags);
       end loop;
 
-      Chaos.Logging.Log ("AREA", String (Area.Wed_Resource));
+      Chaos.Logging.Log ("AREA", To_String (Area.Wed_Resource));
       Area.Get (Area.Area_Type_Flags);
 
       for I in Area.Weather_Probability'Range loop

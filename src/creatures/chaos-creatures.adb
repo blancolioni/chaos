@@ -290,6 +290,19 @@ package body Chaos.Creatures is
       return Ada.Strings.Unbounded.To_String (Creature.Long_Name);
    end Long_Name;
 
+   ----------
+   -- Mark --
+   ----------
+
+   overriding procedure Mark
+     (Creature   : in out Chaos_Creature_Record;
+      Mark_Value : not null access
+        procedure (Value : in out Lith.Objects.Object))
+   is
+   begin
+      Chaos.Objects.Root_Chaos_Object_Record (Creature).Mark (Mark_Value);
+   end Mark;
+
    --------------------
    -- Max_Hit_Points --
    --------------------
@@ -431,7 +444,7 @@ package body Chaos.Creatures is
    ------------
 
    procedure Update
-     (Creature : Chaos_Creature;
+     (Creature : Chaos_Creature_Record'Class;
       Updater  : not null access
         procedure (Creature : in out Chaos_Creature_Record'Class))
    is

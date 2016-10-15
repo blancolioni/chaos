@@ -42,7 +42,7 @@ package body Chaos.Resources.Key is
       end loop;
       Chaos.Logging.Log
         ("KEY",
-         "resource " & String (Reference)
+         "resource " & To_String (Reference)
          & " type "
          & Hex_Image (Res_Type) & " not found");
       return "";
@@ -110,17 +110,6 @@ package body Chaos.Resources.Key is
             Resource.Biff_Index :=
               Natural (Resource.Locator / 2 ** 20);
             Key.Resource_Entries.Append (Resource);
-
-            if Resource.Resource_Name (1 .. 5) = "SHANK" then
-               Chaos.Logging.Log
-                 ("KEY",
-                  String (Resource.Resource_Name)
-                  & Word_16'Image (Resource.Resource_Type)
-                  & Word_32'Image (Resource.Locator mod 2 ** 20)
-                  & " "
-                  & Ada.Strings.Unbounded.To_String
-                    (Key.Biff_Entries.Element (Resource.Biff_Index).Path));
-            end if;
          end;
       end loop;
 

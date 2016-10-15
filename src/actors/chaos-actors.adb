@@ -208,8 +208,8 @@ package body Chaos.Actors is
    begin
       Db.Update (Actor.Reference, Kill_Actor'Access);
       if not Actor.Creature.Individual then
-         Chaos.Creatures.Update
-           (Actor.Creature, Chaos.Creatures.Kill'Access);
+         Actor.Creature.Update
+           (Chaos.Creatures.Kill'Access);
       end if;
    end Kill;
 
@@ -412,8 +412,8 @@ package body Chaos.Actors is
             end Update_Creature_Hit_Points;
 
          begin
-            Chaos.Creatures.Update
-              (Actor.Creature, Update_Creature_Hit_Points'Access);
+            Actor.Creature.Update
+              (Update_Creature_Hit_Points'Access);
          end;
       end if;
    end Take_Damage;

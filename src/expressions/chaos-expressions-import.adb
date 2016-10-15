@@ -3,13 +3,25 @@ with Ada.Text_IO;
 
 with WL.Binary_IO;                     use WL.Binary_IO;
 
+with Lith.Environment;
 with Lith.Objects.Symbols;
+
+with Chaos.Expressions.Maps;
 
 with Chaos.Expressions.Import.Actions;
 with Chaos.Expressions.Import.Objects;
 with Chaos.Expressions.Import.Triggers;
 
+with Chaos.Parser;
+
+with Chaos.Resources.Manager;
+with Chaos.Resources.Bcs;
+
+with Chaos.Logging;
+
 package body Chaos.Expressions.Import is
+
+   Script_Cache : Lith.Objects.Object := Lith.Objects.Nil;
 
    procedure Error (Line    : Positive;
                     Message : String);
@@ -311,14 +323,66 @@ package body Chaos.Expressions.Import is
    -------------------
 
    procedure Import_Script
-     (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class)
+     (Reference : Chaos.Resources.Resource_Reference)
    is
+      use type Lith.Objects.Object;
       Start : Integer := 1;
    begin
-      Import_SC (Resource, Start);
-      Ada.Text_IO.Put_Line
-        (Store.Show (Store.Top));
+      if Script_Cache = Lith.Objects.Nil then
+         Script_Cache := Chaos.Expressions.Maps.Create;
+         Lith.Environment.Define
+           ("chaos-script-cache", Script_Cache);
+      end if;
+
+      if Chaos.Expressions.Maps.Contains
+        (Script_Cache, Chaos.Resources.To_String (Reference))
+      then
+         Store.Push
+           (Chaos.Expressions.Maps.Get
+              (Script_Cache, Chaos.Resources.To_String (Reference)));
+      else
+         Chaos.Logging.Log ("SCRIPT",
+                            "importing "
+                              & Chaos.Resources.To_String (Reference));
+         declare
+            Script : Chaos.Resources.Bcs.Bcs_Resource'Class renames
+                       Chaos.Resources.Bcs.Bcs_Resource'Class
+                         (Chaos.Resources.Manager.Load_Resource
+                            (Reference => Reference,
+                             Res_Type  =>
+                               Chaos.Resources.Script_Resource).all);
+         begin
+            Import_SC (Script, Start);
+            Chaos.Expressions.Maps.Set
+              (Script_Cache, Chaos.Resources.To_String (Reference),
+               Store.Top);
+            Chaos.Logging.Log ("SCRIPT", Store.Show (Store.Top));
+         end;
+      end if;
    end Import_Script;
+
+   --------------------
+   -- Import_Scripts --
+   --------------------
+
+   procedure Import_Scripts
+     (Scripts : Chaos.Resources.Script_Array)
+   is
+      Block_Count : Natural := 0;
+   begin
+      Chaos.Parser.Parse_Expression
+        ("this.script-continue := true");
+      for Resource of Scripts loop
+         if Chaos.Resources.Has_Resource (Resource) then
+            Store.Push (Lith.Objects.Symbols.If_Symbol);
+            Chaos.Parser.Parse_Expression ("this.script-continue");
+            Import_Script (Resource);
+            Store.Create_List (3);
+            Block_Count := Block_Count + 1;
+         end if;
+      end loop;
+      Store.Create_List (Block_Count + 1);
+   end Import_Scripts;
 
    ---------------
    -- Import_TR --

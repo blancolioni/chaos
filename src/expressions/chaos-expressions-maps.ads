@@ -8,6 +8,12 @@ package Chaos.Expressions.Maps is
      (Value : Lith.Objects.Object)
       return Boolean;
 
+   function Contains
+     (Map    : Lith.Objects.Object;
+      Key    : String)
+      return Boolean
+     with Pre => Is_Map (Map);
+
    function Get
      (Map    : Lith.Objects.Object;
       Key    : String)

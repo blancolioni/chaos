@@ -126,6 +126,7 @@ package body Chaos.Powers is
         procedure (Value : in out Lith.Objects.Object))
    is
    begin
+      Chaos.Objects.Root_Chaos_Object_Record (Power).Mark (Mark_Value);
       Mark_Value (Power.Attack);
       Mark_Value (Power.Defence);
       Mark_Value (Power.Hit_Effects);

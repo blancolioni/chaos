@@ -70,10 +70,6 @@ package Chaos.Areas is
       Square_Location : Chaos.Locations.Square_Location)
       return Chaos.Locations.Pixel_Location;
 
-   function Script
-     (Area : Chaos_Area_Record'Class)
-      return Lith.Objects.Object;
-
    function Feature_Count
      (Area : Chaos_Area_Record'Class)
       return Natural;
@@ -249,7 +245,6 @@ private
          Entrances      : Area_Entrance_Vectors.Vector;
          Visibility     : Chaos.Vision.Chaos_Vision;
          Images         : Chaos.Images.Chaos_Image_Container;
-         Script         : Lith.Objects.Object := Lith.Objects.Nil;
       end record;
 
    overriding function Object_Database

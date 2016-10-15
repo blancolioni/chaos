@@ -1,8 +1,11 @@
+private with WL.String_Maps;
+
 with Chaos.Actors;
 with Chaos.Areas;
 with Chaos.Creatures;
 with Chaos.Dialog;
 with Chaos.Locations;
+with Chaos.Objects;
 with Chaos.Party;
 
 package Chaos.Game is
@@ -64,6 +67,23 @@ package Chaos.Game is
 
    procedure Start (Game : in out Chaos_Game_Record'Class);
 
+   procedure Script_Round (Game : in out Chaos_Game_Record'Class);
+
+   procedure Set_Script_Flag
+     (Game  : in out Chaos_Game_Record'Class;
+      Actor : not null access constant
+        Chaos.Objects.Root_Chaos_Object_Record'Class;
+      Group : String;
+      Name  : String);
+
+   function Script_Flag
+     (Game  : in out Chaos_Game_Record'Class;
+      Actor : not null access constant
+        Chaos.Objects.Root_Chaos_Object_Record'Class;
+      Group : String;
+      Name  : String)
+      return Boolean;
+
    type Chaos_Game is access all Chaos_Game_Record'Class;
 
    function Current_Game return Chaos_Game;
@@ -73,6 +93,9 @@ package Chaos.Game is
 
 private
 
+   package Script_Flag_Maps is
+     new WL.String_Maps (Boolean);
+
    type Chaos_Game_Record is tagged
       record
          Area         : Chaos.Areas.Chaos_Area;
@@ -81,6 +104,7 @@ private
          Target       : Chaos.Actors.Chaos_Actor;
          Dialog       : Chaos.Dialog.Chaos_Dialog;
          Dialog_State : Chaos.Dialog.Dialog_Cursor;
+         Script_Flags : Script_Flag_Maps.Map;
       end record;
 
    procedure Show_Dialog_State

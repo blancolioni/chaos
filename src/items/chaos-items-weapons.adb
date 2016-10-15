@@ -47,6 +47,15 @@ package body Chaos.Items.Weapons is
       end case;
    end Equipment_Slot_OK;
 
+   ------------
+   -- Exists --
+   ------------
+
+   function Exists (Identifier : String) return Boolean is
+   begin
+      return Db.Exists (Identifier);
+   end Exists;
+
    ---------
    -- Get --
    ---------

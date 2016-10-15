@@ -1,6 +1,9 @@
 with Ada.Calendar;
+with Ada.Characters.Handling;
+
 with WL.String_Maps;
 
+with Lith.Environment;
 with Lith.Objects.Interfaces;
 with Lith.Objects.Symbols;
 
@@ -49,7 +52,7 @@ package body Chaos.Expressions.Primitives is
    procedure Create_Primitives is
       use Lith.Objects.Interfaces;
    begin
-      Define_Function ("chaos-set-property!", 3, Evaluate_Chaos_Set'Access);
+      Define_Function ("chaos-set-property", 3, Evaluate_Chaos_Set'Access);
       Define_Function ("chaos-get-property", 2, Evaluate_Chaos_Get'Access);
       Define_Function ("chaos-roll-dice", 3, Evaluate_Roll_Dice'Access);
       Define_Function ("chaos-set-timer", 3, Evaluate_Set_Timer'Access);
@@ -65,20 +68,54 @@ package body Chaos.Expressions.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
-      Map   : constant Lith.Objects.Object :=
-                Store.Argument (1);
-      Name  : constant String :=
-                Lith.Objects.Symbols.Get_Name
-                  (Lith.Objects.To_Symbol (Store.Argument (2)));
+      use Lith.Objects, Lith.Objects.Symbols;
+
+      function Get
+        (Map  : Object;
+         Name : String)
+         return Object;
+
+      ---------
+      -- Get --
+      ---------
+
+      function Get
+        (Map  : Object;
+         Name : String)
+         return Object
+      is
+      begin
+         if Chaos.Objects.Is_Object (Map) then
+            return Chaos.Objects.To_Object (Map).Property (Name);
+         elsif Chaos.Expressions.Maps.Is_Map (Map) then
+            return Chaos.Expressions.Maps.Get (Map, Name);
+         else
+            raise Constraint_Error with
+              "chaos-get-property: expected a map, but found "
+              & Store.Show (Map);
+         end if;
+      end Get;
+
    begin
-      if Chaos.Objects.Is_Object (Map) then
-         return Chaos.Objects.To_Object (Map).Property (Name);
-      elsif Chaos.Expressions.Maps.Is_Map (Map) then
-         return Chaos.Expressions.Maps.Get (Map, Name);
+      if Store.Argument_Count = 1 then
+         declare
+            Full_Name : constant String :=
+                          Get_Name (To_Symbol (Store.Argument (1)));
+            Map_Name  : constant String :=
+                          Ada.Characters.Handling.To_Lower
+                            (Full_Name
+                               (Full_Name'First .. Full_Name'First + 5));
+            Prop_Name : constant String :=
+                          Full_Name (Full_Name'First + 6 .. Full_Name'Last);
+            Map       : constant Lith.Objects.Object :=
+                          Lith.Environment.Get (Map_Name);
+         begin
+            return Get (Map, Prop_Name);
+         end;
       else
-         raise Constraint_Error with
-           "chaos-get-property: expected a map, but found "
-           & Store.Show (Map);
+         return Get (Store.Argument (1),
+                     Lith.Objects.Symbols.Get_Name
+                       (Lith.Objects.To_Symbol (Store.Argument (2))));
       end if;
    end Evaluate_Chaos_Get;
 
@@ -145,6 +182,7 @@ package body Chaos.Expressions.Primitives is
       if Timeouts.Contains (Key) then
          Timeouts.Delete (Key);
       end if;
+
       Timeouts.Insert
         (Key,
          Ada.Calendar.Clock + Duration (Timeout));

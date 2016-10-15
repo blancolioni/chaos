@@ -55,6 +55,7 @@ package Chaos.Items.Weapons is
    type Chaos_Weapon is access constant Chaos_Weapon_Record'Class;
 
    function Get (Identifier : String) return Chaos_Weapon;
+   function Exists (Identifier : String) return Boolean;
 
 private
 

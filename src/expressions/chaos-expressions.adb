@@ -13,7 +13,7 @@ package body Chaos.Expressions is
 
    procedure Create_Environment is
    begin
-      Lith.Library.Initialise (128 * 1024);
+      Lith.Library.Initialise (256 * 1024);
       Lith.Environment.Define
         ("global", Chaos.Expressions.Maps.Create);
       Chaos.Expressions.Primitives.Create_Primitives;
