@@ -17,4 +17,10 @@ package Chaos.Expressions.Import.Objects is
       Id_5      : Natural;
       Name      : String);
 
+   procedure Import_Object_Identifier
+     (Id : String);
+
+   procedure Import_Object_Name
+     (Name : String);
+
 end Chaos.Expressions.Import.Objects;

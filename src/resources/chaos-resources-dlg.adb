@@ -29,6 +29,22 @@ package body Chaos.Resources.Dlg is
             Dlg.Get (State.First_Transition);
             Dlg.Get (State.Transition_Count);
             Dlg.Get (State.State_Trigger);
+            if State.State_Trigger /= 16#FFFF_FFFF# then
+               Dlg.Push_Offset
+                 (Dlg.State_Trigger_Offset + 8 * State.State_Trigger);
+               declare
+                  Offset, Length : Word_32;
+               begin
+                  Dlg.Get (Offset);
+                  Dlg.Get (Length);
+                  Dlg.Push_Offset (Offset);
+                  State.Trigger :=
+                    Ada.Strings.Unbounded.To_Unbounded_String
+                      (Dlg.Get (Natural (Length)));
+                  Dlg.Pop_Offset;
+               end;
+               Dlg.Pop_Offset;
+            end if;
             Dlg.State_Table.Append (State);
          end;
       end loop;
@@ -103,6 +119,20 @@ package body Chaos.Resources.Dlg is
       return Dlg.State_Table.Element (Natural (State)).First_Transition
         + Transition;
    end State_Transition_Index;
+
+   -------------------
+   -- State_Trigger --
+   -------------------
+
+   function State_Trigger
+     (Dlg   : Dlg_Resource'Class;
+      State : WL.Binary_IO.Word_32)
+      return String
+   is
+   begin
+      return Ada.Strings.Unbounded.To_String
+        (Dlg.State_Table.Element (Natural (State)).Trigger);
+   end State_Trigger;
 
    ----------------------
    -- Transition_Flags --

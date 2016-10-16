@@ -86,7 +86,7 @@ package body Chaos.Expressions.Import.Actions is
       then
          Chaos.Logging.Log
            ("ACTION",
-            "warning: bad action id: " & WL.Binary_IO.Hex_Image (Action_Id));
+            "warning: bad action id:" & Natural'Image (Index));
          Store.Push (False_Value);
          return;
       end if;

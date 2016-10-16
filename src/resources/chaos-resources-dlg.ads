@@ -1,4 +1,5 @@
 private with Ada.Containers.Vectors;
+private with Ada.Strings.Unbounded;
 
 package Chaos.Resources.Dlg is
 
@@ -13,6 +14,11 @@ package Chaos.Resources.Dlg is
      (Dlg   : Dlg_Resource'Class;
       State : WL.Binary_IO.Word_32)
       return WL.Binary_IO.Word_32;
+
+   function State_Trigger
+     (Dlg   : Dlg_Resource'Class;
+      State : WL.Binary_IO.Word_32)
+      return String;
 
    function State_Transition_Count
      (Dlg : Dlg_Resource'Class;
@@ -48,6 +54,7 @@ private
          First_Transition : Word_32;
          Transition_Count : Word_32;
          State_Trigger    : Word_32;
+         Trigger          : Ada.Strings.Unbounded.Unbounded_String;
       end record;
 
    package State_Table_Vectors is
@@ -62,6 +69,7 @@ private
          Action_Index         : Word_32;
          Next_State_Reference : Resource_Reference;
          Next_State_Index     : Word_32;
+         Trigger              : Ada.Strings.Unbounded.Unbounded_String;
       end record;
 
    package Transition_Table_Vectors is

@@ -35,6 +35,10 @@ package body Chaos.Creatures.Import is
 
       procedure Configure (Creature : in out Chaos_Creature_Record'Class);
 
+      ---------------
+      -- Configure --
+      ---------------
+
       procedure Configure (Creature : in out Chaos_Creature_Record'Class) is
          use type WL.Binary_IO.Word_32;
          use Chaos.Resources.Cre;

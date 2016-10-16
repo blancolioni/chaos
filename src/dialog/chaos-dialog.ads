@@ -2,6 +2,8 @@ private with Ada.Containers.Vectors;
 
 private with Memor;
 
+private with Lith.Objects;
+
 private with Chaos.Localisation;
 
 with Chaos.Objects;
@@ -65,6 +67,7 @@ private
    type Dialog_State is
       record
          Response_Index : Chaos.Localisation.Local_Text_Index;
+         Trigger        : Lith.Objects.Object;
          Transitions    : Dialog_Transition_Vectors.Vector;
       end record;
 
@@ -84,5 +87,10 @@ private
    overriding procedure Add_Properties
      (Dialog : Chaos_Dialog_Record)
    is null;
+
+   overriding procedure Mark
+     (Dialog   : in out Chaos_Dialog_Record;
+      Mark_Value : not null access
+        procedure (Value : in out Lith.Objects.Object));
 
 end Chaos.Dialog;

@@ -2,6 +2,8 @@ with WL.Binary_IO;
 
 with Chaos.Logging;
 
+with Chaos.Parser;
+
 with Chaos.Dialog.Db;
 
 with Chaos.Resources.Dlg;
@@ -28,13 +30,16 @@ package body Chaos.Dialog.Import is
             Dlg : Chaos.Resources.Dlg.Dlg_Resource'Class renames
                     Chaos.Resources.Dlg.Dlg_Resource'Class (Res.all);
 
-            procedure Create (Dialog : in out Chaos_Dialog_Record'Class);
+            procedure Create (Dialog : in out Chaos_Dialog_Record'Class)
+            is null;
 
-            ------------
-            -- Create --
-            ------------
+            procedure Configure (Dialog : in out Chaos_Dialog_Record'Class);
 
-            procedure Create (Dialog : in out Chaos_Dialog_Record'Class) is
+            ---------------
+            -- Configure --
+            ---------------
+
+            procedure Configure (Dialog : in out Chaos_Dialog_Record'Class) is
                use type WL.Binary_IO.Word_32;
             begin
                Dialog.Initialize (Name);
@@ -45,12 +50,14 @@ package body Chaos.Dialog.Import is
                      State.Response_Index :=
                        Chaos.Localisation.Local_Text_Index
                          (Dlg.State_Response (I));
-                     if False then
-                        Chaos.Logging.Log
-                          ("DIALOG",
-                           Chaos.Localisation.Indexed_Text
-                             (State.Response_Index));
-                     end if;
+
+                     declare
+                        Trigger : constant String :=
+                                    Dlg.State_Trigger (I);
+                     begin
+                        State.Trigger :=
+                          Chaos.Parser.Parse_Trigger (Trigger);
+                     end;
 
                      for J in 0 .. Dlg.State_Transition_Count (I) - 1 loop
                         declare
@@ -84,10 +91,14 @@ package body Chaos.Dialog.Import is
                      Dialog.States.Append (State);
                   end;
                end loop;
-            end Create;
+            end Configure;
 
+            Dialog : constant Chaos_Dialog :=
+                       Db.Create (Create'Access);
          begin
-            return Db.Create (Create'Access);
+            Dialog.Save_Object;
+            Db.Update (Dialog.Reference, Configure'Access);
+            return Dialog;
          end;
       else
          return null;

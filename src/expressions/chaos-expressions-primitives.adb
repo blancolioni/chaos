@@ -85,7 +85,15 @@ package body Chaos.Expressions.Primitives is
          return Object
       is
       begin
-         if Chaos.Objects.Is_Object (Map) then
+         if Is_Symbol (Map) then
+            declare
+               Id : constant String :=
+                      Ada.Characters.Handling.To_Lower
+                        (Get_Name (To_Symbol (Map)));
+            begin
+               return Get (Lith.Environment.Get (Get_Symbol (Id)), Name);
+            end;
+         elsif Chaos.Objects.Is_Object (Map) then
             return Chaos.Objects.To_Object (Map).Property (Name);
          elsif Chaos.Expressions.Maps.Is_Map (Map) then
             return Chaos.Expressions.Maps.Get (Map, Name);
@@ -127,21 +135,58 @@ package body Chaos.Expressions.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
-      Map : constant Lith.Objects.Object :=
-              Store.Argument (1);
-      Name : constant String :=
-               Lith.Objects.Symbols.Get_Name
-                 (Lith.Objects.To_Symbol (Store.Argument (2)));
+      use Lith.Objects, Lith.Objects.Symbols;
+
       Value : constant Lith.Objects.Object :=
                 Store.Argument (3);
+
+      procedure Set
+        (Map  : Object;
+         Name : String);
+
+      ---------
+      -- Set --
+      ---------
+
+      procedure Set
+        (Map  : Object;
+         Name : String)
+      is
+      begin
+         if Chaos.Objects.Is_Object (Map) then
+            raise Constraint_Error with
+              "cannot set property " & Name & " on object "
+                & Chaos.Objects.To_Object (Map).Identifier;
+         elsif Chaos.Expressions.Maps.Is_Map (Map) then
+            Chaos.Expressions.Maps.Set (Map, Name, Value);
+         else
+            raise Constraint_Error with
+              "chaos-get-property: expected a map, but found "
+              & Store.Show (Map);
+         end if;
+      end Set;
+
    begin
-      if not Chaos.Expressions.Maps.Is_Map (Map) then
-         raise Constraint_Error with
-           "chaos-setg-property!: expected a map, but found "
-           & Store.Show (Map);
+      if Store.Argument_Count = 1 then
+         declare
+            Full_Name : constant String :=
+                          Get_Name (To_Symbol (Store.Argument (1)));
+            Map_Name  : constant String :=
+                          Ada.Characters.Handling.To_Lower
+                            (Full_Name
+                               (Full_Name'First .. Full_Name'First + 5));
+            Prop_Name : constant String :=
+                          Full_Name (Full_Name'First + 6 .. Full_Name'Last);
+            Map       : constant Lith.Objects.Object :=
+                          Lith.Environment.Get (Map_Name);
+         begin
+            Set (Map, Prop_Name);
+         end;
+      else
+         Set (Store.Argument (1),
+              Lith.Objects.Symbols.Get_Name
+                (Lith.Objects.To_Symbol (Store.Argument (2))));
       end if;
-      Chaos.Expressions.Maps.Set
-        (Map, Name, Value);
       return Value;
    end Evaluate_Chaos_Set;
 

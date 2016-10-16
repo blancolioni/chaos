@@ -1,6 +1,9 @@
 with Ada.Characters.Handling;
+with Ada.Containers.Indefinite_Holders;
 with Ada.Directories;
 with Ada.Strings.Fixed;
+
+with WL.Binary_IO;
 
 with Chaos.Parser.Tokens;              use Chaos.Parser.Tokens;
 with Chaos.Parser.Lexical;             use Chaos.Parser.Lexical;
@@ -9,6 +12,9 @@ with Chaos.Dice;
 
 with Chaos.Expressions.Maps;
 with Chaos.Expressions.Vectors;
+
+with Chaos.Expressions.Import.Objects;
+with Chaos.Expressions.Import.Triggers;
 
 with Lith.Objects.Symbols;
 
@@ -542,5 +548,157 @@ package body Chaos.Parser is
       end loop;
 
    end Parse_Operator_Expression;
+
+   -------------------
+   -- Parse_Trigger --
+   -------------------
+
+   function Parse_Trigger (Text : String) return Lith.Objects.Object is
+      use Chaos.Expressions.Import.Triggers;
+      package String_Holder is
+        new Ada.Containers.Indefinite_Holders (String);
+      Trigger_Id : Natural := 0;
+      Integer_1_Value, Integer_2_Value : Integer := 0;
+      Text_1_Holder, Text_2_Holder : String_Holder.Holder :=
+                                       String_Holder.To_Holder ("");
+      Flags_Value : WL.Binary_IO.Word_32 := 0;
+      Count : Natural := 0;
+      Found : array (Trigger_Argument_Name) of Boolean :=
+                (others => False);
+   begin
+      Open_String (Text);
+      Chaos.Expressions.Store.Push
+        (Lith.Objects.Symbols.Get_Symbol ("and"));
+
+      while Tok = Tok_Identifier loop
+         Count := Count + 1;
+         Trigger_Id :=
+           Chaos.Expressions.Import.Triggers.Get_Trigger_Id (Tok_Text);
+         if Trigger_Id = 0 then
+            Error ("unknown trigger: " & Tok_Text);
+            Close;
+            Chaos.Expressions.Store.Drop (1);
+            return Lith.Objects.False_Value;
+         end if;
+
+         Scan;
+
+         if Tok = Tok_Left_Paren then
+            Scan;
+         else
+            Error ("missing '('");
+            Close;
+            Chaos.Expressions.Store.Drop (1);
+            return Lith.Objects.False_Value;
+         end if;
+
+         while Tok /= Tok_Right_Paren loop
+            if Tok = Tok_Identifier then
+               if Is_Number (Tok_Text) then
+                  if not Found (Integer_1) then
+                     Integer_1_Value := Integer'Value (Tok_Text);
+                     Found (Integer_1) := True;
+                  elsif not Found (Integer_2) then
+                     Integer_2_Value := Integer'Value (Tok_Text);
+                     Found (Integer_2) := True;
+                  elsif not Found (Flags) then
+                     Flags_Value := WL.Binary_IO.Word_32'Value (Tok_Text);
+                     Found (Flags) := True;
+                  else
+                     raise Constraint_Error with
+                       "extra integer argument in trigger";
+                  end if;
+               elsif not Found (Object_Reference) then
+                  Chaos.Expressions.Import.Objects.Import_Object_Identifier
+                    (Tok_Text);
+               else
+                  raise Constraint_Error with
+                    "extra identifier argument in trigger";
+               end if;
+               Scan;
+            elsif Tok = Tok_String_Constant then
+               if not Found (Text_1) then
+                  Text_1_Holder.Replace_Element (Tok_Text);
+                  Found (Text_1) := True;
+               elsif not Found (Text_2) then
+                  Text_2_Holder.Replace_Element (Tok_Text);
+                  Found (Text_2) := True;
+               else
+                  raise Constraint_Error with
+                    "extra string argument in trigger";
+               end if;
+               Scan;
+            else
+               raise Constraint_Error with
+                 "unexpected token: " & Tok_Text;
+            end if;
+
+            if Tok = Tok_Comma then
+               Scan;
+            elsif Tok /= Tok_Right_Paren then
+               raise Constraint_Error with
+                 "syntax error at " & Tok_Text;
+            end if;
+         end loop;
+--
+--              for Argument of Arguments loop
+--                 case Argument is
+--                 when Integer_1 =>
+--                    Integer_1_Value := Integer'Value (Tok_Text);
+--                    Scan;
+--                 when Integer_2 =>
+--                    Integer_2_Value := Integer'Value (Tok_Text);
+--                    Scan;
+--                 when Text_1 =>
+--                    Text_1_Holder.Replace_Element (Tok_Text);
+--                    Scan;
+--                 when Text_2 =>
+--                    Text_2_Holder.Replace_Element (Tok_Text);
+--                    Scan;
+--                 when Object_Reference =>
+--                    if Tok = Tok_Identifier then
+--                  Chaos.Expressions.Import.Objects.Import_Object_Identifier
+--                         (Tok_Text);
+--                       Scan;
+--                    elsif Tok = Tok_String_Constant then
+--                       Chaos.Expressions.Import.Objects.Import_Object_Name
+--                         (Tok_Text);
+--                       Scan;
+--                    else
+--                  Error ("expected a string or an identifier, but found '"
+--                              & Tok_Text & "'");
+--                       Close;
+--                       return Lith.Objects.False_Value;
+--                    end if;
+--                 when Flags =>
+--                    Flags_Value :=
+--                      WL.Binary_IO.Word_32'Value (Tok_Text);
+--                    Scan;
+--                 end case;
+--                 if Tok = Tok_Comma then
+--                    Scan;
+--                 elsif Tok /= Tok_Right_Paren then
+--                    Error ("missing ')'");
+--                    Close;
+--                    return Lith.Objects.False_Value;
+--                 end if;
+--              end loop;
+
+         if Tok = Tok_Right_Paren then
+            Scan;
+         else
+            Error ("missing ')'");
+         end if;
+
+         Chaos.Expressions.Import.Triggers.Import_Trigger
+           (Trigger_Id, Integer_1_Value, Flags_Value, Integer_2_Value,
+            Text_1_Holder.Element, Text_2_Holder.Element);
+
+      end loop;
+
+      Chaos.Expressions.Store.Create_List (Count + 1);
+      return Chaos.Expressions.Store.Pop;
+
+   end Parse_Trigger;
 
 end Chaos.Parser;

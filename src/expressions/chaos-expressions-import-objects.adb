@@ -30,23 +30,11 @@ package body Chaos.Expressions.Import.Objects is
       if Name /= "" then
          Store.Push
            (Lith.Objects.Symbols.Get_Symbol ("chaos-object-with-code"));
+         Store.Push (Lith.Objects.Symbols.Quote_Symbol);
          Store.Push (Lith.Objects.Symbols.Get_Symbol (Name));
          Store.Create_List (2);
+         Store.Create_List (2);
          Store.Push (Store.Pop, Lith.Objects.Secondary);
-
-         --           declare
---              use type Chaos.Objects.Chaos_Object;
---              Object : constant Chaos.Objects.Chaos_Object :=
---                         Chaos.Objects.Search.Find_Object
---                           (Name);
---           begin
---              if Object = null then
---                 Chaos.Logging.Log ("SCRIPT", "unknown object: " & Name);
---                 Store.Push (Lith.Objects.Nil, Lith.Objects.Secondary);
---              else
---                 Store.Push (Object.To_Expression, Lith.Objects.Secondary);
---              end if;
---           end;
       else
          Store.Push (Lith.Objects.Symbols.Quote_Symbol);
          Store.Push_Nil;
@@ -54,5 +42,37 @@ package body Chaos.Expressions.Import.Objects is
          Store.Push (Store.Pop, Lith.Objects.Secondary);
       end if;
    end Import_Object;
+
+   ------------------------------
+   -- Import_Object_Identifier --
+   ------------------------------
+
+   procedure Import_Object_Identifier
+     (Id : String)
+   is
+      pragma Unreferenced (Id);
+   begin
+      Store.Push (Lith.Objects.Symbols.Quote_Symbol);
+      Store.Push_Nil;
+      Store.Create_List (2);
+      Store.Push (Store.Pop, Lith.Objects.Secondary);
+   end Import_Object_Identifier;
+
+   ------------------------
+   -- Import_Object_Name --
+   ------------------------
+
+   procedure Import_Object_Name
+     (Name : String)
+   is
+   begin
+      Store.Push
+        (Lith.Objects.Symbols.Get_Symbol ("chaos-object-with-code"));
+      Store.Push (Lith.Objects.Symbols.Quote_Symbol);
+      Store.Push (Lith.Objects.Symbols.Get_Symbol (Name));
+      Store.Create_List (2);
+      Store.Create_List (2);
+      Store.Push (Store.Pop, Lith.Objects.Secondary);
+   end Import_Object_Name;
 
 end Chaos.Expressions.Import.Objects;

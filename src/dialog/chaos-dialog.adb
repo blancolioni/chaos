@@ -58,6 +58,22 @@ package body Chaos.Dialog is
       Position.State := Transitions.Element (Index).Next_State;
    end Choose;
 
+   ----------
+   -- Mark --
+   ----------
+
+   overriding procedure Mark
+     (Dialog     : in out Chaos_Dialog_Record;
+      Mark_Value : not null access
+        procedure (Value : in out Lith.Objects.Object))
+   is
+   begin
+      Chaos.Objects.Root_Chaos_Object_Record (Dialog).Mark (Mark_Value);
+      for State of Dialog.States loop
+         Mark_Value (State.Trigger);
+      end loop;
+   end Mark;
+
    ---------------------
    -- Object_Database --
    ---------------------
