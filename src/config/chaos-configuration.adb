@@ -13,6 +13,7 @@ with Chaos.Game.Primitives;
 with Chaos.Expressions;
 with Chaos.Objects.Primitives;
 
+with Chaos.Expressions.Import.Actions;
 with Chaos.Expressions.Import.Triggers;
 
 package body Chaos.Configuration is
@@ -31,6 +32,7 @@ package body Chaos.Configuration is
       Chaos.Objects.Primitives.Add_Primitives;
 
       Chaos.Expressions.Import.Triggers.Load_Triggers;
+      Chaos.Expressions.Import.Actions.Load_Actions;
 
       Chaos_Config :=
         Tropos.Reader.Read_Config

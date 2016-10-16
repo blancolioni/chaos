@@ -130,15 +130,13 @@ package body Chaos.Expressions.Import is
 
             Chaos.Expressions.Import.Actions.Import_Action
               (Action_Id,
-               Store.Top (3, Lith.Objects.Secondary),
-               Store.Top (2, Lith.Objects.Secondary),
-               Store.Top (1, Lith.Objects.Secondary),
                Integer_1, Integer_2, Integer_3,
                X, Y,
                String_1, String_2);
-
-            Store.Drop (3, Lith.Objects.Secondary);
          end;
+
+         Store.Drop (3, Lith.Objects.Secondary);
+
       end;
    end Import_AC;
 
@@ -296,6 +294,7 @@ package body Chaos.Expressions.Import is
          Store.Swap;
          Store.Cons;
       end if;
+      --  Chaos.Logging.Log ("RE", Store.Show (Store.Top));
    end Import_RS;
 
    ---------------
