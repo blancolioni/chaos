@@ -104,9 +104,9 @@ package body Chaos.Resources.Cre is
       Cre.Get (Cre.Spell_Memorisation_Count);
       Cre.Get (Cre.Memorised_Spells_Offset);
       Cre.Get (Cre.Memorised_Spells_Count);
-      Cre.Get (Cre.Item_Slot_Offset);
-      Cre.Get (Cre.Item_Offset);
-      Cre.Get (Cre.Item_Count);
+      Cre.Get (Cre.Entity_Slot_Offset);
+      Cre.Get (Cre.Entity_Offset);
+      Cre.Get (Cre.Entity_Count);
       Cre.Get (Cre.Effect_Offset);
       Cre.Get (Cre.Effect_Count);
       Cre.Get (Cre.Dialog_Ref);

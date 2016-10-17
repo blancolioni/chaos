@@ -2,7 +2,7 @@ with Tropos.Reader;
 
 with Chaos.Paths;
 with Chaos.Classes.Configure;
-with Chaos.Items.Weapons.Configure;
+with Chaos.Entities.Weapons.Configure;
 with Chaos.Localisation.Configure;
 with Chaos.Powers.Configure;
 with Chaos.Races.Configure;
@@ -49,7 +49,7 @@ package body Chaos.Configuration is
       Chaos.Localisation.Configure.Read_Local_Text
         (Language => Chaos_Config.Get ("language", "english"));
       Chaos.Teams.Configure.Read_Config;
-      Chaos.Items.Weapons.Configure.Read_Config;
+      Chaos.Entities.Weapons.Configure.Read_Config;
       Chaos.Powers.Configure.Read_Config;
       Chaos.Races.Configure.Read_Config;
       Chaos.Classes.Configure.Read_Config;

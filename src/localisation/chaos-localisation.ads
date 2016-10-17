@@ -32,8 +32,6 @@ package Chaos.Localisation is
      (Index : Local_Text_Index;
       Text  : String);
 
-private
-
    procedure Add_Text
      (Key  : String;
       Text : String);

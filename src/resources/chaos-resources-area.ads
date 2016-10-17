@@ -1,5 +1,7 @@
 with Ada.Containers.Vectors;
 
+with Chaos.Resources.Vertices;
+
 package Chaos.Resources.Area is
 
    use WL.Binary_IO;
@@ -52,20 +54,6 @@ package Chaos.Resources.Area is
    package Area_Actor_Vectors is
      new Ada.Containers.Vectors (Positive, Actor_Entry);
 
-   type Vertex is
-      record
-         X, Y : Word_16;
-      end record;
-
-   package Vertex_Vectors is
-     new Ada.Containers.Vectors (Positive, Vertex);
-
-   type Rectangle is
-      record
-         X1, X2 : Word_16;
-         Y1, Y2 : Word_16;
-      end record;
-
    type Door_Entry is
       record
          Name                        : String (1 .. 32);
@@ -75,8 +63,8 @@ package Chaos.Resources.Area is
          Open_Vertex_Count           : Word_16;
          Closed_Vertex_Count         : Word_16;
          First_Closed_Vertex         : Word_32;
-         Open_Bounding_Box           : Rectangle;
-         Closed_Bounding_Box         : Rectangle;
+         Open_Bounding_Box           : Vertices.Rectangle;
+         Closed_Bounding_Box         : Vertices.Rectangle;
          First_Open_Impeded_Vertex   : Word_32;
          Open_Impeded_Vertex_Count   : Word_16;
          Closed_Impeded_Vertex_Count : Word_16;
@@ -91,11 +79,11 @@ package Chaos.Resources.Area is
          Trap_Detected               : Word_16;
          Trap_Launch_Target_X        : Word_16;
          Trap_Launch_Target_Y        : Word_16;
-         Key_Item                    : Resource_Reference;
+         Key_Entity                    : Resource_Reference;
          Door_Script                 : Resource_Reference;
          Secret_Door_Detection       : Word_32;
          Lock_Difficulty             : Word_32;
-         Toggle_Door_Open_Box        : Rectangle;
+         Toggle_Door_Open_Box        : Vertices.Rectangle;
          Lockpick_String             : String (1 .. 4);
          Travel_Trigger              : String (1 .. 24);
          Dialog_Speaker_Name         : String (1 .. 4);
@@ -122,7 +110,7 @@ package Chaos.Resources.Area is
       record
          Name                        : String (1 .. 32);
          Region_Type                 : Word_16;
-         Bounding_Box                : Rectangle;
+         Bounding_Box                : Vertices.Rectangle;
          Vertex_Count                : Word_16;
          First_Vertex                : Word_32;
          Trigger_Value               : Word_32;
@@ -137,7 +125,7 @@ package Chaos.Resources.Area is
          Trap_Detected               : Word_16;
          Trap_Launch_X               : Word_16;
          Trap_Launch_Y               : Word_16;
-         Key_Item                    : Resource_Reference;
+         Key_Entity                    : Resource_Reference;
          Region_Script               : Resource_Reference;
          Alternative_Use_X           : Word_16;
          Alternative_Use_Y           : Word_16;
@@ -152,6 +140,49 @@ package Chaos.Resources.Area is
 
    package Area_Region_Vectors is
      new Ada.Containers.Vectors (Positive, Region_Entry);
+
+   type Container_Entry is
+      record
+         Name                        : String (1 .. 32);
+         X, Y                        : Word_16;
+         Container_Type              : Word_16;
+         Lock_Difficulty             : Word_16;
+         Flags                       : Word_32;
+         Trap_Detection_Difficulty   : Word_16;
+         Trap_Removal_Difficulty     : Word_16;
+         Is_Trapped                  : Word_16;
+         Trap_Detected               : Word_16;
+         Trap_Launch_X               : Word_16;
+         Trap_Launch_Y               : Word_16;
+         Bounding_Box                : Vertices.Rectangle;
+         First_Item_Index            : Word_32;
+         Item_Count                  : Word_32;
+         Trap_Script                 : Resource_Reference;
+         First_Vertex                : Word_32;
+         Vertex_Count                : Word_16;
+         Trigger_Range               : Word_16;
+         Owner                       : String (1 .. 32);
+         Key_Item                    : Resource_Reference;
+         Break_Difficulty            : Word_32;
+         Lockpick_String             : Word_32;
+         Unused                      : Unused_Bytes (1 .. 56);
+      end record;
+
+   package Area_Container_Vectors is
+     new Ada.Containers.Vectors (Positive, Container_Entry);
+
+   type Item_Entry is
+      record
+         Resource        : Resource_Reference;
+         Expiration_Time : Word_16;
+         Quantity_1      : Word_16;
+         Quantity_2      : Word_16;
+         Quantity_3      : Word_16;
+         Flags           : Word_32;
+      end record;
+
+   package Area_Item_Vectors is
+     new Ada.Containers.Vectors (Positive, Item_Entry);
 
    type Area_Resource is
      new Chaos_Resource with
@@ -207,8 +238,10 @@ package Chaos.Resources.Area is
          Unused_7                  : Word_32;
          Actors                    : Area_Actor_Vectors.Vector;
          Doors                     : Area_Door_Vectors.Vector;
-         Vertices                  : Vertex_Vectors.Vector;
+         Area_Vertices             : Vertices.Vertex_Vectors.Vector;
          Entrances                 : Area_Entrance_Vectors.Vector;
+         Containers                : Area_Container_Vectors.Vector;
+         Items                     : Area_Item_Vectors.Vector;
          Regions                   : Area_Region_Vectors.Vector;
       end record;
 

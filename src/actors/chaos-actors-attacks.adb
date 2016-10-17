@@ -141,7 +141,7 @@ package body Chaos.Actors.Attacks is
    procedure Weapon_Attack
      (Attacker : Chaos.Actors.Chaos_Actor;
       Defender : Chaos.Actors.Chaos_Actor;
-      Weapon   : Chaos.Items.Weapons.Chaos_Weapon)
+      Weapon   : Chaos.Entities.Weapons.Chaos_Weapon)
    is
       use Chaos.Abilities;
       Str_Bonus : constant Ability_Bonus_Range :=
@@ -149,7 +149,7 @@ package body Chaos.Actors.Attacks is
       Dex_Bonus : constant Ability_Bonus_Range :=
                     Attacker.Creature.Ability_Bonus (Dex);
       Bonus     : constant Ability_Bonus_Range :=
-                    (if Weapon.Has_Property (Chaos.Items.Weapons.Finesse)
+                    (if Weapon.Has_Property (Chaos.Entities.Weapons.Finesse)
                      then Ability_Bonus_Range'Max (Str_Bonus, Dex_Bonus)
                      else Str_Bonus);
       Proficiency : constant Natural :=

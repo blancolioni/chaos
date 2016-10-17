@@ -1,6 +1,6 @@
-with Chaos.Items.Weapons.Db;
+with Chaos.Entities.Weapons.Db;
 
-package body Chaos.Items.Weapons is
+package body Chaos.Entities.Weapons is
 
    --------------
    -- Category --
@@ -31,7 +31,7 @@ package body Chaos.Items.Weapons is
    -----------------------
 
    overriding function Equipment_Slot_OK
-     (Item : Chaos_Weapon_Record;
+     (Entity : Chaos_Weapon_Record;
       Slot : Chaos.Equipment.Chaos_Equipment_Slot)
       return Boolean
    is
@@ -41,7 +41,7 @@ package body Chaos.Items.Weapons is
          when Weapon_Slot =>
             return True;
          when Shield =>
-            return not Item.Two_Handed;
+            return not Entity.Two_Handed;
          when others =>
             return False;
       end case;
@@ -139,4 +139,4 @@ package body Chaos.Items.Weapons is
       return Weapon.Short_Range;
    end Short_Range;
 
-end Chaos.Items.Weapons;
+end Chaos.Entities.Weapons;

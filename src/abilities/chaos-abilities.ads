@@ -21,15 +21,15 @@ package Chaos.Abilities is
 
    function Ability_Score
      (Able : Ability_Interface;
-      Item : Ability)
+      Entity : Ability)
       return Ability_Score_Range
       is abstract;
 
    function Ability_Bonus
      (Able : Ability_Interface'Class;
-      Item : Ability)
+      Entity : Ability)
       return Ability_Bonus_Range
-   is (Ability_Bonus_Range (Integer (Able.Ability_Score (Item)) / 2 - 5));
+   is (Ability_Bonus_Range (Integer (Able.Ability_Score (Entity)) / 2 - 5));
 
 --     procedure Insert_Abilities
 --       (Able : Ability_Interface'Class;

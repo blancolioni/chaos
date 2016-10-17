@@ -15,4 +15,9 @@ package Chaos.Features.Import is
       Region_Index : Positive)
       return Chaos_Feature;
 
+   function Import_Container
+     (Area            : Chaos.Resources.Area.Area_Resource'Class;
+      Container_Index : Positive)
+      return Chaos_Feature;
+
 end Chaos.Features.Import;

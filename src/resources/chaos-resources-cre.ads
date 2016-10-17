@@ -103,9 +103,9 @@ package Chaos.Resources.Cre is
          Spell_Memorisation_Count  : Word_32;
          Memorised_Spells_Offset   : Word_32;
          Memorised_Spells_Count    : Word_32;
-         Item_Slot_Offset          : Word_32;
-         Item_Offset               : Word_32;
-         Item_Count                : Word_32;
+         Entity_Slot_Offset          : Word_32;
+         Entity_Offset               : Word_32;
+         Entity_Count                : Word_32;
          Effect_Offset             : Word_32;
          Effect_Count              : Word_32;
          Dialog_Ref                : Resource_Reference;

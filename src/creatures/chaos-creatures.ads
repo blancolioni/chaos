@@ -19,16 +19,16 @@ with Chaos.Teams;
 with Chaos.Vision;
 
 with Chaos.Equipment;
-with Chaos.Items.Weapons;
-with Chaos.Things;
+with Chaos.Entities.Weapons;
+with Chaos.Items;
 
 with Chaos.Powers;
 with Chaos.Dialog;
 
 package Chaos.Creatures is
 
-   Max_Inventory_Items : constant := 40;
-   type Inventory_Count is range 0 .. Max_Inventory_Items;
+   Max_Inventory_Entities : constant := 40;
+   type Inventory_Count is range 0 .. Max_Inventory_Entities;
    subtype Inventory_Index is Inventory_Count range 1 .. Inventory_Count'Last;
 
    type Chaos_Creature_Record is
@@ -122,23 +122,23 @@ package Chaos.Creatures is
 
    function Active_Weapon
      (Creature : Chaos_Creature_Record'Class)
-      return Chaos.Items.Weapons.Chaos_Weapon;
+      return Chaos.Entities.Weapons.Chaos_Weapon;
 
    procedure Set_Equipment
      (Creature : in out Chaos_Creature_Record'Class;
       Slot     : Chaos.Equipment.Chaos_Equipment_Slot;
-      Thing    : Chaos.Things.Chaos_Thing)
-     with Pre => Thing.Equipment_Slot_OK (Slot);
+      Item    : Chaos.Items.Chaos_Item)
+     with Pre => Item.Equipment_Slot_OK (Slot);
 
    procedure Set_Inventory
      (Creature : in out Chaos_Creature_Record'Class;
       Index    : Inventory_Index;
-      Thing    : Chaos.Things.Chaos_Thing);
+      Item    : Chaos.Items.Chaos_Item);
 
    function Inventory
      (Creature : in out Chaos_Creature_Record'Class;
       Index    : Inventory_Index)
-      return Chaos.Things.Chaos_Thing;
+      return Chaos.Items.Chaos_Item;
 
    function Has_Dialog
      (Creature : Chaos_Creature_Record'Class)
@@ -193,10 +193,10 @@ private
      array (Creature_Color_Part) of Natural;
 
    type Creature_Equipment is
-     array (Chaos.Equipment.Chaos_Equipment_Slot) of Chaos.Things.Chaos_Thing;
+     array (Chaos.Equipment.Chaos_Equipment_Slot) of Chaos.Items.Chaos_Item;
 
-   type Inventory_Item_Array is
-     array (Inventory_Index) of Chaos.Things.Chaos_Thing;
+   type Inventory_Entity_Array is
+     array (Inventory_Index) of Chaos.Items.Chaos_Item;
 
    type Chaos_Creature_Record is
      new Chaos.Objects.Root_Localised_Object_Record
@@ -225,7 +225,7 @@ private
          Color_Map           : Creature_Color_Map;
          Cash                : Chaos.Coins.Coins_Type;
          Equipment           : Creature_Equipment := (others => null);
-         Inventory           : Inventory_Item_Array := (others => null);
+         Inventory           : Inventory_Entity_Array := (others => null);
          Active_Weapon       : Chaos.Equipment.Weapon_Slot :=
                                  Chaos.Equipment.Weapon_1;
          Script              : Lith.Objects.Object;

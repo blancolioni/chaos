@@ -4,7 +4,7 @@ package Chaos.Sizes is
 
    type Chaos_Size_Interface is limited interface;
 
-   function Size (Item : Chaos_Size_Interface) return Chaos_Size
+   function Size (Entity : Chaos_Size_Interface) return Chaos_Size
                   is abstract;
 
 end Chaos.Sizes;

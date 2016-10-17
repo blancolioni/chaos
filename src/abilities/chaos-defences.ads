@@ -16,7 +16,7 @@ package Chaos.Defences is
 
    function Defence_Score
      (Defender : Defence_Interface;
-      Item     : Defence)
+      Entity     : Defence)
       return Defence_Score_Range
       is abstract;
 

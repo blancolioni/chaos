@@ -44,6 +44,7 @@ package Chaos.Resources is
    Creature_Resource   : constant Resource_Type;
    Dialog_Resource     : constant Resource_Type;
    Identifier_Resource : constant Resource_Type;
+   Item_Resource       : constant Resource_Type;
    Script_Resource     : constant Resource_Type;
    Table_Resource      : constant Resource_Type;
    Tileset_Resource    : constant Resource_Type;
@@ -103,6 +104,7 @@ private
    Bam_Resource        : constant Resource_Type := 16#03E8#;
    Wed_Resource        : constant Resource_Type := 16#03E9#;
    Tileset_Resource    : constant Resource_Type := 16#03EB#;
+   Item_Resource       : constant Resource_Type := 16#03ED#;
    Script_Resource     : constant Resource_Type := 16#03EF#;
    Identifier_Resource : constant Resource_Type := 16#03F0#;
    Creature_Resource   : constant Resource_Type := 16#03F1#;

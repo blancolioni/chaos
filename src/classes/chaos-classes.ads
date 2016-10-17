@@ -49,20 +49,20 @@ package Chaos.Classes is
 
    type Chaos_Class_Interface is limited interface;
 
-   function Class (Item : Chaos_Class_Interface) return Chaos_Class
+   function Class (Entity : Chaos_Class_Interface) return Chaos_Class
                    is abstract;
 
    function Class_Defence_Bonus
-     (Item    : Chaos_Class_Interface'Class;
+     (Entity    : Chaos_Class_Interface'Class;
       Defence : Chaos.Defences.Defence)
       return Chaos.Defences.Defence_Score_Change;
 
    function Base_Hit_Points
-     (Item : Chaos_Class_Interface'Class)
+     (Entity : Chaos_Class_Interface'Class)
       return Natural;
 
    function Level_Hit_Points
-     (Item : Chaos_Class_Interface'Class)
+     (Entity : Chaos_Class_Interface'Class)
       return Natural;
 
 private

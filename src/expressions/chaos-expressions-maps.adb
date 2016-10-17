@@ -30,15 +30,15 @@ package body Chaos.Expressions.Maps is
       return Boolean;
 
    overriding procedure Mark
-     (Item  : in out Map_Expression;
+     (Entity  : in out Map_Expression;
       Store : in out Lith.Objects.Object_Store'Class;
       Mark  : not null access
         procedure (X : in out Lith.Objects.Object));
 
    function Fetch
-     (Item : Lith.Objects.Object)
+     (Entity : Lith.Objects.Object)
       return access Map_Expression'Class
-   is (Map_Expression (Store.Get_External_Object (Item).all)'Access);
+   is (Map_Expression (Store.Get_External_Object (Entity).all)'Access);
 
    --------------
    -- Contains --
@@ -116,14 +116,14 @@ package body Chaos.Expressions.Maps is
    ----------
 
    overriding procedure Mark
-     (Item  : in out Map_Expression;
+     (Entity  : in out Map_Expression;
       Store : in out Lith.Objects.Object_Store'Class;
       Mark  : not null access
         procedure (X : in out Lith.Objects.Object))
    is
       use Lith_Object_Maps;
       pragma Unreferenced (Store);
-      Position : Cursor := Item.M.First;
+      Position : Cursor := Entity.M.First;
    begin
       while Has_Element (Position) loop
          declare
@@ -131,7 +131,7 @@ package body Chaos.Expressions.Maps is
                           Element (Position);
          begin
             Mark (Value);
-            Item.M.Replace_Element (Position, Value);
+            Entity.M.Replace_Element (Position, Value);
          end;
          Next (Position);
       end loop;

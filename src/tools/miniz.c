@@ -124,7 +124,7 @@
         const void *pBuf, size_t buf_size, const void *pComment, mz_uint16 comment_size, mz_uint level_and_flags);
 
      The archive will be created if it doesn't already exist, otherwise it'll be appended to.
-     Note the appending is done in-place and is not an atomic operation, so if something goes wrong
+     Note the appending is done in-place and is not an atomic operation, so if someItem goes wrong
      during the operation it's possible the archive could be left without a central directory (although the local
      file headers and file data will be fine, so the archive will be recoverable).
 
@@ -137,7 +137,7 @@
      2. Or, you can convert an mz_zip_reader in-place to an mz_zip_writer using mz_zip_writer_init_from_reader(),
      append new files as needed, then finalize the archive which will write an updated central directory to the
      original archive. (This is basically what mz_zip_add_mem_to_archive_file_in_place() does.) There's a
-     possibility that the archive's central directory could be lost with this method if anything goes wrong, though.
+     possibility that the archive's central directory could be lost with this method if anyItem goes wrong, though.
 
      - ZIP archive support limitations:
      No zip64 or spanning support. Extraction functions can only handle unencrypted, stored or deflated files.
@@ -248,10 +248,10 @@ enum { MZ_DEFAULT_STRATEGY = 0, MZ_FILTERED = 1, MZ_HUFFMAN_ONLY = 2, MZ_RLE = 3
 #ifndef MINIZ_NO_ZLIB_APIS
 
 // Heap allocation callbacks.
-// Note that mz_alloc_func parameter types purpsosely differ from zlib's: items/size is size_t, not unsigned long.
-typedef void *(*mz_alloc_func)(void *opaque, size_t items, size_t size);
+// Note that mz_alloc_func parameter types purpsosely differ from zlib's: Entities/size is size_t, not unsigned long.
+typedef void *(*mz_alloc_func)(void *opaque, size_t Entities, size_t size);
 typedef void (*mz_free_func)(void *opaque, void *address);
-typedef void *(*mz_realloc_func)(void *opaque, void *address, size_t items, size_t size);
+typedef void *(*mz_realloc_func)(void *opaque, void *address, size_t Entities, size_t size);
 
 #define MZ_VERSION          "9.1.15"
 #define MZ_VERNUM           0x91F0
@@ -322,7 +322,7 @@ int mz_deflateInit(mz_streamp pStream, int level);
 //   mem_level must be between [1, 9] (it's checked but ignored by miniz.c)
 int mz_deflateInit2(mz_streamp pStream, int level, int method, int window_bits, int mem_level, int strategy);
 
-// Quickly resets a compressor without having to reallocate anything. Same as calling mz_deflateEnd() followed by mz_deflateInit()/mz_deflateInit2().
+// Quickly resets a compressor without having to reallocate anyItem. Same as calling mz_deflateEnd() followed by mz_deflateInit()/mz_deflateInit2().
 int mz_deflateReset(mz_streamp pStream);
 
 // mz_deflate() compresses the input to output, consuming as much of the input and producing as much output as possible.
@@ -634,7 +634,7 @@ mz_bool mz_zip_writer_init_file(mz_zip_archive *pZip, const char *pFilename, mz_
 // For archives opened using mz_zip_reader_init_file, pFilename must be the archive's filename so it can be reopened for writing. If the file can't be reopened, mz_zip_reader_end() will be called.
 // For archives opened using mz_zip_reader_init_mem, the memory block must be growable using the realloc callback (which defaults to realloc unless you've overridden it).
 // Finally, for archives opened using mz_zip_reader_init, the mz_zip_archive's user provided m_pWrite function cannot be NULL.
-// Note: In-place archive modification is not recommended unless you know what you're doing, because if execution stops or something goes wrong before
+// Note: In-place archive modification is not recommended unless you know what you're doing, because if execution stops or someItem goes wrong before
 // the archive is finalized the file's central directory will be hosed.
 mz_bool mz_zip_writer_init_from_reader(mz_zip_archive *pZip, const char *pFilename);
 
@@ -1007,9 +1007,9 @@ void mz_free(void *p)
 
 #ifndef MINIZ_NO_ZLIB_APIS
 
-static void *def_alloc_func(void *opaque, size_t items, size_t size) { (void)opaque, (void)items, (void)size; return MZ_MALLOC(items * size); }
+static void *def_alloc_func(void *opaque, size_t Entities, size_t size) { (void)opaque, (void)Entities, (void)size; return MZ_MALLOC(Entities * size); }
 static void def_free_func(void *opaque, void *address) { (void)opaque, (void)address; MZ_FREE(address); }
-static void *def_realloc_func(void *opaque, void *address, size_t items, size_t size) { (void)opaque, (void)address, (void)items, (void)size; return MZ_REALLOC(address, items * size); }
+static void *def_realloc_func(void *opaque, void *address, size_t Entities, size_t size) { (void)opaque, (void)address, (void)Entities, (void)size; return MZ_REALLOC(address, Entities * size); }
 
 const char *mz_version(void)
 {
@@ -1290,7 +1290,7 @@ int mz_inflate(mz_streamp pStream, int flush)
        // The output buffer MUST be large to hold the remaining uncompressed data when flush==MZ_FINISH.
        if (status == TINFL_STATUS_DONE)
           return pState->m_dict_avail ? MZ_BUF_ERROR : MZ_STREAM_END;
-       // status here must be TINFL_STATUS_HAS_MORE_OUTPUT, which means there's at least 1 more byte on the way. If there's no more room left in the output buffer then something is wrong.
+       // status here must be TINFL_STATUS_HAS_MORE_OUTPUT, which means there's at least 1 more byte on the way. If there's no more room left in the output buffer then someItem is wrong.
        else if (!pStream->avail_out)
           return MZ_BUF_ERROR;
     }
@@ -1365,7 +1365,7 @@ const char *mz_error(int err)
 #define TINFL_CR_RETURN_FOREVER(state_index, result) do { for ( ; ; ) { TINFL_CR_RETURN(state_index, result); } } MZ_MACRO_END
 #define TINFL_CR_FINISH }
 
-// TODO: If the caller has indicated that there's no more input, and we attempt to read beyond the input buf, then something is wrong with the input because the inflator never
+// TODO: If the caller has indicated that there's no more input, and we attempt to read beyond the input buf, then someItem is wrong with the input because the inflator never
 // reads ahead more than it needs to. Currently TINFL_GET_BYTE() pads the end of the stream with 0's in this scenario.
 #define TINFL_GET_BYTE(state_index, c) do { \
   if (pIn_buf_cur >= pIn_buf_end) { \
@@ -4846,7 +4846,7 @@ mz_bool mz_zip_add_mem_to_archive_file_in_place(const char *pZip_filename, const
     status = MZ_FALSE;
   if ((!status) && (created_new_archive))
   {
-    // It's a new archive and something went wrong, so just delete it.
+    // It's a new archive and someItem went wrong, so just delete it.
     int ignoredStatus = MZ_DELETE_FILE(pZip_filename);
     (void)ignoredStatus;
   }

@@ -57,11 +57,11 @@ package body Chaos.Classes is
    ---------------------
 
    function Base_Hit_Points
-     (Item : Chaos_Class_Interface'Class)
+     (Entity : Chaos_Class_Interface'Class)
       return Natural
    is
    begin
-      return Item.Class.Base_Hit_Points;
+      return Entity.Class.Base_Hit_Points;
    end Base_Hit_Points;
 
    -------------------------
@@ -69,13 +69,13 @@ package body Chaos.Classes is
    -------------------------
 
    function Class_Defence_Bonus
-     (Item    : Chaos_Class_Interface'Class;
+     (Entity    : Chaos_Class_Interface'Class;
       Defence : Chaos.Defences.Defence)
       return Chaos.Defences.Defence_Score_Change
    is
    begin
-      if Item.Class /= null then
-         return Item.Class.Defences (Defence);
+      if Entity.Class /= null then
+         return Entity.Class.Defences (Defence);
       else
          return 0;
       end if;
@@ -120,11 +120,11 @@ package body Chaos.Classes is
    ----------------------
 
    function Level_Hit_Points
-     (Item : Chaos_Class_Interface'Class)
+     (Entity : Chaos_Class_Interface'Class)
       return Natural
    is
    begin
-      return Item.Class.Level_Hit_Points;
+      return Entity.Class.Level_Hit_Points;
    end Level_Hit_Points;
 
    ---------------------

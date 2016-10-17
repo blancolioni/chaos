@@ -82,6 +82,10 @@ package body Chaos.Areas.Import is
 
       procedure Configure (Area : in out Chaos_Area_Record'Class);
 
+      ---------------
+      -- Configure --
+      ---------------
+
       procedure Configure (Area : in out Chaos_Area_Record'Class) is
       begin
          Area.Create
@@ -189,6 +193,17 @@ package body Chaos.Areas.Import is
                                 Area.To_Square_Index (Square_Loc);
             begin
                Area.Squares (Square_Index).Feature := Feature;
+               Area.Features.Append (Feature);
+            end;
+         end loop;
+
+         for Container_Index in 1 .. Are.Containers.Last_Index loop
+            declare
+               Feature : constant Chaos.Features.Chaos_Feature :=
+                           Chaos.Features.Import.Import_Container
+                             (Are, Container_Index);
+            begin
+               Area.Features.Append (Feature);
             end;
          end loop;
 

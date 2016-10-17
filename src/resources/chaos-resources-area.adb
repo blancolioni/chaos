@@ -123,10 +123,7 @@ package body Chaos.Resources.Area is
          begin
             Area.Get (Region.Name);
             Area.Get (Region.Region_Type);
-            Area.Get (Region.Bounding_Box.X1);
-            Area.Get (Region.Bounding_Box.Y1);
-            Area.Get (Region.Bounding_Box.X2);
-            Area.Get (Region.Bounding_Box.Y2);
+            Vertices.Get (Area, Region.Bounding_Box);
             Area.Get (Region.Vertex_Count);
             Area.Get (Region.First_Vertex);
             Area.Get (Region.Trigger_Value);
@@ -141,7 +138,7 @@ package body Chaos.Resources.Area is
             Area.Get (Region.Trap_Detected);
             Area.Get (Region.Trap_Launch_X);
             Area.Get (Region.Trap_Launch_Y);
-            Area.Get (Region.Key_Item);
+            Area.Get (Region.Key_Entity);
             Area.Get (Region.Region_Script);
             Area.Get (Region.Alternative_Use_X);
             Area.Get (Region.Alternative_Use_Y);
@@ -169,14 +166,8 @@ package body Chaos.Resources.Area is
             Area.Get (Door.Open_Vertex_Count);
             Area.Get (Door.Closed_Vertex_Count);
             Area.Get (Door.First_Closed_Vertex);
-            Area.Get (Door.Open_Bounding_Box.X1);
-            Area.Get (Door.Open_Bounding_Box.Y1);
-            Area.Get (Door.Open_Bounding_Box.X2);
-            Area.Get (Door.Open_Bounding_Box.Y2);
-            Area.Get (Door.Closed_Bounding_Box.X1);
-            Area.Get (Door.Closed_Bounding_Box.Y1);
-            Area.Get (Door.Closed_Bounding_Box.X2);
-            Area.Get (Door.Closed_Bounding_Box.Y2);
+            Vertices.Get (Area, Door.Open_Bounding_Box);
+            Vertices.Get (Area, Door.Closed_Bounding_Box);
             Area.Get (Door.First_Open_Impeded_Vertex);
             Area.Get (Door.Open_Impeded_Vertex_Count);
             Area.Get (Door.Closed_Impeded_Vertex_Count);
@@ -192,14 +183,11 @@ package body Chaos.Resources.Area is
             Area.Get (Door.Trap_Detected);
             Area.Get (Door.Trap_Launch_Target_X);
             Area.Get (Door.Trap_Launch_Target_Y);
-            Area.Get (Door.Key_Item);
+            Area.Get (Door.Key_Entity);
             Area.Get (Door.Door_Script);
             Area.Get (Door.Secret_Door_Detection);
             Area.Get (Door.Lock_Difficulty);
-            Area.Get (Door.Toggle_Door_Open_Box.X1);
-            Area.Get (Door.Toggle_Door_Open_Box.Y1);
-            Area.Get (Door.Toggle_Door_Open_Box.X2);
-            Area.Get (Door.Toggle_Door_Open_Box.Y2);
+            Vertices.Get (Area, Door.Toggle_Door_Open_Box);
             Area.Get (Door.Lockpick_String);
             Area.Get (Door.Travel_Trigger);
             Area.Get (Door.Dialog_Speaker_Name);
@@ -211,6 +199,54 @@ package body Chaos.Resources.Area is
               ("AREA", To_String (Door.Resource_Name) & " " & Door.Name);
 
             Area.Doors.Append (Door);
+         end;
+      end loop;
+
+      Area.Set_Offset (Area.Containers_Offset);
+      for I in 1 .. Area.Containers_Count loop
+         declare
+            Container : Container_Entry;
+         begin
+            Area.Get (Container.Name);
+            Area.Get (Container.X);
+            Area.Get (Container.Y);
+            Area.Get (Container.Container_Type);
+            Area.Get (Container.Lock_Difficulty);
+            Area.Get (Container.Flags);
+            Area.Get (Container.Trap_Detection_Difficulty);
+            Area.Get (Container.Trap_Removal_Difficulty);
+            Area.Get (Container.Is_Trapped);
+            Area.Get (Container.Trap_Detected);
+            Area.Get (Container.Trap_Launch_X);
+            Area.Get (Container.Trap_Launch_Y);
+            Vertices.Get (Area, Container.Bounding_Box);
+            Area.Get (Container.First_Item_Index);
+            Area.Get (Container.Item_Count);
+            Area.Get (Container.Trap_Script);
+            Area.Get (Container.First_Vertex);
+            Area.Get (Container.Vertex_Count);
+            Area.Get (Container.Trigger_Range);
+            Area.Get (Container.Owner);
+            Area.Get (Container.Key_Item);
+            Area.Get (Container.Break_Difficulty);
+            Area.Get (Container.Lockpick_String);
+            Area.Get (Container.Unused);
+            Area.Containers.Append (Container);
+         end;
+      end loop;
+
+      Area.Set_Offset (Area.Items_Offset);
+      for I in 1 .. Area.Items_Count loop
+         declare
+            Item : Item_Entry;
+         begin
+            Area.Get (Item.Resource);
+            Area.Get (Item.Expiration_Time);
+            Area.Get (Item.Quantity_1);
+            Area.Get (Item.Quantity_2);
+            Area.Get (Item.Quantity_3);
+            Area.Get (Item.Flags);
+            Area.Items.Append (Item);
          end;
       end loop;
 
@@ -232,16 +268,9 @@ package body Chaos.Resources.Area is
          end;
       end loop;
 
-      Area.Set_Offset (Area.Vertices_Offset);
-      for I in 1 .. Area.Vertices_Count loop
-         declare
-            V : Vertex;
-         begin
-            Area.Get (V.X);
-            Area.Get (V.Y);
-            Area.Vertices.Append (V);
-         end;
-      end loop;
+      Vertices.Get (Area, Area.Vertices_Offset,
+                    Word_32 (Area.Vertices_Count),
+                    Area.Area_Vertices);
 
    end Load;
 

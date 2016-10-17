@@ -14,7 +14,7 @@ package Chaos.Vision is
 
    type Chaos_Vision_Interface is limited interface;
 
-   function Vision (Item : Chaos_Vision_Interface) return Chaos_Vision
+   function Vision (Entity : Chaos_Vision_Interface) return Chaos_Vision
                     is abstract;
 
    function Visible_Range
@@ -23,8 +23,8 @@ package Chaos.Vision is
       return Natural;
 
    function Vision
-     (Item : Chaos_Vision_Interface'class)
+     (Entity : Chaos_Vision_Interface'class)
       return Lith.Objects.Object
-   is (To_Expression (Item.Vision));
+   is (To_Expression (Entity.Vision));
 
 end Chaos.Vision;

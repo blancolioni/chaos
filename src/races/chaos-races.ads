@@ -41,23 +41,23 @@ package Chaos.Races is
 
    type Chaos_Race_Interface is limited interface;
 
-   function Race (Item : Chaos_Race_Interface) return Chaos_Race
+   function Race (Entity : Chaos_Race_Interface) return Chaos_Race
                   is abstract;
 
    function Size
-     (Item : Chaos_Race_Interface'Class)
+     (Entity : Chaos_Race_Interface'Class)
       return Chaos.Sizes.Chaos_Size
-   is (Item.Race.Size);
+   is (Entity.Race.Size);
 
    function Speed
-     (Item : Chaos_Race_Interface'Class)
+     (Entity : Chaos_Race_Interface'Class)
       return Chaos.Speed.Chaos_Speed
-   is (Item.Race.Speed);
+   is (Entity.Race.Speed);
 
    function Vision
-     (Item : Chaos_Race_Interface'Class)
+     (Entity : Chaos_Race_Interface'Class)
       return Chaos.Vision.Chaos_Vision
-   is (Item.Race.Vision);
+   is (Entity.Race.Vision);
 
 private
 

@@ -1,4 +1,18 @@
+with Chaos.Features.Db;
+
 package body Chaos.Features is
+
+   --------------------
+   -- Add_Properties --
+   --------------------
+
+   overriding procedure Add_Properties
+     (Feature : Chaos_Feature_Record)
+   is
+      pragma Unreferenced (Feature);
+   begin
+      null;
+   end Add_Properties;
 
    ------------------
    -- Bounding_Box --
@@ -59,6 +73,19 @@ package body Chaos.Features is
    begin
       return Feature.Travel;
    end Has_Destination;
+
+   ---------------------
+   -- Object_Database --
+   ---------------------
+
+   overriding function Object_Database
+     (Feature : Chaos_Feature_Record)
+      return Memor.Memor_Database
+   is
+      pragma Unreferenced (Feature);
+   begin
+      return Db.Get_Database;
+   end Object_Database;
 
    -------------
    -- Polygon --

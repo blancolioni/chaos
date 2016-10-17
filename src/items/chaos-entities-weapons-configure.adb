@@ -7,12 +7,12 @@ with Chaos.Paths;
 
 with Chaos.Parser;
 
-with Chaos.Items.Weapons.Db;
+with Chaos.Entities.Weapons.Db;
 
 with Chaos.Expressions.Enumerated;
 with Chaos.Expressions.Vectors;
 
-package body Chaos.Items.Weapons.Configure is
+package body Chaos.Entities.Weapons.Configure is
 
    package Weapon_Category_Expressions is
      new Chaos.Expressions.Enumerated (Weapon_Category);
@@ -39,15 +39,15 @@ package body Chaos.Items.Weapons.Configure is
       Handler : Configure_Weapon_Handler);
 
    procedure Set_Identity
-     (Item   : in out Chaos_Weapon_Record'Class;
+     (Entity   : in out Chaos_Weapon_Record'Class;
       Value  : Lith.Objects.Object);
 
    procedure Set_Price
-     (Item   : in out Chaos_Weapon_Record'Class;
+     (Entity   : in out Chaos_Weapon_Record'Class;
       Value  : Lith.Objects.Object);
 
    procedure Set_Weight
-     (Item   : in out Chaos_Weapon_Record'Class;
+     (Entity   : in out Chaos_Weapon_Record'Class;
       Value  : Lith.Objects.Object);
 
    procedure Set_Category
@@ -124,7 +124,7 @@ package body Chaos.Items.Weapons.Configure is
       end Create;
 
    begin
-      Chaos.Items.Weapons.Db.Create (Create'Access);
+      Chaos.Entities.Weapons.Db.Create (Create'Access);
    end Create_Weapon;
 
    -----------------
@@ -200,13 +200,13 @@ package body Chaos.Items.Weapons.Configure is
    ------------------
 
    procedure Set_Identity
-     (Item   : in out Chaos_Weapon_Record'Class;
+     (Entity   : in out Chaos_Weapon_Record'Class;
       Value  : Lith.Objects.Object)
    is
    begin
-      Item.Initialize
+      Entity.Initialize
         (Chaos.Expressions.Store.Show (Value));
-      Item.Log ("new weapon: " & Item.Identifier);
+      Entity.Log ("new weapon: " & Entity.Identifier);
    end Set_Identity;
 
    ---------------
@@ -214,11 +214,11 @@ package body Chaos.Items.Weapons.Configure is
    ---------------
 
    procedure Set_Price
-     (Item   : in out Chaos_Weapon_Record'Class;
+     (Entity   : in out Chaos_Weapon_Record'Class;
       Value  : Lith.Objects.Object)
    is
    begin
-      Item.Price :=
+      Entity.Price :=
         Chaos.Coins.To_Coins
           (Chaos.Expressions.Store.Show (Value));
    end Set_Price;
@@ -299,11 +299,11 @@ package body Chaos.Items.Weapons.Configure is
    ----------------
 
    procedure Set_Weight
-     (Item   : in out Chaos_Weapon_Record'Class;
+     (Entity   : in out Chaos_Weapon_Record'Class;
       Value  : Lith.Objects.Object)
    is
    begin
-      Item.Weight :=
+      Entity.Weight :=
         Chaos.Weight.Chaos_Weight'Value
           (Chaos.Expressions.Store.Show (Value));
    end Set_Weight;
@@ -319,4 +319,4 @@ package body Chaos.Items.Weapons.Configure is
       Configure_Map.Insert (Name, Handler);
    end Setting;
 
-end Chaos.Items.Weapons.Configure;
+end Chaos.Entities.Weapons.Configure;

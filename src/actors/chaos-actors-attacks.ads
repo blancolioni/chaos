@@ -1,4 +1,4 @@
-with Chaos.Items.Weapons;
+with Chaos.Entities.Weapons;
 with Chaos.Powers;
 
 package Chaos.Actors.Attacks is
@@ -6,7 +6,7 @@ package Chaos.Actors.Attacks is
    procedure Weapon_Attack
      (Attacker : Chaos.Actors.Chaos_Actor;
       Defender : Chaos.Actors.Chaos_Actor;
-      Weapon   : Chaos.Items.Weapons.Chaos_Weapon)
+      Weapon   : Chaos.Entities.Weapons.Chaos_Weapon)
      with Pre => Attacker.Has_Standard_Action,
      Post => not Attacker.Has_Standard_Action;
 

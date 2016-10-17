@@ -124,17 +124,17 @@ package body Chaos.Objects is
       use Chaos.Expressions;
 
       procedure Set_Script_Executed
-        (Item : in out Memor.Root_Record_Type'Class);
+        (Entity : in out Memor.Root_Record_Type'Class);
 
       -------------------------
       -- Set_Script_Executed --
       -------------------------
 
       procedure Set_Script_Executed
-        (Item : in out Memor.Root_Record_Type'Class)
+        (Entity : in out Memor.Root_Record_Type'Class)
       is
       begin
-         Root_Chaos_Object_Record'Class (Item).Set_Flag ("script-executed");
+         Root_Chaos_Object_Record'Class (Entity).Set_Flag ("script-executed");
       end Set_Script_Executed;
 
    begin
@@ -227,7 +227,7 @@ package body Chaos.Objects is
    ----------
 
    overriding procedure Mark
-     (Item  : in out Object_Record_Interface;
+     (Entity  : in out Object_Record_Interface;
       Store : in out Lith.Objects.Object_Store'Class;
       Mark  : not null access
         procedure (X : in out Lith.Objects.Object))
@@ -246,7 +246,7 @@ package body Chaos.Objects is
       end Mark_Object;
 
    begin
-      Item.Db.Update (Item.Reference, Mark_Object'Access);
+      Entity.Db.Update (Entity.Reference, Mark_Object'Access);
    end Mark;
 
    ----------
@@ -267,11 +267,11 @@ package body Chaos.Objects is
    ----------
 
    overriding function Name
-     (Item : Object_Record_Interface)
+     (Entity : Object_Record_Interface)
       return String
    is
    begin
-      return Item.Db.Database_Class_Name;
+      return Entity.Db.Database_Class_Name;
    end Name;
 
    -----------
@@ -279,14 +279,14 @@ package body Chaos.Objects is
    -----------
 
    overriding function Print
-     (Item  : Object_Record_Interface;
+     (Entity  : Object_Record_Interface;
       Store : in out Lith.Objects.Object_Store'Class)
       return String
    is
       pragma Unreferenced (Store);
    begin
-      return Item.Db.Database_Class_Name
-        & "-" & Chaos_Object (Item.Db.Element (Item.Reference)).Identifier;
+      return Entity.Db.Database_Class_Name
+        & "-" & Chaos_Object (Entity.Db.Element (Entity.Reference)).Identifier;
    end Print;
 
    --------------

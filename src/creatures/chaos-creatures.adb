@@ -37,11 +37,11 @@ package body Chaos.Creatures is
 
    function Active_Weapon
      (Creature : Chaos_Creature_Record'Class)
-      return Chaos.Items.Weapons.Chaos_Weapon
+      return Chaos.Entities.Weapons.Chaos_Weapon
    is
    begin
-      return Chaos.Items.Weapons.Chaos_Weapon
-        (Creature.Equipment (Creature.Active_Weapon_Slot).Item);
+      return Chaos.Entities.Weapons.Chaos_Weapon
+        (Creature.Equipment (Creature.Active_Weapon_Slot).Entity);
    end Active_Weapon;
 
    ------------------------
@@ -261,7 +261,7 @@ package body Chaos.Creatures is
    function Inventory
      (Creature : in out Chaos_Creature_Record'Class;
       Index    : Inventory_Index)
-      return Chaos.Things.Chaos_Thing
+      return Chaos.Items.Chaos_Item
    is
    begin
       return Creature.Inventory (Index);
@@ -488,10 +488,10 @@ package body Chaos.Creatures is
    procedure Set_Equipment
      (Creature : in out Chaos_Creature_Record'Class;
       Slot     : Chaos.Equipment.Chaos_Equipment_Slot;
-      Thing    : Chaos.Things.Chaos_Thing)
+      Item    : Chaos.Items.Chaos_Item)
    is
    begin
-      Creature.Equipment (Slot) := Thing;
+      Creature.Equipment (Slot) := Item;
    end Set_Equipment;
 
    -------------------
@@ -501,10 +501,10 @@ package body Chaos.Creatures is
    procedure Set_Inventory
      (Creature : in out Chaos_Creature_Record'Class;
       Index    : Inventory_Index;
-      Thing    : Chaos.Things.Chaos_Thing)
+      Item    : Chaos.Items.Chaos_Item)
    is
    begin
-      Creature.Inventory (Index) := Thing;
+      Creature.Inventory (Index) := Item;
    end Set_Inventory;
 
    ----------------

@@ -29,15 +29,15 @@ package body Chaos.Expressions.Vectors is
       return Boolean;
 
    overriding procedure Mark
-     (Item  : in out Vector_Expression;
+     (Entity  : in out Vector_Expression;
       Store : in out Lith.Objects.Object_Store'Class;
       Mark  : not null access
         procedure (X : in out Lith.Objects.Object));
 
    function Fetch
-     (Item : Lith.Objects.Object)
+     (Entity : Lith.Objects.Object)
       return access Vector_Expression'Class
-   is (Vector_Expression (Store.Get_External_Object (Item).all)'Access);
+   is (Vector_Expression (Store.Get_External_Object (Entity).all)'Access);
 
    ------------
    -- Append --
@@ -144,15 +144,15 @@ package body Chaos.Expressions.Vectors is
    ----------
 
    overriding procedure Mark
-     (Item  : in out Vector_Expression;
+     (Entity  : in out Vector_Expression;
       Store : in out Lith.Objects.Object_Store'Class;
       Mark  : not null access
         procedure (X : in out Lith.Objects.Object))
    is
       pragma Unreferenced (Store);
    begin
-      for I in 1 .. Item.V.Last_Index loop
-         Mark (Item.V (I));
+      for I in 1 .. Entity.V.Last_Index loop
+         Mark (Entity.V (I));
       end loop;
    end Mark;
 

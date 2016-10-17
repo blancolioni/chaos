@@ -48,8 +48,8 @@ package body Chaos.Creatures.Quick is
          Creature.Cash := Chaos.Coins.GP (100);
          Creature.Set_Equipment
            (Chaos.Equipment.Weapon_1,
-            Chaos.Things.Create
-              (Chaos.Items.Weapons.Get ("quarterstaff")));
+            Chaos.Items.Create
+              (Chaos.Entities.Weapons.Get ("quarterstaff")));
 
          Creature.Set_Active_Weapon_Slot (Chaos.Equipment.Weapon_1);
       end Create;

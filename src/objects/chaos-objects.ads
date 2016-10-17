@@ -141,11 +141,11 @@ private
       end record;
 
    overriding function Name
-     (Item : Object_Record_Interface)
+     (Entity : Object_Record_Interface)
       return String;
 
    overriding function Print
-     (Item  : Object_Record_Interface;
+     (Entity  : Object_Record_Interface;
       Store : in out Lith.Objects.Object_Store'Class)
       return String;
 
@@ -155,13 +155,13 @@ private
       return Boolean;
 
    overriding procedure Mark
-     (Item  : in out Object_Record_Interface;
+     (Entity  : in out Object_Record_Interface;
       Store : in out Lith.Objects.Object_Store'Class;
       Mark  : not null access
         procedure (X : in out Lith.Objects.Object));
 
    overriding procedure Finalize
-     (Item  : in out Object_Record_Interface;
+     (Entity  : in out Object_Record_Interface;
       Store : in out Lith.Objects.Object_Store'Class)
    is null;
 

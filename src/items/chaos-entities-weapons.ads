@@ -2,7 +2,7 @@ private with Memor;
 
 with Chaos.Dice;
 
-package Chaos.Items.Weapons is
+package Chaos.Entities.Weapons is
 
    type Weapon_Category is
      (Simple_Melee, Simple_Ranged, Military_Melee, Military_Ranged,
@@ -15,11 +15,11 @@ package Chaos.Items.Weapons is
      (Finesse, Light_Thrown, Off_Hand, Versatile);
 
    type Chaos_Weapon_Record is
-     new Chaos_Item_Record
+     new Chaos_Entity_Record
    with private;
 
    overriding function Equipment_Slot_OK
-     (Item : Chaos_Weapon_Record;
+     (Entity : Chaos_Weapon_Record;
       Slot : Chaos.Equipment.Chaos_Equipment_Slot)
       return Boolean;
 
@@ -61,7 +61,7 @@ private
 
    type Weapon_Properties is array (Weapon_Property) of Boolean;
 
-   type Chaos_Weapon_Record is new Chaos_Item_Record with
+   type Chaos_Weapon_Record is new Chaos_Entity_Record with
       record
          Category    : Weapon_Category;
          Group       : Weapon_Group;
@@ -81,4 +81,4 @@ private
      (Weapon : Chaos_Weapon_Record)
    is null;
 
-end Chaos.Items.Weapons;
+end Chaos.Entities.Weapons;
