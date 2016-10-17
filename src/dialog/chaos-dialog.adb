@@ -4,6 +4,8 @@ with Chaos.Dialog.Db;
 
 with Chaos.Expressions;
 
+with Chaos.Logging;
+
 package body Chaos.Dialog is
 
    ------------
@@ -119,6 +121,9 @@ package body Chaos.Dialog is
       State : Natural := 0;
    begin
       while State <= Dialog.States.Last_Index loop
+         Chaos.Logging.Log
+           ("DIALOG",
+            Store.Show (Dialog.States.Element (State).Trigger));
          exit when Chaos.Expressions.Store.Evaluate
            (Dialog.States.Element (State).Trigger,
             Symbols.Get_Symbol ("this"), Owner.To_Expression)

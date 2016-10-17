@@ -592,6 +592,7 @@ package body Chaos.Parser is
         (Lith.Objects.Symbols.Get_Symbol ("and"));
 
       while Tok = Tok_Identifier loop
+         Found := (others => False);
          Count := Count + 1;
          Trigger_Id :=
            Chaos.Expressions.Import.Triggers.Get_Trigger_Id (Tok_Text);
@@ -632,6 +633,7 @@ package body Chaos.Parser is
                   then
                      Chaos.Expressions.Import.Objects.Import_Object_Identifier
                        (Tok_Text);
+                     Found (Object_Reference) := True;
                   elsif not Found (Integer_1) then
                      Integer_1_Value := Chaos.Identifiers.Value (Tok_Text);
                   elsif not Found (Integer_2) then
@@ -717,6 +719,15 @@ package body Chaos.Parser is
             Scan;
          else
             Error ("missing ')'");
+         end if;
+
+         if not Found (Object_Reference) then
+            Chaos.Expressions.Store.Push
+              (Lith.Objects.Symbols.Quote_Symbol);
+            Chaos.Expressions.Store.Push_Nil;
+            Chaos.Expressions.Store.Create_List (2);
+            Chaos.Expressions.Store.Push
+              (Chaos.Expressions.Store.Pop, Lith.Objects.Secondary);
          end if;
 
          Chaos.Expressions.Import.Triggers.Import_Trigger

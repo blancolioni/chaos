@@ -309,12 +309,18 @@ package body Chaos.Game is
 
    procedure Start (Game : in out Chaos_Game_Record'Class) is
       pragma Unreferenced (Game);
+      Start : constant Lith.Objects.Object :=
+                Chaos.Parser.Load_Script
+                  (Chaos.Paths.Config_File ("start.script"));
    begin
+      Chaos.Expressions.Store.Reset;
+      Chaos.Expressions.Store.Report_State;
+      Ada.Text_IO.Put_Line
+        (Chaos.Expressions.Store.Show (Start));
       Ada.Text_IO.Put_Line
         (Chaos.Expressions.Store.Show
            (Chaos.Expressions.Store.Evaluate
-                (Chaos.Parser.Load_Script
-                     (Chaos.Paths.Config_File ("start.script")))));
+                (Start)));
    end Start;
 
    ------------------

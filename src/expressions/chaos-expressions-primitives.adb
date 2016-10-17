@@ -96,7 +96,11 @@ package body Chaos.Expressions.Primitives is
          elsif Chaos.Objects.Is_Object (Map) then
             return Chaos.Objects.To_Object (Map).Property (Name);
          elsif Chaos.Expressions.Maps.Is_Map (Map) then
-            return Chaos.Expressions.Maps.Get (Map, Name);
+            if Chaos.Expressions.Maps.Contains (Map, Name) then
+               return Chaos.Expressions.Maps.Get (Map, Name);
+            else
+               return To_Object (Integer'(0));
+            end if;
          else
             raise Constraint_Error with
               "chaos-get-property: expected a map, but found "

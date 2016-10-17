@@ -2,7 +2,7 @@
 (chaos-add-trigger 1 'Acquired '(chaos-flag this acquired text-1))
 (chaos-add-trigger 2 'AttackedBy '(chaos-script-flag this object 'attacked-by))
 (chaos-add-trigger #x0D 'Exists '(chaos-object-exists object))
-(chaos-add-trigger #x0F 'Global '(eq? (chaos-get-property text-1 text-2) integer-1))
+(chaos-add-trigger #x0F 'Global '(eq? (chaos-get-property text-2 text-1) integer-1))
 (chaos-add-trigger #x1C 'See '(chaos-can-see this object))
 (chaos-add-trigger #x20 'HitBy '(chaos-script-flag this object 'hit-by))
 (chaos-add-trigger #x22 'TimerExpired '(chaos-timer-expired this integer-1))

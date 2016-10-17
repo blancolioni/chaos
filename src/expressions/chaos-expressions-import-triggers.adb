@@ -198,7 +198,7 @@ package body Chaos.Expressions.Import.Triggers is
            (Import.Triggers.Text_2)
          then
             Store.Push
-              (Get_Symbol (Text_1 (Text_1'First .. Text_1'First + 5)));
+              (Get_Symbol (Text_1 (Text_1'First + 6 .. Text_1'Last)));
          else
             Store.Push (Get_Symbol (Text_1));
          end if;
@@ -213,7 +213,7 @@ package body Chaos.Expressions.Import.Triggers is
         (Import.Triggers.Text_2)
       then
          Store.Push
-           (Get_Symbol (Text_1 (Text_1'First + 6 .. Text_1'Last)));
+           (Get_Symbol (Text_1 (Text_1'First .. Text_1'First + 5)));
       else
          Store.Push_Nil;
       end if;
