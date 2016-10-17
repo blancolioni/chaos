@@ -11,6 +11,7 @@ with Chaos.Resources.Biff;
 with Chaos.Resources.Bmp;
 with Chaos.Resources.Cre;
 with Chaos.Resources.Dlg;
+with Chaos.Resources.Ids;
 with Chaos.Resources.Key;
 with Chaos.Resources.Tables;
 with Chaos.Resources.Tis;
@@ -68,6 +69,8 @@ package body Chaos.Resources.Manager is
             return new Chaos.Resources.Cre.Cre_Resource;
          when Dialog_Resource =>
             return new Chaos.Resources.Dlg.Dlg_Resource;
+         when Identifier_Resource =>
+            return new Chaos.Resources.Ids.Ids_Resource;
          when Script_Resource =>
             return new Chaos.Resources.Bcs.Bcs_Resource;
          when Table_Resource =>

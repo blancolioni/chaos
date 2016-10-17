@@ -16,6 +16,8 @@ with Chaos.Objects.Primitives;
 with Chaos.Expressions.Import.Actions;
 with Chaos.Expressions.Import.Triggers;
 
+with Chaos.Identifiers.Import;
+
 package body Chaos.Configuration is
 
    Chaos_Config : Tropos.Configuration;
@@ -26,7 +28,13 @@ package body Chaos.Configuration is
 
    procedure Read_Configuration is
    begin
+
       Chaos.Expressions.Create_Environment;
+
+      Chaos.Identifiers.Import.Import_Identifiers ("object");
+      Chaos.Identifiers.Import.Import_Identifiers ("ea");
+      Chaos.Identifiers.Import.Import_Identifiers ("reaction");
+
       Chaos.Areas.Primitives.Create_Primitives;
       Chaos.Game.Primitives.Add_Primitives;
       Chaos.Objects.Primitives.Add_Primitives;
