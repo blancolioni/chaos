@@ -294,9 +294,7 @@ package body Chaos.Game is
              Chaos.UI.Current_UI;
    begin
       UI.Put_Line (Chaos.Dialog.Text (Game.Dialog_State));
-      if Chaos.Dialog.Choice_Count (Game.Dialog_State) = 0 then
-         Game.Dialog := null;
-      else
+      if not Chaos.Dialog.Finished (Game.Dialog_State) then
          for I in 1 .. Chaos.Dialog.Choice_Count (Game.Dialog_State) loop
             UI.Put_Line
               (Positive'Image (I) & ". "
@@ -329,6 +327,7 @@ package body Chaos.Game is
       Listener : Chaos.Actors.Chaos_Actor)
    is
       Dialog : Chaos.Dialog.Chaos_Dialog;
+      Creature : Chaos.Creatures.Chaos_Creature;
 
       procedure Update_Listener_Orientation
         (Actor : in out Chaos.Actors.Chaos_Actor_Record'Class);
@@ -365,8 +364,10 @@ package body Chaos.Game is
    begin
       if Talker.Creature.Has_Dialog then
          Dialog := Talker.Creature.Dialog;
+         Creature := Talker.Creature;
       elsif Listener.Creature.Has_Dialog then
          Dialog := Listener.Creature.Dialog;
+         Creature := Listener.Creature;
       else
          Chaos.UI.Current_UI.Activate (Listener);
          Chaos.UI.Current_UI.Display_Localised_Text
@@ -375,8 +376,11 @@ package body Chaos.Game is
          return;
       end if;
 
+      Chaos.Creatures.On_Start_Dialog
+        (Talker.Creature, Listener.Creature);
+
       Game.Dialog := Dialog;
-      Game.Dialog_State := Dialog.Start;
+      Game.Dialog_State := Dialog.Start (Creature);
 
       Talker.Update (Update_Talker_Orientation'Access);
       Listener.Update (Update_Listener_Orientation'Access);

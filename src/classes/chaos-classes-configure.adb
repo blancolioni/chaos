@@ -18,8 +18,6 @@ with Chaos.Classes.Db;
 
 package body Chaos.Classes.Configure is
 
-   First_Class : Boolean := True;
-
    package Class_Settings is
      new Chaos.Settings (Chaos_Class_Record);
 
@@ -124,12 +122,6 @@ package body Chaos.Classes.Configure is
       New_Class.Save_Object;
       Db.Update (New_Class.Reference, Configure'Access);
       New_Class.Define_Object;
-
-      if First_Class then
-         New_Class.Add_Properties;
-         First_Class := False;
-      end if;
-
    end Create_Class;
 
    -----------------

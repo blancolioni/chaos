@@ -10,6 +10,14 @@ package body Chaos.Creatures is
    package Defence_Properties is
      new Chaos.Defences.Defender_Objects (Chaos_Creature_Record);
 
+   function Last_Talked_To_By_Property
+     (Object : Chaos.Objects.Root_Chaos_Object_Record'Class)
+      return Lith.Objects.Object;
+
+   function Num_Times_Talked_To_Property
+     (Object : Chaos.Objects.Root_Chaos_Object_Record'Class)
+      return Lith.Objects.Object;
+
    -------------------
    -- Ability_Score --
    -------------------
@@ -70,6 +78,10 @@ package body Chaos.Creatures is
    begin
       Ability_Properties.Add_Ability_Properties (Object);
       Defence_Properties.Add_Defence_Properties (Object);
+      Object.Add_Property ("last-talked-to-by",
+                           Last_Talked_To_By_Property'Access);
+      Object.Add_Property ("num-times-talked-to",
+                           Num_Times_Talked_To_Property'Access);
    end Add_Properties;
 
    -----------
@@ -266,6 +278,24 @@ package body Chaos.Creatures is
       Creature.Alive := False;
    end Kill;
 
+   --------------------------------
+   -- Last_Talked_To_By_Property --
+   --------------------------------
+
+   function Last_Talked_To_By_Property
+     (Object : Chaos.Objects.Root_Chaos_Object_Record'Class)
+      return Lith.Objects.Object
+   is
+      Creature : Chaos_Creature_Record'Class renames
+                   Chaos_Creature_Record'Class (Object);
+   begin
+      if Creature.Last_Talked_To_By = null then
+         return Lith.Objects.Nil;
+      else
+         return Creature.Last_Talked_To_By.To_Expression;
+      end if;
+   end Last_Talked_To_By_Property;
+
    -----------
    -- Level --
    -----------
@@ -328,6 +358,19 @@ package body Chaos.Creatures is
       return Result;
    end Max_Hit_Points;
 
+   ----------------------------------
+   -- Num_Times_Talked_To_Property --
+   ----------------------------------
+
+   function Num_Times_Talked_To_Property
+     (Object : Chaos.Objects.Root_Chaos_Object_Record'Class)
+      return Lith.Objects.Object
+   is
+   begin
+      return Lith.Objects.To_Object
+        (Chaos_Creature_Record'Class (Object).Num_Times_Talked_To);
+   end Num_Times_Talked_To_Property;
+
    ---------------------
    -- Object_Database --
    ---------------------
@@ -340,6 +383,55 @@ package body Chaos.Creatures is
    begin
       return Db.Get_Database;
    end Object_Database;
+
+   -------------------
+   -- On_End_Dialog --
+   -------------------
+
+   overriding procedure On_End_Dialog
+     (Creature : Chaos_Creature_Record)
+   is
+      procedure Update (C : in out Chaos_Creature_Record'Class);
+
+      ------------
+      -- Update --
+      ------------
+
+      procedure Update (C : in out Chaos_Creature_Record'Class) is
+      begin
+         C.Num_Times_Talked_To := C.Num_Times_Talked_To + 1;
+      end Update;
+
+   begin
+      Creature.Update (Update'Access);
+   end On_End_Dialog;
+
+   ---------------------
+   -- On_Start_Dialog --
+   ---------------------
+
+   procedure On_Start_Dialog
+     (Creature_1, Creature_2 : Chaos_Creature)
+   is
+      procedure Update_Creature (C : in out Chaos_Creature_Record'Class);
+
+      ---------------------
+      -- Update_Creature --
+      ---------------------
+
+      procedure Update_Creature (C : in out Chaos_Creature_Record'Class) is
+      begin
+         if C.Identifier = Creature_1.Identifier then
+            C.Last_Talked_To_By := Creature_2;
+         else
+            C.Last_Talked_To_By := Creature_1;
+         end if;
+      end Update_Creature;
+
+   begin
+      Creature_1.Update (Update_Creature'Access);
+      Creature_2.Update (Update_Creature'Access);
+   end On_Start_Dialog;
 
    -----------------
    -- Power_Count --

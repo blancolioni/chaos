@@ -125,6 +125,7 @@ package body Chaos.Creatures.Import is
         ("CREATURE", Name);
       Creature.Save_Object;
       Creature.Update (Configure'Access);
+      Creature.Define_Object;
       return Creature;
    end Import_Creature;
 

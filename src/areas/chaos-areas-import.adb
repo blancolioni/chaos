@@ -219,7 +219,8 @@ package body Chaos.Areas.Import is
             use type WL.Binary_IO.Word_16;
             Creature : constant Chaos.Creatures.Chaos_Creature :=
                          Chaos.Creatures.Import.Import_Creature
-                           (String (Actor_Entry.CRE_File));
+                           (Chaos.Resources.To_String
+                              (Actor_Entry.CRE_File));
             Actor    : constant Chaos.Actors.Chaos_Actor :=
                          Chaos.Actors.Create_Actor
                            (From_Creature => Creature,

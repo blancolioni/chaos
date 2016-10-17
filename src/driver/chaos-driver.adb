@@ -105,6 +105,14 @@ begin
             Ada.Text_IO.Put_Line ("area script" & I'Img);
             Chaos.Game.Current_Game.Script_Round;
          end loop;
+
+         for I in 1 .. 2 loop
+            Chaos.Game.Current_Game.Start_Dialog
+              (Chaos.Game.Current_Game.Party.Party_Member (1),
+               Chaos.Game.Current_Game.Area.Actor
+                 (Chaos.Creatures.Get ("PHLYDI")));
+         end loop;
+
          UI.Stop;
       end;
    else

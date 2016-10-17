@@ -35,12 +35,9 @@ package body Chaos.Objects is
    is
       Class_Name : constant String :=
                      Object.Object_Database.Database_Class_Name;
-      Empty_Map  : Property_Maps.Map;
    begin
       if not Class_Properties.Contains (Class_Name) then
-         Class_Properties.Insert (Class_Name, Empty_Map);
-         Class_Properties (Class_Name).Insert
-           ("identifier", Get_Identifier_Property'Access);
+         Object.Create_Property_Table;
       end if;
 
       Class_Properties (Class_Name).Insert (Name, Get);
@@ -59,6 +56,21 @@ package body Chaos.Objects is
          Object.Flags.Delete (Name);
       end if;
    end Clear_Flag;
+
+   ---------------------------
+   -- Create_Property_Table --
+   ---------------------------
+
+   procedure Create_Property_Table
+     (Object : Root_Chaos_Object_Record'Class)
+   is
+      Class_Name : constant String :=
+                     Object.Object_Database.Database_Class_Name;
+   begin
+      Class_Properties.Insert (Class_Name, Property_Maps.Empty_Map);
+      Class_Properties (Class_Name).Insert
+        ("identifier", Get_Identifier_Property'Access);
+   end Create_Property_Table;
 
    -------------------
    -- Define_Object --
@@ -330,6 +342,7 @@ package body Chaos.Objects is
       if not Have_List then
          List := Lith.Objects.Nil;
          Lith.Environment.Define (List_Symbol, List);
+         Object.Add_Properties;
       end if;
 
       Store.Push (Object.To_Expression);

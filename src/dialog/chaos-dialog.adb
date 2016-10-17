@@ -1,4 +1,8 @@
+with Lith.Objects.Symbols;
+
 with Chaos.Dialog.Db;
+
+with Chaos.Expressions;
 
 package body Chaos.Dialog is
 
@@ -14,7 +18,8 @@ package body Chaos.Dialog is
                       Position.Dialog.States.Element (Position.State)
                       .Transitions;
    begin
-      return (Position.Dialog, Transitions.Element (Index).Next_State);
+      return (Position.Dialog, Transitions.Element (Index).Next_State,
+              Position.Owner);
    end Choice;
 
    ------------------
@@ -56,7 +61,19 @@ package body Chaos.Dialog is
                       .Transitions;
    begin
       Position.State := Transitions.Element (Index).Next_State;
+      if Finished (Position) then
+         Position.Owner.On_End_Dialog;
+      end if;
    end Choose;
+
+   --------------
+   -- Finished --
+   --------------
+
+   function Finished (Position : Dialog_Cursor) return Boolean is
+   begin
+      return Choice_Count (Position) = 0;
+   end Finished;
 
    ----------
    -- Mark --
@@ -91,12 +108,38 @@ package body Chaos.Dialog is
    -- Start --
    -----------
 
-   function Start (Dialog : not null access constant
-                     Chaos_Dialog_Record'Class)
-                   return Dialog_Cursor
+   function Start
+     (Dialog : not null access constant
+        Chaos_Dialog_Record'Class;
+      Owner  : not null access constant
+        Chaos.Objects.Root_Chaos_Object_Record'Class)
+      return Dialog_Cursor
    is
+      use Lith.Objects, Chaos.Expressions;
+      State : Natural := 0;
    begin
-      return (Chaos_Dialog (Dialog), 0);
+      while State <= Dialog.States.Last_Index loop
+         exit when Chaos.Expressions.Store.Evaluate
+           (Dialog.States.Element (State).Trigger,
+            Symbols.Get_Symbol ("this"), Owner.To_Expression)
+           /= False_Value;
+         State := State + 1;
+      end loop;
+
+      if State <= Dialog.States.Last_Index then
+         declare
+            Position : constant Dialog_Cursor :=
+                         (Chaos_Dialog (Dialog), State,
+                          Chaos.Objects.Chaos_Object (Owner));
+         begin
+            if Finished (Position) then
+               Owner.On_End_Dialog;
+            end if;
+            return Position;
+         end;
+      else
+         return (null, 0, null);
+      end if;
    end Start;
 
    ----------

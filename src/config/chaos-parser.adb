@@ -5,6 +5,8 @@ with Ada.Strings.Fixed;
 
 with WL.Binary_IO;
 
+with Lith.Objects.Symbols;
+
 with Chaos.Parser.Tokens;              use Chaos.Parser.Tokens;
 with Chaos.Parser.Lexical;             use Chaos.Parser.Lexical;
 
@@ -16,7 +18,7 @@ with Chaos.Expressions.Vectors;
 with Chaos.Expressions.Import.Objects;
 with Chaos.Expressions.Import.Triggers;
 
-with Lith.Objects.Symbols;
+with Chaos.Identifiers;
 
 package body Chaos.Parser is
 
@@ -608,9 +610,20 @@ package body Chaos.Parser is
                      raise Constraint_Error with
                        "extra integer argument in trigger";
                   end if;
-               elsif not Found (Object_Reference) then
-                  Chaos.Expressions.Import.Objects.Import_Object_Identifier
-                    (Tok_Text);
+               elsif Chaos.Identifiers.Exists (Tok_Text) then
+                  if Chaos.Identifiers.Group (Tok_Text) = "object"
+                    and then not Found (Object_Reference)
+                  then
+                     Chaos.Expressions.Import.Objects.Import_Object_Identifier
+                       (Tok_Text);
+                  elsif not Found (Integer_1) then
+                     Integer_1_Value := Chaos.Identifiers.Value (Tok_Text);
+                  elsif not Found (Integer_2) then
+                     Integer_2_Value := Chaos.Identifiers.Value (Tok_Text);
+                  else
+                     raise Constraint_Error with
+                       "extra integer identifier argument in trigger";
+                  end if;
                else
                   raise Constraint_Error with
                     "extra identifier argument in trigger";

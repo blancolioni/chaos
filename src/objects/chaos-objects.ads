@@ -105,6 +105,10 @@ package Chaos.Objects is
    procedure Execute_Script
      (Object : Root_Chaos_Object_Record'Class);
 
+   procedure On_End_Dialog
+     (Object : Root_Chaos_Object_Record)
+   is null;
+
    type Root_Localised_Object_Record is
      abstract limited new Root_Chaos_Object_Record with private;
 
@@ -125,6 +129,9 @@ private
          Flags     : Flag_Maps.Map;
          Script    : Lith.Objects.Object;
       end record;
+
+   procedure Create_Property_Table
+     (Object : Root_Chaos_Object_Record'Class);
 
    type Object_Record_Interface is
      new Lith.Objects.External_Object_Interface with

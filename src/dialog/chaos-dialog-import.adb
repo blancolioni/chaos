@@ -55,8 +55,16 @@ package body Chaos.Dialog.Import is
                         Trigger : constant String :=
                                     Dlg.State_Trigger (I);
                      begin
-                        State.Trigger :=
-                          Chaos.Parser.Parse_Trigger (Trigger);
+                        if Trigger /= "" then
+                           Chaos.Logging.Log
+                             ("DIALOG",
+                              Name & " state" & I'Img & " trigger: "
+                              & Trigger);
+                           State.Trigger :=
+                             Chaos.Parser.Parse_Trigger (Trigger);
+                        else
+                           State.Trigger := Lith.Objects.True_Value;
+                        end if;
                      end;
 
                      for J in 0 .. Dlg.State_Transition_Count (I) - 1 loop

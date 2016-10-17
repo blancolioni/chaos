@@ -164,6 +164,12 @@ package Chaos.Creatures is
 
    type Chaos_Creature is access constant Chaos_Creature_Record'Class;
 
+   procedure On_Start_Dialog
+     (Creature_1, Creature_2 : Chaos_Creature);
+
+   overriding procedure On_End_Dialog
+     (Creature : Chaos_Creature_Record);
+
    function Exists
      (Identifier : String)
       return Boolean;
@@ -202,27 +208,29 @@ private
      and Chaos.Vision.Chaos_Vision_Interface
      and Chaos.Powers.Powered_Interface with
       record
-         Individual     : Boolean;
-         Alive          : Boolean;
-         Short_Name     : Ada.Strings.Unbounded.Unbounded_String;
-         Long_Name      : Ada.Strings.Unbounded.Unbounded_String;
-         Race           : Chaos.Races.Chaos_Race;
-         Class          : Chaos.Classes.Chaos_Class;
-         Abilities      : Chaos.Abilities.Ability_Scores;
-         Level          : Chaos.Levels.Chaos_Level;
-         HP             : Natural;
-         Powers         : Chaos.Powers.Power_Collection;
-         Alignment      : Chaos.Alignment.Chaos_Alignment;
-         Team           : Chaos.Teams.Chaos_Team;
-         Dialog         : Chaos.Dialog.Chaos_Dialog;
-         Animation_Id   : Natural := 0;
-         Color_Map      : Creature_Color_Map;
-         Cash           : Chaos.Coins.Coins_Type;
-         Equipment      : Creature_Equipment := (others => null);
-         Inventory      : Inventory_Item_Array := (others => null);
-         Active_Weapon  : Chaos.Equipment.Weapon_Slot :=
-                            Chaos.Equipment.Weapon_1;
-         Script         : Lith.Objects.Object;
+         Individual          : Boolean;
+         Alive               : Boolean;
+         Short_Name          : Ada.Strings.Unbounded.Unbounded_String;
+         Long_Name           : Ada.Strings.Unbounded.Unbounded_String;
+         Race                : Chaos.Races.Chaos_Race;
+         Class               : Chaos.Classes.Chaos_Class;
+         Abilities           : Chaos.Abilities.Ability_Scores;
+         Level               : Chaos.Levels.Chaos_Level;
+         HP                  : Natural;
+         Powers              : Chaos.Powers.Power_Collection;
+         Alignment           : Chaos.Alignment.Chaos_Alignment;
+         Team                : Chaos.Teams.Chaos_Team;
+         Dialog              : Chaos.Dialog.Chaos_Dialog;
+         Animation_Id        : Natural := 0;
+         Color_Map           : Creature_Color_Map;
+         Cash                : Chaos.Coins.Coins_Type;
+         Equipment           : Creature_Equipment := (others => null);
+         Inventory           : Inventory_Item_Array := (others => null);
+         Active_Weapon       : Chaos.Equipment.Weapon_Slot :=
+                                 Chaos.Equipment.Weapon_1;
+         Script              : Lith.Objects.Object;
+         Last_Talked_To_By   : Chaos_Creature;
+         Num_Times_Talked_To : Natural := 0;
       end record;
 
    overriding function Object_Database

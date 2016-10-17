@@ -18,8 +18,12 @@ package Chaos.Dialog is
 
    type Dialog_Cursor is private;
 
+   function Finished (Position : Dialog_Cursor) return Boolean;
+
    function Start (Dialog : not null access constant
-                     Chaos_Dialog_Record'Class)
+                     Chaos_Dialog_Record'Class;
+                   Owner  : not null access constant
+                     Chaos.Objects.Root_Chaos_Object_Record'Class)
                    return Dialog_Cursor;
 
    function Text (Position : Dialog_Cursor) return String;
@@ -44,6 +48,7 @@ private
       record
          Dialog : Chaos_Dialog;
          State  : Natural;
+         Owner  : Chaos.Objects.Chaos_Object;
       end record;
 
    type Dialog_Transition is

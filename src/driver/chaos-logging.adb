@@ -23,7 +23,8 @@ package body Chaos.Logging is
       Ada.Text_IO.Put_Line
         (Ada.Text_IO.Standard_Error,
          "[" & Component & "] "
-         & Clean (Clean'First .. Index));
+         & (if True then Message
+           else Clean (Clean'First .. Index)));
    end Log;
 
 end Chaos.Logging;
