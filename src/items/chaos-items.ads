@@ -46,6 +46,48 @@ package Chaos.Items is
       return Chaos.Coins.Coins_Type
    is (Item.Entity.Price);
 
+   type Inventory_Interface is limited interface;
+
+   function Capacity (Inv : Inventory_Interface) return Natural is abstract;
+   function Item
+     (Inv : Inventory_Interface;
+      Index : Positive)
+      return Chaos_Item
+      is abstract
+     with Pre'Class => Index <= Inv.Capacity;
+
+   procedure Replace_Item
+     (Inv      : in out Inventory_Interface;
+      Index    : Positive;
+      New_Item : Chaos_Item)
+   is abstract
+     with Pre'class => Index <= Inv.Capacity,
+       Post'Class => Inv.Item (Index) = New_Item;
+
+   function Has_Item
+     (Inv  : Inventory_Interface'Class;
+      Item : Chaos_Item)
+      return Boolean;
+
+   function Has_Entity
+     (Inv    : Inventory_Interface'Class;
+      Entity : Chaos.Entities.Chaos_Entity)
+      return Boolean;
+
+   procedure Remove_Item
+     (Inv  : in out Inventory_Interface'Class;
+      Item : Chaos_Item)
+     with Pre => Inv.Has_Item (Item);
+
+   procedure Remove_Entity
+     (Inv  : in out Inventory_Interface'Class;
+      Entity : Chaos.Entities.Chaos_Entity)
+     with Pre => Inv.Has_Entity (Entity);
+
+   function Weight
+     (Inv : Inventory_Interface'Class)
+      return Chaos.Weight.Chaos_Weight;
+
 private
 
    type Chaos_Item_Record is

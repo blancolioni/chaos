@@ -14,7 +14,8 @@ private package Chaos.Parser.Tokens is
        Tok_Asterisk, Tok_Hash, Tok_At, Tok_Quote,
        Tok_Plus, Tok_Assign, Tok_Arrow, Tok_Lambda,
        Tok_Equal, Tok_Not_Equal,
-       Tok_Less_Equal, Tok_Less, Tok_Greater_Equal, Tok_Greater
+       Tok_Less_Equal, Tok_Less, Tok_Greater_Equal, Tok_Greater,
+       Tok_Exclam
       );
 
 end Chaos.Parser.Tokens;

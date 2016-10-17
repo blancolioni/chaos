@@ -23,45 +23,89 @@ package body Chaos.Resources.Ids is
    overriding procedure Load
      (Ids : in out Ids_Resource)
    is
+      Start : Positive := 1;
    begin
       Chaos.Resources.Text.Text_Resource (Ids).Load;
 
-      declare
-         Count_Line : constant String := Ids.Line (1);
-         Count      : constant Natural :=
-                        (if Count_Line = ""
-                         then Ids.Line_Count - 1
-                         else Natural'Value (Count_Line));
-      begin
-         for I in 1 .. Count loop
-            declare
-               use Ada.Characters.Handling;
-               S : constant String := Ids.Line (1 + I);
-               Index : Positive := S'First;
-               Value : Integer;
-            begin
+      if Ids.Line_Count >= 1 then
+         declare
+            Header : constant String := Ids.Line (1);
+         begin
+            if Header'Length > 3 and then Header (1 .. 3) = "IDS" then
+               Start := 2;
+            end if;
+         end;
+      end if;
+
+      for I in Start .. Ids.Line_Count loop
+         declare
+            use Ada.Characters.Handling;
+            S     : constant String := Ids.Line (I + Start - 1);
+            Index : Positive := S'First;
+            Start : Positive;
+            Value : Integer;
+            Neg   : Boolean := False;
+            Hex   : Boolean := False;
+         begin
+            if Index < S'Last then
                if S (Index) = '-' then
                   Index := Index + 1;
+                  Neg := True;
                end if;
-               if not Is_Digit (S (Index)) then
-                  raise Constraint_Error with
-                    "bad line in IDS resource: " & S;
+            end if;
+
+            if Index < S'Last - 1
+              and then S (Index .. Index + 1) = "0x"
+            then
+               Index := Index + 2;
+               Hex := True;
+            end if;
+
+            Start := Index;
+
+            if Index < S'Last
+              and then not Is_Digit (S (Index))
+              and then (not Hex
+                        or else not Is_Hexadecimal_Digit (S (Index)))
+            then
+               raise Constraint_Error with
+                 "bad line in IDS resource: " & S;
+            end if;
+
+            while Index <= S'Last
+              and then (Is_Digit (S (Index))
+                        or else (Hex
+                                 and then Is_Hexadecimal_Digit (S (Index))))
+            loop
+               Index := Index + 1;
+            end loop;
+
+            if Index <= S'Last then
+               if Hex then
+                  Value :=
+                    Integer'Value ("16#" & S (Start .. Index - 1) & "#");
+               else
+                  Value :=
+                    Integer'Value (S (Start .. Index - 1));
                end if;
 
-               while Is_Digit (S (Index)) loop
-                  Index := Index + 1;
-               end loop;
-               Value := Integer'Value (S (S'First .. Index - 1));
+               if Neg then
+                  Value := -Value;
+               end if;
+
                while Is_Space (S (Index)) loop
                   Index := Index + 1;
                end loop;
-               Ids.Id_Vector.Append
-                 ((Ada.Strings.Unbounded.To_Unbounded_String
-                  (S (Index .. S'Last)),
-                  Value));
-            end;
-         end loop;
-      end;
+
+               if Index < S'Last then
+                  Ids.Id_Vector.Append
+                    ((Ada.Strings.Unbounded.To_Unbounded_String
+                     (S (Index .. S'Last)),
+                     Value));
+               end if;
+            end if;
+         end;
+      end loop;
    end Load;
 
    ---------------

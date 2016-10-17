@@ -1,5 +1,7 @@
 package Chaos.Expressions.Import.Objects is
 
+   procedure Load_Objects;
+
    procedure Import_Object
      (Team      : Natural;
       Faction   : Natural;

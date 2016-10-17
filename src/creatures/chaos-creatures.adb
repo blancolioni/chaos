@@ -254,18 +254,18 @@ package body Chaos.Creatures is
       return Creature.Individual;
    end Individual;
 
-   ---------------
-   -- Inventory --
-   ---------------
+   ----------
+   -- Item --
+   ----------
 
-   function Inventory
-     (Creature : in out Chaos_Creature_Record'Class;
-      Index    : Inventory_Index)
+   overriding function Item
+     (Creature : Chaos_Creature_Record;
+      Index    : Positive)
       return Chaos.Items.Chaos_Item
    is
    begin
       return Creature.Inventory (Index);
-   end Inventory;
+   end Item;
 
    ----------
    -- Kill --
@@ -457,6 +457,15 @@ package body Chaos.Creatures is
       return Creature.Race;
    end Race;
 
+   overriding procedure Replace_Item
+     (Creature : in out Chaos_Creature_Record;
+      Index    : Positive;
+      Item     : Chaos.Items.Chaos_Item)
+   is
+   begin
+      Creature.Inventory (Index) := Item;
+   end Replace_Item;
+
    ----------------------------
    -- Set_Active_Weapon_Slot --
    ----------------------------
@@ -493,19 +502,6 @@ package body Chaos.Creatures is
    begin
       Creature.Equipment (Slot) := Item;
    end Set_Equipment;
-
-   -------------------
-   -- Set_Inventory --
-   -------------------
-
-   procedure Set_Inventory
-     (Creature : in out Chaos_Creature_Record'Class;
-      Index    : Inventory_Index;
-      Item    : Chaos.Items.Chaos_Item)
-   is
-   begin
-      Creature.Inventory (Index) := Item;
-   end Set_Inventory;
 
    ----------------
    -- Short_Name --

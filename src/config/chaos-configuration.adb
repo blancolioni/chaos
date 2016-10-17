@@ -14,6 +14,7 @@ with Chaos.Expressions;
 with Chaos.Objects.Primitives;
 
 with Chaos.Expressions.Import.Actions;
+with Chaos.Expressions.Import.Objects;
 with Chaos.Expressions.Import.Triggers;
 
 with Chaos.Identifiers.Import;
@@ -41,6 +42,7 @@ package body Chaos.Configuration is
 
       Chaos.Expressions.Import.Triggers.Load_Triggers;
       Chaos.Expressions.Import.Actions.Load_Actions;
+      Chaos.Expressions.Import.Objects.Load_Objects;
 
       Chaos_Config :=
         Tropos.Reader.Read_Config

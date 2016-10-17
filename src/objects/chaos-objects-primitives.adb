@@ -3,9 +3,16 @@ with Lith.Objects.Symbols;
 
 with Chaos.Objects.Search;
 
+with Chaos.Entities;
+with Chaos.Items;
+
 package body Chaos.Objects.Primitives is
 
    function Evaluate_Chaos_Flag
+     (Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
+
+   function Evaluate_Chaos_Has_Item
      (Store : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
 
@@ -17,6 +24,8 @@ package body Chaos.Objects.Primitives is
    begin
       Lith.Objects.Interfaces.Define_Function
         ("chaos-flag", 2, Evaluate_Chaos_Flag'Access);
+      Lith.Objects.Interfaces.Define_Function
+        ("chaos-has-item", 2, Evaluate_Chaos_Has_Item'Access);
    end Add_Primitives;
 
    -------------------------
@@ -47,5 +56,38 @@ package body Chaos.Objects.Primitives is
       end if;
       return To_Object (Result);
    end Evaluate_Chaos_Flag;
+
+   -----------------------------
+   -- Evaluate_Chaos_Has_Item --
+   -----------------------------
+
+   function Evaluate_Chaos_Has_Item
+     (Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is
+   begin
+      if Is_Object (Store.Argument (1))
+        and then To_Object (Store.Argument (1)).all in
+          Chaos.Items.Inventory_Interface'Class
+      then
+         declare
+            Inv : Chaos.Items.Inventory_Interface'Class renames
+                    Chaos.Items.Inventory_Interface'Class
+                      (To_Object (Store.Argument (1)).all);
+            Item : constant Chaos_Object :=
+                     Search.Find_Entity_Object
+                       (Lith.Objects.Symbols.Get_Name
+                          (Lith.Objects.To_Symbol
+                             (Store.Argument (2))));
+         begin
+            return Lith.Objects.To_Object
+              (Inv.Has_Entity (Chaos.Entities.Chaos_Entity (Item)));
+         end;
+      else
+         raise Constraint_Error with
+           "expected an object for chaos-has-item, but found '"
+           & Store.Show (Store.Argument (1));
+      end if;
+   end Evaluate_Chaos_Has_Item;
 
 end Chaos.Objects.Primitives;

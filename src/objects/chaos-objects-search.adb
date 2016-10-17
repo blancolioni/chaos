@@ -7,6 +7,30 @@ with Chaos.Creatures.Import;
 
 package body Chaos.Objects.Search is
 
+   --------------------------
+   -- Find_Creature_Object --
+   --------------------------
+
+   function Find_Creature_Object
+     (Code : String)
+      return Chaos_Object
+   is
+   begin
+      return Find_Object (Code, Creature => True, Entity => False);
+   end Find_Creature_Object;
+
+   ------------------------
+   -- Find_Entity_Object --
+   ------------------------
+
+   function Find_Entity_Object
+     (Code : String)
+      return Chaos_Object
+   is
+   begin
+      return Find_Object (Code, Creature => False, Entity => True);
+   end Find_Entity_Object;
+
    -----------------
    -- Find_Object --
    -----------------

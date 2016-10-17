@@ -53,6 +53,9 @@ package body Chaos.Identifiers is
             end if;
             New_Entry.Group_Index := Group_Index;
             Identifier_Map.Insert (Identifier, New_Entry);
+            Chaos.Logging.Log
+              ("IDS", "added " & Group_Name & "." & Identifier & " = "
+                 & Integer'Image (Value));
          end;
       end if;
    end Add;

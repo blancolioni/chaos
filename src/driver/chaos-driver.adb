@@ -10,6 +10,7 @@ with Chaos.Creatures.Quick;
 with Chaos.Dice;
 with Chaos.Expressions;
 with Chaos.Game;
+with Chaos.Items;
 with Chaos.Localisation;
 with Chaos.Parser;
 with Chaos.Vision;
@@ -106,7 +107,30 @@ begin
             Chaos.Game.Current_Game.Script_Round;
          end loop;
 
-         for I in 1 .. 2 loop
+         for I in 1 .. 3 loop
+            if I = 3 then
+               declare
+                  procedure Give_Book
+                    (Creature : in out Creatures.Chaos_Creature_Record'Class);
+
+                  ---------------
+                  -- Give_Book --
+                  ---------------
+
+                  procedure Give_Book
+                    (Creature : in out Creatures.Chaos_Creature_Record'Class)
+                  is
+                  begin
+                     Creature.Replace_Item
+                       (1, Chaos.Items.Create ("BOOK16"));
+                  end Give_Book;
+
+               begin
+                  Chaos.Game.Current_Game.Party
+                    .Party_Member (1).Creature.Update (Give_Book'Access);
+               end;
+            end if;
+
             Chaos.Game.Current_Game.Start_Dialog
               (Chaos.Game.Current_Game.Party.Party_Member (1),
                Chaos.Game.Current_Game.Area.Actor

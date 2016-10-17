@@ -19,4 +19,5 @@
 (chaos-add-trigger #x48 'RandomNumGT '(> (random 1 integer-1) integer-2))
 (chaos-add-trigger #x49 'RandomNumLT '(< (random 1 integer-1) integer-2))
 (chaos-add-trigger #x51 'Dead '(chaos-flag text-1 'dead))
+(chaos-add-trigger #x61 'HasItem '(chaos-has-item object text-1))
 (chaos-add-trigger #xf00 'NumberOfTimesTalkedTo '(= (chaos-get-property this 'num-times-talked-to) integer-1))

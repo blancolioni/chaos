@@ -1,5 +1,7 @@
 with Lith.Objects.Symbols;
 
+with Chaos.Paths;
+
 package body Chaos.Expressions.Import.Objects is
 
    -------------------
@@ -50,10 +52,9 @@ package body Chaos.Expressions.Import.Objects is
    procedure Import_Object_Identifier
      (Id : String)
    is
-      pragma Unreferenced (Id);
    begin
-      Store.Push (Lith.Objects.Symbols.Quote_Symbol);
-      Store.Push_Nil;
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-get-" & Id));
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("this"));
       Store.Create_List (2);
       Store.Push (Store.Pop, Lith.Objects.Secondary);
    end Import_Object_Identifier;
@@ -74,5 +75,20 @@ package body Chaos.Expressions.Import.Objects is
       Store.Create_List (2);
       Store.Push (Store.Pop, Lith.Objects.Secondary);
    end Import_Object_Name;
+
+   ------------------
+   -- Load_Objects --
+   ------------------
+
+   procedure Load_Objects is
+   begin
+      if not Chaos.Expressions.Store.Load
+        (Chaos.Paths.Config_File
+           ("script/objects.scm"))
+      then
+         raise Constraint_Error with
+           "cannot load object configuration";
+      end if;
+   end Load_Objects;
 
 end Chaos.Expressions.Import.Objects;

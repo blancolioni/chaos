@@ -20,7 +20,7 @@ private package Chaos.Parser.Lexical is
                  First_Symbol       => Tok_Left_Brace,
                  Symbols            => "{ } [ ] ( ) , : ; . & / * # @ ' "
                                      & " + := => \ "
-                                     & " = /= <= < >= >",
+                                     & " = /= <= < >= > !",
                  Identifier_Start   => "abcdefghijklmnopqrstuvwxyz" &
                                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" &
                                        "0123456789" &

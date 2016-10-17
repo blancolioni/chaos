@@ -567,8 +567,27 @@ package body Chaos.Parser is
       Count : Natural := 0;
       Found : array (Trigger_Argument_Name) of Boolean :=
                 (others => False);
+      New_Text : String (1 .. Text'Length);
+      Length   : Natural := 0;
    begin
-      Open_String (Text);
+      for Ch of Text loop
+         if Ch = Character'Val (10) then
+            Length := Length + 1;
+            New_Text (Length) := ' ';
+         elsif Ch = Character'Val (13) then
+            null;
+         else
+            Length := Length + 1;
+            New_Text (Length) := Ch;
+         end if;
+      end loop;
+
+      Open_String (New_Text (1 .. Length));
+      if Tok = Tok_Exclam then
+         Flags_Value := 1;
+         Scan;
+      end if;
+
       Chaos.Expressions.Store.Push
         (Lith.Objects.Symbols.Get_Symbol ("and"));
 
@@ -603,9 +622,6 @@ package body Chaos.Parser is
                   elsif not Found (Integer_2) then
                      Integer_2_Value := Integer'Value (Tok_Text);
                      Found (Integer_2) := True;
-                  elsif not Found (Flags) then
-                     Flags_Value := WL.Binary_IO.Word_32'Value (Tok_Text);
-                     Found (Flags) := True;
                   else
                      raise Constraint_Error with
                        "extra integer argument in trigger";
