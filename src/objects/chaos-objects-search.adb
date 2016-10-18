@@ -1,7 +1,8 @@
 with Chaos.Resources.Manager;
 
 with Chaos.Creatures;
-with Chaos.Entities.Weapons;
+with Chaos.Entities.Search;
+with Chaos.Features;
 
 with Chaos.Creatures.Import;
 
@@ -36,9 +37,10 @@ package body Chaos.Objects.Search is
    -----------------
 
    function Find_Object
-     (Code     : String;
-      Creature : Boolean := True;
-      Entity     : Boolean := True)
+     (Code       : String;
+      Creature   : Boolean := True;
+      Entity     : Boolean := True;
+      Feature    : Boolean := True)
       return Chaos_Object
    is
    begin
@@ -61,8 +63,20 @@ package body Chaos.Objects.Search is
       end if;
 
       if Entity then
-         if Chaos.Entities.Weapons.Exists (Code) then
-            return Chaos_Object (Chaos.Entities.Weapons.Get (Code));
+         declare
+            use type Chaos.Entities.Chaos_Entity;
+            Result : constant Chaos.Entities.Chaos_Entity :=
+                       Chaos.Entities.Search.Get_Entity (Code);
+         begin
+            if Result /= null then
+               return Chaos_Object (Result);
+            end if;
+         end;
+      end if;
+
+      if Feature then
+         if Chaos.Features.Exists (Code) then
+            return Chaos_Object (Chaos.Features.Get (Code));
          end if;
       end if;
 

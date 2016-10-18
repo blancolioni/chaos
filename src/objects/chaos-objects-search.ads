@@ -3,7 +3,8 @@ package Chaos.Objects.Search is
    function Find_Object
      (Code       : String;
       Creature   : Boolean := True;
-      Entity     : Boolean := True)
+      Entity     : Boolean := True;
+      Feature    : Boolean := True)
       return Chaos_Object;
 
    function Find_Entity_Object
