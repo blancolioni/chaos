@@ -1,3 +1,5 @@
+with Ada.Containers.Vectors;
+
 package Chaos.Resources.Cre is
 
    use WL.Binary_IO;
@@ -48,6 +50,19 @@ package Chaos.Resources.Cre is
    type Id_Reference_Array is array (Ids_Reference) of Word_8;
 
    type Object_Ids is array (1 .. 5) of Word_8;
+
+   type Inventory_Item_Entry is
+      record
+         Resource        : Resource_Reference;
+         Expiration_Time : Word_16;
+         Quantity_1      : Word_16;
+         Quantity_2      : Word_16;
+         Quantity_3      : Word_16;
+         Flags           : Word_32;
+      end record;
+
+   package Inventory_Item_Vectors is
+     new Ada.Containers.Vectors (Positive, Inventory_Item_Entry);
 
    type Cre_Resource is
      new Chaos_Resource with
@@ -103,12 +118,13 @@ package Chaos.Resources.Cre is
          Spell_Memorisation_Count  : Word_32;
          Memorised_Spells_Offset   : Word_32;
          Memorised_Spells_Count    : Word_32;
-         Entity_Slot_Offset          : Word_32;
-         Entity_Offset               : Word_32;
-         Entity_Count                : Word_32;
+         Item_Slot_Offset          : Word_32;
+         Item_Offset               : Word_32;
+         Item_Count                : Word_32;
          Effect_Offset             : Word_32;
          Effect_Count              : Word_32;
          Dialog_Ref                : Resource_Reference;
+         Inventory                 : Inventory_Item_Vectors.Vector;
       end record;
 
    overriding function Signature

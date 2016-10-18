@@ -116,6 +116,17 @@ package body Chaos.Creatures.Import is
             end;
          end if;
 
+         for Itm_Ref of Cre.Inventory loop
+            declare
+               Item : constant Chaos.Items.Chaos_Item :=
+                        Chaos.Items.Create
+                          (Chaos.Resources.To_String
+                             (Itm_Ref.Resource));
+            begin
+               Creature.Add_Item (Item);
+            end;
+         end loop;
+
       end Configure;
 
       Creature : constant Chaos_Creature :=
