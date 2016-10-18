@@ -62,6 +62,30 @@ package body Chaos.Features is
       return Chaos.Resources.To_String (Feature.Destination);
    end Destination_Name;
 
+   ------------
+   -- Exists --
+   ------------
+
+   function Exists
+     (Code : String)
+      return Boolean
+   is
+   begin
+      return Db.Exists (Code);
+   end Exists;
+
+   ---------
+   -- Get --
+   ---------
+
+   function Get
+     (Code : String)
+      return Chaos_Feature
+   is
+   begin
+      return Db.Get (Code);
+   end Get;
+
    ---------------------
    -- Has_Destination --
    ---------------------

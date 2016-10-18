@@ -53,6 +53,15 @@ package Chaos.Features is
      (Feature : Chaos_Feature_Record'Class)
       return String;
 
+   function Exists
+     (Code : String)
+      return Boolean;
+
+   function Get
+     (Code : String)
+      return Chaos_Feature
+     with Pre => Exists (Code);
+
 private
 
    package Polygon_Vectors is
