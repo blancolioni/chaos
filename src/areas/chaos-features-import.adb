@@ -10,6 +10,10 @@ package body Chaos.Features.Import is
       First_Vertex : Positive;
       Vertex_Count : Natural);
 
+   ----------------------
+   -- Import_Container --
+   ----------------------
+
    function Import_Container
      (Area            : Chaos.Resources.Area.Area_Resource'Class;
       Container_Index : Positive)
@@ -79,10 +83,13 @@ package body Chaos.Features.Import is
       return Chaos_Feature
    is
 
-      procedure Create (Feature : in out Chaos_Feature_Record'Class)
-      is null;
+      procedure Create (Feature : in out Chaos_Feature_Record'Class);
 
       procedure Configure (Feature : in out Chaos_Feature_Record'Class);
+
+      ---------------
+      -- Configure --
+      ---------------
 
       procedure Configure (Feature : in out Chaos_Feature_Record'Class) is
          Area_Door     : Chaos.Resources.Area.Door_Entry renames
@@ -128,6 +135,17 @@ package body Chaos.Features.Import is
          Feature.State := 1;
          Feature.Cursor_Index := 32;
       end Configure;
+
+      ------------
+      -- Create --
+      ------------
+
+      procedure Create (Feature : in out Chaos_Feature_Record'Class) is
+      begin
+         Feature.Initialize
+           (Chaos.Resources.To_String
+              (Area.Doors.Element (Area_Index).Resource_Name));
+      end Create;
 
       Feature : constant Chaos_Feature := Db.Create (Create'Access);
    begin
