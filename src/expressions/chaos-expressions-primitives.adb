@@ -1,5 +1,6 @@
 with Ada.Calendar;
 with Ada.Characters.Handling;
+with Ada.Exceptions;
 
 with WL.String_Maps;
 
@@ -123,11 +124,27 @@ package body Chaos.Expressions.Primitives is
                           Lith.Environment.Get (Map_Name);
          begin
             return Get (Map, Prop_Name);
+         exception
+            when E : others =>
+               raise Constraint_Error with
+                 "chaos-get-property: failed with "
+                 & Full_Name & " " & Map_Name & " " & Prop_Name
+                 & " (" & Ada.Exceptions.Exception_Message (E) & ")";
          end;
       else
-         return Get (Store.Argument (1),
-                     Lith.Objects.Symbols.Get_Name
-                       (Lith.Objects.To_Symbol (Store.Argument (2))));
+         begin
+            return Get (Store.Argument (1),
+                        Lith.Objects.Symbols.Get_Name
+                          (Lith.Objects.To_Symbol (Store.Argument (2))));
+         exception
+            when E : others =>
+               raise Constraint_Error with
+                 "chaos-get-property: failed with "
+                 & Store.Show (Store.Argument (1))
+                 & " "
+                 & Store.Show (Store.Argument (2))
+                 & " (" & Ada.Exceptions.Exception_Message (E) & ")";
+         end;
       end if;
    end Evaluate_Chaos_Get;
 
@@ -157,7 +174,15 @@ package body Chaos.Expressions.Primitives is
          Name : String)
       is
       begin
-         if Chaos.Objects.Is_Object (Map) then
+         if Is_Symbol (Map) then
+            declare
+               Id : constant String :=
+                      Ada.Characters.Handling.To_Lower
+                        (Get_Name (To_Symbol (Map)));
+            begin
+               Set (Lith.Environment.Get (Get_Symbol (Id)), Name);
+            end;
+         elsif Chaos.Objects.Is_Object (Map) then
             raise Constraint_Error with
               "cannot set property " & Name & " on object "
                 & Chaos.Objects.To_Object (Map).Identifier;
@@ -165,7 +190,7 @@ package body Chaos.Expressions.Primitives is
             Chaos.Expressions.Maps.Set (Map, Name, Value);
          else
             raise Constraint_Error with
-              "chaos-get-property: expected a map, but found "
+              "chaos-set-property: expected a map, but found "
               & Store.Show (Map);
          end if;
       end Set;
@@ -174,7 +199,8 @@ package body Chaos.Expressions.Primitives is
       if Store.Argument_Count = 1 then
          declare
             Full_Name : constant String :=
-                          Get_Name (To_Symbol (Store.Argument (1)));
+                          Ada.Characters.Handling.To_Lower
+                            (Get_Name (To_Symbol (Store.Argument (1))));
             Map_Name  : constant String :=
                           Ada.Characters.Handling.To_Lower
                             (Full_Name
@@ -185,11 +211,29 @@ package body Chaos.Expressions.Primitives is
                           Lith.Environment.Get (Map_Name);
          begin
             Set (Map, Prop_Name);
+         exception
+            when E : others =>
+               raise Constraint_Error with
+                 "chaos-set-property: failed with "
+                 & Full_Name & " " & Map_Name & " " & Prop_Name
+                 & " " & Store.Show (Value)
+                 & " (" & Ada.Exceptions.Exception_Message (E) & ")";
          end;
       else
-         Set (Store.Argument (1),
-              Lith.Objects.Symbols.Get_Name
-                (Lith.Objects.To_Symbol (Store.Argument (2))));
+         begin
+            Set (Store.Argument (1),
+                 Lith.Objects.Symbols.Get_Name
+                   (Lith.Objects.To_Symbol (Store.Argument (2))));
+         exception
+            when E : others =>
+               raise Constraint_Error with
+                 "chaos-set-property: failed with "
+                 & Store.Show (Store.Argument (1))
+                 & " "
+                 & Store.Show (Store.Argument (2))
+                 & " " & Store.Show (Value)
+                 & " (" & Ada.Exceptions.Exception_Message (E) & ")";
+         end;
       end if;
       return Value;
    end Evaluate_Chaos_Set;

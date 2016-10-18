@@ -147,11 +147,15 @@ package body Chaos.Objects is
               (Object.Reference, Set_Script_Executed'Access);
          end if;
       end if;
---     exception
---        when others =>
---           Chaos.Logging.Log
---             (Object.Global_Setting_Name ("script"),
---              "script failed");
+   exception
+      when others =>
+         Chaos.Logging.Log
+           (Object.Global_Setting_Name ("SCRIPT"),
+            "Error executing script for " & Object.Identifier);
+         Chaos.Logging.Log
+           (Object.Global_Setting_Name ("SCRIPT"),
+            Store.Show (Object.Script));
+         raise;
    end Execute_Script;
 
    ----------
