@@ -8,3 +8,6 @@ config-dnd
 config/chaos.kit
 config/chaos.tropos
 temp/*
+chaos.gpr
+chaos.log
+src/config/chaos-paths.ads
