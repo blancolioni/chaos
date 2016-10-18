@@ -174,6 +174,12 @@ package Chaos.Creatures is
    overriding procedure On_End_Dialog
      (Creature : Chaos_Creature_Record);
 
+   function Get_Reaction
+     (Creature    : Chaos_Creature_Record;
+      To_Creature : Chaos_Creature)
+      return Integer
+   is (10 + Integer (To_Creature.Ability_Bonus (Chaos.Abilities.Cha)));
+
    function Exists
      (Identifier : String)
       return Boolean;
