@@ -26,7 +26,7 @@ package Chaos.Expressions.Import.Actions is
       Text_1, Text_2,
       Object_1, Object_2, Object_3);
 
-   subtype Object_Argument is Action_Argument_Name range Object_1 .. Object_2;
+   subtype Object_Argument is Action_Argument_Name range Object_1 .. Object_3;
 
    type Action_Argument_Names is
      array (Positive range <>) of Action_Argument_Name;
