@@ -261,7 +261,8 @@ package body Chaos.Expressions.Import.Actions is
       Text_1_Value    : Unbounded_String;
       Text_2_Value    : Unbounded_String;
       X, Y            : Integer := 0;
-      Found           : array (Action_Argument_Name) of Boolean :=
+      Available       : Argument_Flags;
+      Have_Object     : array (Object_Argument) of Boolean :=
                           (others => False);
    begin
 
@@ -272,18 +273,21 @@ package body Chaos.Expressions.Import.Actions is
          return;
       end if;
 
+      Available :=
+        Actions.Element (Action_Id).Arguments;
+
       for Arg of Call.Args loop
          case Arg.Arg_Type is
             when Integer_Argument =>
-               if not Found (Integer_1) then
+               if Available (Integer_1) then
                   Integer_1_Value := Arg.Integer_Value;
-                  Found (Integer_1) := True;
-               elsif not Found (Integer_2) then
+                  Available (Integer_1) := False;
+               elsif Available (Integer_2) then
                   Integer_2_Value := Arg.Integer_Value;
-                  Found (Integer_2) := True;
-               elsif not Found (Integer_3) then
+                  Available (Integer_2) := False;
+               elsif Available (Integer_3) then
                   Integer_3_Value := Arg.Integer_Value;
-                  Found (Integer_3) := True;
+                  Available (Integer_3) := False;
                else
                   Chaos.Logging.Log
                     ("Action",
@@ -291,12 +295,27 @@ package body Chaos.Expressions.Import.Actions is
                      & Action_Name);
                end if;
             when Text_Argument =>
-               if not Found (Text_1) then
+               if Available (Text_1) then
                   Text_1_Value := Arg.Text_Value;
-                  Found (Text_1) := True;
-               elsif not Found (Text_2) then
+                  Available (Text_1) := False;
+               elsif Available (Text_2) then
                   Text_2_Value := Arg.Text_Value;
-                  Found (Text_2) := True;
+                  Available (Text_2) := True;
+               elsif Available (Object_1) then
+                  Objects.Import_Object_Name
+                    (To_String (Arg.Text_Value));
+                  Available (Object_1) := False;
+                  Have_Object (Object_1) := True;
+               elsif Available (Object_2) then
+                  Objects.Import_Object_Name
+                    (To_String (Arg.Text_Value));
+                  Available (Object_2) := False;
+                  Have_Object (Object_2) := True;
+               elsif Available (Object_3) then
+                  Objects.Import_Object_Name
+                    (To_String (Arg.Text_Value));
+                  Available (Object_3) := False;
+                  Have_Object (Object_3) := True;
                else
                   Chaos.Logging.Log
                     ("Action",
@@ -310,17 +329,20 @@ package body Chaos.Expressions.Import.Actions is
                begin
                   if Chaos.Identifiers.Exists (Id) then
                      if Chaos.Identifiers.Group (Id) = "object" then
-                        if not Found (Object_1)
-                          or else not Found (Object_2)
-                          or else not Found (Object_3)
+                        if Available (Object_1)
+                          or else Available (Object_2)
+                          or else Available (Object_3)
                         then
                            Objects.Import_Object_Identifier (Id);
-                           if not Found (Object_1) then
-                              Found (Object_1) := True;
-                           elsif not Found (Object_2) then
-                              Found (Object_2) := True;
+                           if Available (Object_1) then
+                              Available (Object_1) := False;
+                              Have_Object (Object_1) := True;
+                           elsif Available (Object_2) then
+                              Available (Object_2) := False;
+                              Have_Object (Object_2) := True;
                            else
-                              Found (Object_3) := True;
+                              Available (Object_3) := False;
+                              Have_Object (Object_3) := True;
                            end if;
                         else
                            Chaos.Logging.Log
@@ -328,15 +350,15 @@ package body Chaos.Expressions.Import.Actions is
                               "warning: too many object arguments in call to "
                               & Action_Name);
                         end if;
-                     elsif not Found (Integer_1) then
+                     elsif Available (Integer_1) then
                         Integer_1_Value := Chaos.Identifiers.Value (Id);
-                        Found (Integer_1) := True;
-                     elsif not Found (Integer_2) then
+                        Available (Integer_1) := False;
+                     elsif Available (Integer_2) then
                         Integer_2_Value := Chaos.Identifiers.Value (Id);
-                        Found (Integer_2) := True;
-                     elsif not Found (Integer_3) then
+                        Available (Integer_2) := False;
+                     elsif Available (Integer_3) then
                         Integer_3_Value := Chaos.Identifiers.Value (Id);
-                        Found (Integer_3) := True;
+                        Available (Integer_3) := False;
                      else
                         Chaos.Logging.Log
                           ("Action",
@@ -355,11 +377,11 @@ package body Chaos.Expressions.Import.Actions is
                end;
 
             when Coordinate_Argument =>
-               if not Found (Point_X) then
+               if Available (Point_X) then
                   X := Arg.X;
                   Y := Arg.Y;
-                  Found (Point_X) := True;
-                  Found (Point_Y) := True;
+                  Available (Point_X) := False;
+                  Available (Point_Y) := False;
                else
                   Chaos.Logging.Log
                     ("Action",
@@ -371,7 +393,7 @@ package body Chaos.Expressions.Import.Actions is
       end loop;
 
       for Obj in Object_Argument loop
-         if not Found (Obj) then
+         if not Have_Object (Obj) then
             Chaos.Expressions.Store.Push
               (Lith.Objects.Symbols.Quote_Symbol);
             Chaos.Expressions.Store.Push_Nil;
