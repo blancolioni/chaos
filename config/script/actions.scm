@@ -8,3 +8,4 @@
 (chaos-add-action 161 'increment-chapter '(chaos-set-property global 'chapter (+ 1 (chaos-get-property global 'chapter))))
 (chaos-add-action 164 'AddExperienceParty '(chaos-party-experience integer-1))
 (chaos-add-action 177 'trigger-activation '(chaos-set-trigger this object-1 integer-1))
+(chaos-add-action 116 'TakePartyItem '(chaos-take-party-item this text-1))

@@ -4,6 +4,25 @@ with Chaos.Entities.Search;
 
 package body Chaos.Items is
 
+   --------------
+   -- Add_Item --
+   --------------
+
+   procedure Add_Item
+     (Inv  : in out Inventory_Interface'Class;
+      Item : Chaos_Item)
+   is
+   begin
+      for I in 1 .. Inv.Capacity loop
+         if Inv.Item (I) = null then
+            Inv.Replace_Item (I, Item);
+            return;
+         end if;
+      end loop;
+      raise Inventory_Full with
+        "no room for " & Item.Identifier;
+   end Add_Item;
+
    ------------
    -- Create --
    ------------
@@ -99,6 +118,26 @@ package body Chaos.Items is
       end loop;
       return False;
    end Has_Item;
+
+   ----------
+   -- Item --
+   ----------
+
+   function Item
+     (Inv    : Inventory_Interface'Class;
+      Entity : Chaos.Entities.Chaos_Entity)
+      return Chaos_Item
+   is
+      use type Chaos.Entities.Chaos_Entity;
+   begin
+      for Index in 1 .. Inv.Capacity loop
+         if Inv.Item (Index).Entity = Entity then
+            return Inv.Item (Index);
+         end if;
+      end loop;
+      raise Constraint_Error with
+        "no such item '" & Entity.Identifier & "' in inventory";
+   end Item;
 
    ---------------------
    -- Object_Database --

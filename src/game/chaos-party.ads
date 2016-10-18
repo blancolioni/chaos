@@ -1,6 +1,8 @@
 with Chaos.Actors;
 with Chaos.Areas;
 with Chaos.Commands;
+with Chaos.Entities;
+with Chaos.Items;
 
 package Chaos.Party is
 
@@ -38,6 +40,11 @@ package Chaos.Party is
    procedure Give_Experience
      (Party : Chaos_Party_Record'Class;
       XP    : Natural);
+
+   function Take_Item
+     (Party : Chaos_Party_Record'Class;
+      Entity : Chaos.Entities.Chaos_Entity)
+      return Chaos.Items.Chaos_Item;
 
 private
 

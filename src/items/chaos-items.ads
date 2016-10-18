@@ -46,6 +46,8 @@ package Chaos.Items is
       return Chaos.Coins.Coins_Type
    is (Item.Entity.Price);
 
+   Inventory_Full : exception;
+
    type Inventory_Interface is limited interface;
 
    function Capacity (Inv : Inventory_Interface) return Natural is abstract;
@@ -74,10 +76,19 @@ package Chaos.Items is
       Entity : Chaos.Entities.Chaos_Entity)
       return Boolean;
 
+   function Item
+     (Inv    : Inventory_Interface'Class;
+      Entity : Chaos.Entities.Chaos_Entity)
+      return Chaos_Item;
+
    procedure Remove_Item
      (Inv  : in out Inventory_Interface'Class;
       Item : Chaos_Item)
      with Pre => Inv.Has_Item (Item);
+
+   procedure Add_Item
+     (Inv  : in out Inventory_Interface'Class;
+      Item : Chaos_Item);
 
    procedure Remove_Entity
      (Inv  : in out Inventory_Interface'Class;

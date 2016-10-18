@@ -173,4 +173,44 @@ package body Chaos.Party is
         & Actor.Identifier;
    end Remove_Party_Member;
 
+   ---------------
+   -- Take_Item --
+   ---------------
+
+   function Take_Item
+     (Party  : Chaos_Party_Record'Class;
+      Entity : Chaos.Entities.Chaos_Entity)
+      return Chaos.Items.Chaos_Item
+   is
+      use type Chaos.Actors.Chaos_Actor;
+      Item : Chaos.Items.Chaos_Item;
+
+      procedure Remove_Item
+        (Creature : in out Chaos.Creatures.Chaos_Creature_Record'Class);
+
+      -----------------
+      -- Remove_Item --
+      -----------------
+
+      procedure Remove_Item
+        (Creature : in out Chaos.Creatures.Chaos_Creature_Record'Class)
+      is
+      begin
+         Creature.Remove_Item (Item);
+      end Remove_Item;
+
+   begin
+      for PC of Party.Members loop
+         if PC /= null and then
+           PC.Creature.Has_Entity (Entity)
+         then
+            Item := PC.Creature.Item (Entity);
+            PC.Creature.Update (Remove_Item'Access);
+            return Item;
+         end if;
+      end loop;
+      raise Constraint_Error with
+        "item '" & Entity.Identifier & "' not found in party";
+   end Take_Item;
+
 end Chaos.Party;
