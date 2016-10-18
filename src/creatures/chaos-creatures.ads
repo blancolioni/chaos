@@ -157,6 +157,10 @@ package Chaos.Creatures is
      (Creature : Chaos_Creature_Record'Class)
       return Chaos.Teams.Chaos_Team;
 
+   procedure Change_Experience_Points
+     (Creature : in out Chaos_Creature_Record'Class;
+      XP       : Integer);
+
    procedure Kill
      (Creature : in out Chaos_Creature_Record'Class)
      with Pre => Creature.Individual and then Creature.Alive,
@@ -226,6 +230,7 @@ private
          Race                : Chaos.Races.Chaos_Race;
          Class               : Chaos.Classes.Chaos_Class;
          Abilities           : Chaos.Abilities.Ability_Scores;
+         XP                  : Natural := 0;
          Level               : Chaos.Levels.Chaos_Level;
          HP                  : Natural;
          Powers              : Chaos.Powers.Power_Collection;

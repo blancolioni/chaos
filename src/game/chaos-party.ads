@@ -35,6 +35,10 @@ package Chaos.Party is
 
    function Create_Party return Party_Type;
 
+   procedure Give_Experience
+     (Party : Chaos_Party_Record'Class;
+      XP    : Natural);
+
 private
 
    type Party_Member_Array is

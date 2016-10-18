@@ -1,9 +1,15 @@
 with Lith.Objects.Interfaces;
 with Lith.Objects.Symbols;
 
+with Chaos.UI;
+
 package body Chaos.Game.Primitives is
 
    function Evaluate_Chaos_Script_Flag
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
+
+   function Evaluate_Chaos_Party_Experience
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
 
@@ -16,7 +22,26 @@ package body Chaos.Game.Primitives is
    begin
       Define_Function ("chaos-script-flag", 3,
                        Evaluate_Chaos_Script_Flag'Access);
+      Define_Function ("chaos-party-experience", 1,
+                       Evaluate_Chaos_Party_Experience'Access);
    end Add_Primitives;
+
+   -------------------------------------
+   -- Evaluate_Chaos_Party_Experience --
+   -------------------------------------
+
+   function Evaluate_Chaos_Party_Experience
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is
+   begin
+      Chaos.UI.Current_UI.Put_Line
+        ("The party gains " & Store.Show (Store.Argument (1)) & "XP");
+
+      Current_Game.Party.Give_Experience
+        (Lith.Objects.To_Integer (Store.Argument (1)));
+      return Store.Argument (1);
+   end Evaluate_Chaos_Party_Experience;
 
    --------------------------------
    -- Evaluate_Chaos_Script_Flag --

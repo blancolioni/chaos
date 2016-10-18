@@ -108,6 +108,18 @@ package body Chaos.Creatures is
       return Creature.Animation_Id;
    end Animation_Id;
 
+   ------------------------------
+   -- Change_Experience_Points --
+   ------------------------------
+
+   procedure Change_Experience_Points
+     (Creature : in out Chaos_Creature_Record'Class;
+      XP       : Integer)
+   is
+   begin
+      Creature.XP := Creature.XP + XP;
+   end Change_Experience_Points;
+
    -----------
    -- Class --
    -----------

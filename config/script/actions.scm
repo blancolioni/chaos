@@ -6,4 +6,5 @@
 (chaos-add-action 115 'set-global-timer '(chaos-set-timer text-1 integer-1))
 (chaos-add-action 151 'display-string '(ui-display-string integer-1))
 (chaos-add-action 161 'increment-chapter '(chaos-set-property global 'chapter (+ 1 (chaos-get-property global 'chapter))))
+(chaos-add-action 164 'AddExperienceParty '(chaos-party-experience integer-1))
 (chaos-add-action 177 'trigger-activation '(chaos-set-trigger this object-1 integer-1))

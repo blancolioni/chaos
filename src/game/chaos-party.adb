@@ -4,6 +4,8 @@
 --  with Chaos.Commands.Meta_Commands;
 --  with Chaos.Commands.Moves;
 
+with Chaos.Creatures;
+
 package body Chaos.Party is
 
    procedure Add_Party_Member
@@ -73,6 +75,50 @@ package body Chaos.Party is
    begin
       return new Chaos_Party_Record;
    end Create_Party;
+
+   ---------------------
+   -- Give_Experience --
+   ---------------------
+
+   procedure Give_Experience
+     (Party : Chaos_Party_Record'Class;
+      XP    : Natural)
+   is
+      use type Chaos.Actors.Chaos_Actor;
+      Count : Natural := 0;
+
+      Award : Natural;
+
+      procedure Add_XP
+        (Creature : in out Chaos.Creatures.Chaos_Creature_Record'Class);
+
+      ------------
+      -- Add_XP --
+      ------------
+
+      procedure Add_XP
+        (Creature : in out Chaos.Creatures.Chaos_Creature_Record'Class)
+      is
+      begin
+         Creature.Change_Experience_Points (Award);
+      end Add_XP;
+
+   begin
+      for Member of Party.Members loop
+         if Member /= null then
+            Count := Count + 1;
+         end if;
+      end loop;
+
+      Award := XP / Count + XP mod Count;
+
+      for Member of Party.Members loop
+         if Member /= null then
+            Member.Creature.Update (Add_XP'Access);
+            Award := XP / Count;
+         end if;
+      end loop;
+   end Give_Experience;
 
    ---------------------
    -- Is_Party_Member --

@@ -85,9 +85,11 @@ package body Chaos.Dialog is
                            Position.Dialog.Transitions (Transition_Index);
    begin
       if Transition.Has_Action then
-         Chaos.Logging.Log
-           ("DIALOG", "action: "
-            & Chaos.Expressions.Store.Show (Transition.Action));
+         if False then
+            Chaos.Logging.Log
+              ("DIALOG", "action: "
+               & Chaos.Expressions.Store.Show (Transition.Action));
+         end if;
          Chaos.Expressions.Store.Evaluate
            (Transition.Action,
             Lith.Objects.Symbols.Get_Symbol ("this"),
