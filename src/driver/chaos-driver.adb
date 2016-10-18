@@ -107,7 +107,7 @@ begin
             Chaos.Game.Current_Game.Script_Round;
          end loop;
 
-         for I in 1 .. 3 loop
+         for I in 1 .. 4 loop
             if I = 3 then
                declare
                   procedure Give_Book
