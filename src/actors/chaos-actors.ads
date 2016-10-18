@@ -196,4 +196,9 @@ private
    overriding procedure Add_Properties
      (Object : Chaos_Actor_Record);
 
+   overriding function Display_Name
+     (Actor : Chaos_Actor_Record)
+      return String
+   is (Actor.Creature.Display_Name);
+
 end Chaos.Actors;

@@ -261,4 +261,9 @@ private
       Mark_Value : not null access
         procedure (Value : in out Lith.Objects.Object));
 
+   overriding function Display_Name
+     (Creature : Chaos_Creature_Record)
+      return String
+   is (Ada.Strings.Unbounded.To_String (Creature.Short_Name));
+
 end Chaos.Creatures;
