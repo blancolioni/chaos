@@ -583,17 +583,19 @@ package body Chaos.Parser is
       end loop;
 
       Open_String (New_Text (1 .. Length));
-      if Tok = Tok_Exclam then
-         Flags_Value := 1;
-         Scan;
-      end if;
 
       Chaos.Expressions.Store.Push
         (Lith.Objects.Symbols.Get_Symbol ("and"));
 
-      while Tok = Tok_Identifier loop
+      while Tok = Tok_Identifier or else Tok = Tok_Exclam loop
          Found := (others => False);
          Count := Count + 1;
+         if Tok = Tok_Exclam then
+            Flags_Value := 1;
+            Scan;
+         else
+            Flags_Value := 0;
+         end if;
          Trigger_Id :=
            Chaos.Expressions.Import.Triggers.Get_Trigger_Id (Tok_Text);
          if Trigger_Id = 0 then
