@@ -16,6 +16,10 @@ package body Chaos.Objects.Primitives is
      (Store : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
 
+   function Evaluate_Chaos_Object_With_Code
+     (Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
+
    --------------------
    -- Add_Primitives --
    --------------------
@@ -26,6 +30,8 @@ package body Chaos.Objects.Primitives is
         ("chaos-flag", 2, Evaluate_Chaos_Flag'Access);
       Lith.Objects.Interfaces.Define_Function
         ("chaos-has-item", 2, Evaluate_Chaos_Has_Item'Access);
+      Lith.Objects.Interfaces.Define_Function
+        ("chaos-object-with-code", 1, Evaluate_Chaos_Object_With_Code'Access);
    end Add_Primitives;
 
    -------------------------
@@ -89,5 +95,27 @@ package body Chaos.Objects.Primitives is
            & Store.Show (Store.Argument (1));
       end if;
    end Evaluate_Chaos_Has_Item;
+
+   -------------------------------------
+   -- Evaluate_Chaos_Object_With_Code --
+   -------------------------------------
+
+   function Evaluate_Chaos_Object_With_Code
+     (Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is
+      Code : constant String :=
+               Lith.Objects.Symbols.Get_Name
+                 (Lith.Objects.To_Symbol (Store.Argument (1)));
+      Result : constant Chaos_Object :=
+                 Chaos.Objects.Search.Find_Object (Code);
+   begin
+      if Result = null then
+         raise Constraint_Error with
+           "cannot find object with code '"
+           & Code & "'";
+      end if;
+      return Result.To_Expression;
+   end Evaluate_Chaos_Object_With_Code;
 
 end Chaos.Objects.Primitives;
