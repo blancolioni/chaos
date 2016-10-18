@@ -294,18 +294,21 @@ package body Chaos.Game is
       UI : constant Chaos.UI.Chaos_UI :=
              Chaos.UI.Current_UI;
    begin
-      UI.Put_Line (Text (Game.Dialog_State));
-      if not Finished (Game.Dialog_State) then
-         if Choice_Count (Game.Dialog_State) = 1
-           and then not Choice_Has_Text (Game.Dialog_State, 1)
-         then
-            Choose (Game.Dialog_State, 1);
-         else
-            for I in 1 .. Chaos.Dialog.Choice_Count (Game.Dialog_State) loop
-               UI.Put_Line
-                 (Positive'Image (I) & ". "
-                  & Chaos.Dialog.Choice_Text (Game.Dialog_State, I));
-            end loop;
+      if Has_State (Game.Dialog_State) then
+         UI.Put_Line (Text (Game.Dialog_State));
+
+         if not Is_Finished (Game.Dialog_State) then
+            if Choice_Count (Game.Dialog_State) = 1
+              and then not Choice_Has_Text (Game.Dialog_State, 1)
+            then
+               Choose (Game.Dialog_State, 1);
+            else
+               for I in 1 .. Chaos.Dialog.Choice_Count (Game.Dialog_State) loop
+                  UI.Put_Line
+                    (Positive'Image (I) & ". "
+                     & Chaos.Dialog.Choice_Text (Game.Dialog_State, I));
+               end loop;
+            end if;
          end if;
       end if;
    end Show_Dialog_State;
@@ -402,9 +405,15 @@ package body Chaos.Game is
 
       Game.Show_Dialog_State;
 
-      Ada.Text_IO.Put_Line
-        ("choices:"
-         & Natural'Image (Chaos.Dialog.Choice_Count (Game.Dialog_State)));
+      if not Chaos.Dialog.Has_State (Game.Dialog_State) then
+         Chaos.UI.Current_UI.Put_Line
+           (Listener.Display_Name
+            & " has nothing to say to you");
+      else
+         Ada.Text_IO.Put_Line
+           ("choices:"
+            & Natural'Image (Chaos.Dialog.Choice_Count (Game.Dialog_State)));
+      end if;
 
    end Start_Dialog;
 
