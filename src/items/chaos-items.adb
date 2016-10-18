@@ -131,7 +131,9 @@ package body Chaos.Items is
       use type Chaos.Entities.Chaos_Entity;
    begin
       for Index in 1 .. Inv.Capacity loop
-         if Inv.Item (Index).Entity = Entity then
+         if Inv.Item (Index) /= null
+           and then Inv.Item (Index).Entity = Entity
+         then
             return Inv.Item (Index);
          end if;
       end loop;
