@@ -290,16 +290,23 @@ package body Chaos.Game is
    procedure Show_Dialog_State
      (Game : in out Chaos_Game_Record'Class)
    is
+      use Chaos.Dialog;
       UI : constant Chaos.UI.Chaos_UI :=
              Chaos.UI.Current_UI;
    begin
-      UI.Put_Line (Chaos.Dialog.Text (Game.Dialog_State));
-      if not Chaos.Dialog.Finished (Game.Dialog_State) then
-         for I in 1 .. Chaos.Dialog.Choice_Count (Game.Dialog_State) loop
-            UI.Put_Line
-              (Positive'Image (I) & ". "
-               & Chaos.Dialog.Choice_Text (Game.Dialog_State, I));
-         end loop;
+      UI.Put_Line (Text (Game.Dialog_State));
+      if not Finished (Game.Dialog_State) then
+         if Choice_Count (Game.Dialog_State) = 1
+           and then not Choice_Has_Text (Game.Dialog_State, 1)
+         then
+            Choose (Game.Dialog_State, 1);
+         else
+            for I in 1 .. Chaos.Dialog.Choice_Count (Game.Dialog_State) loop
+               UI.Put_Line
+                 (Positive'Image (I) & ". "
+                  & Chaos.Dialog.Choice_Text (Game.Dialog_State, I));
+            end loop;
+         end if;
       end if;
    end Show_Dialog_State;
 
@@ -391,7 +398,13 @@ package body Chaos.Game is
       Talker.Update (Update_Talker_Orientation'Access);
       Listener.Update (Update_Listener_Orientation'Access);
 
+      Ada.Text_IO.Put_Line ("Starting dialog: " & Dialog.Identifier);
+
       Game.Show_Dialog_State;
+
+      Ada.Text_IO.Put_Line
+        ("choices:"
+         & Natural'Image (Chaos.Dialog.Choice_Count (Game.Dialog_State)));
 
    end Start_Dialog;
 

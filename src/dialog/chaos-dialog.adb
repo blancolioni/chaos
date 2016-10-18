@@ -14,12 +14,10 @@ package body Chaos.Dialog is
                     Index    : Positive)
                     return Dialog_Cursor
    is
-      Transitions : Dialog_Transition_Vectors.Vector renames
-                      Position.Dialog.States.Element (Position.State)
-                      .Transitions;
+      New_Position : Dialog_Cursor := Position;
    begin
-      return (Position.Dialog, Transitions.Element (Index).Next_State,
-              Position.Owner);
+      Choose (New_Position, Index);
+      return New_Position;
    end Choice;
 
    ------------------
@@ -32,6 +30,24 @@ package body Chaos.Dialog is
         .Last_Index;
    end Choice_Count;
 
+   ---------------------
+   -- Choice_Has_Text --
+   ---------------------
+
+   function Choice_Has_Text
+     (Position : Dialog_Cursor;
+      Index    : Positive)
+      return Boolean
+   is
+      Transitions      : Dialog_Transition_Index_Vectors.Vector renames
+                           Position.Dialog.States.Element (Position.State)
+                           .Transitions;
+      Transition_Index : constant Natural :=
+                           Transitions (Index);
+   begin
+      return Position.Dialog.Transitions (Transition_Index).Has_Text;
+   end Choice_Has_Text;
+
    -----------------
    -- Choice_Text --
    -----------------
@@ -41,12 +57,14 @@ package body Chaos.Dialog is
       Index    : Positive)
       return String
    is
-      Transitions : Dialog_Transition_Vectors.Vector renames
-                      Position.Dialog.States.Element (Position.State)
-                      .Transitions;
+      Transitions      : Dialog_Transition_Index_Vectors.Vector renames
+                           Position.Dialog.States.Element (Position.State)
+                           .Transitions;
+      Transition_Index : constant Natural :=
+                           Transitions (Index);
    begin
       return Chaos.Localisation.Indexed_Text
-        (Transitions.Element (Index).Transition_Text_Index);
+        (Position.Dialog.Transitions (Transition_Index).Transition_Text_Index);
    end Choice_Text;
 
    ------------
@@ -56,13 +74,20 @@ package body Chaos.Dialog is
    procedure Choose (Position : in out Dialog_Cursor;
                      Index    : Positive)
    is
-      Transitions : Dialog_Transition_Vectors.Vector renames
-                      Position.Dialog.States.Element (Position.State)
-                      .Transitions;
+      Transitions      : Dialog_Transition_Index_Vectors.Vector renames
+                           Position.Dialog.States.Element (Position.State)
+                           .Transitions;
+      Transition_Index : constant Natural :=
+                           Transitions (Index);
+      Next_State       : constant Natural :=
+                           Position.Dialog.Transitions (Transition_Index)
+                           .Next_State;
    begin
-      Position.State := Transitions.Element (Index).Next_State;
-      if Finished (Position) then
+      if Position.Dialog.Transitions (Transition_Index).End_State then
          Position.Owner.On_End_Dialog;
+         Position.Finished := True;
+      else
+         Position.State := Next_State;
       end if;
    end Choose;
 
@@ -72,7 +97,7 @@ package body Chaos.Dialog is
 
    function Finished (Position : Dialog_Cursor) return Boolean is
    begin
-      return Choice_Count (Position) = 0;
+      return Position.Finished;
    end Finished;
 
    ----------
@@ -88,6 +113,10 @@ package body Chaos.Dialog is
       Chaos.Objects.Root_Chaos_Object_Record (Dialog).Mark (Mark_Value);
       for State of Dialog.States loop
          Mark_Value (State.Trigger);
+      end loop;
+      for Transition of Dialog.Transitions loop
+         Mark_Value (Transition.Trigger);
+         Mark_Value (Transition.Action);
       end loop;
    end Mark;
 
@@ -130,15 +159,13 @@ package body Chaos.Dialog is
          declare
             Position : constant Dialog_Cursor :=
                          (Chaos_Dialog (Dialog), State,
-                          Chaos.Objects.Chaos_Object (Owner));
+                          Chaos.Objects.Chaos_Object (Owner),
+                          Finished => False);
          begin
-            if Finished (Position) then
-               Owner.On_End_Dialog;
-            end if;
             return Position;
          end;
       else
-         return (null, 0, null);
+         return (null, 0, null, True);
       end if;
    end Start;
 

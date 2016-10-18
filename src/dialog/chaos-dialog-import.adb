@@ -68,35 +68,51 @@ package body Chaos.Dialog.Import is
                      end;
 
                      for J in 0 .. Dlg.State_Transition_Count (I) - 1 loop
-                        declare
-                           Trans_Index : constant WL.Binary_IO.Word_32 :=
-                                           Dlg.State_Transition_Index (I, J);
-                           Transition  : Dialog_Transition;
-                           Flags       : constant WL.Binary_IO.Word_32 :=
-                                           Dlg.Transition_Flags (Trans_Index);
-                        begin
-                           Transition.Has_Text := (Flags and 1) /= 0;
-                           Transition.End_State := (Flags and 8) /= 0;
-                           if Transition.Has_Text then
-                              Transition.Transition_Text_Index :=
-                                Chaos.Localisation.Local_Text_Index
-                                  (Dlg.Transition_Text (Trans_Index));
-                              if False then
-                                 Chaos.Logging.Log
-                                   ("DIALOG",
-                                    Chaos.Localisation.Indexed_Text
-                                      (Transition.Transition_Text_Index));
-                              end if;
-                           end if;
-                           if not Transition.End_State then
-                              Transition.Next_State :=
-                                Natural
-                                  (Dlg.Transition_Next_State (Trans_Index));
-                           end if;
-                           State.Transitions.Append (Transition);
-                        end;
+                        State.Transitions.Append
+                          (Natural (Dlg.State_Transition_Index (I, J)));
                      end loop;
+
                      Dialog.States.Append (State);
+                  end;
+               end loop;
+
+               for I in 0 .. Dlg.Transition_Count - 1 loop
+                  declare
+                     Transition  : Dialog_Transition;
+                     Flags       : constant WL.Binary_IO.Word_32 :=
+                                     Dlg.Transition_Flags (I);
+                  begin
+                     Transition.Has_Text := (Flags and 1) /= 0;
+                     Transition.Has_Trigger := (Flags and 2) /= 0;
+                     Transition.Has_Action := (Flags and 4) /= 0;
+                     Transition.End_State := (Flags and 8) /= 0;
+                     if Transition.Has_Text then
+                        Transition.Transition_Text_Index :=
+                          Chaos.Localisation.Local_Text_Index
+                            (Dlg.Transition_Text (I));
+                        if False then
+                           Chaos.Logging.Log
+                             ("DIALOG",
+                              Chaos.Localisation.Indexed_Text
+                                (Transition.Transition_Text_Index));
+                        end if;
+                     end if;
+                     if Transition.Has_Trigger then
+                        Transition.Trigger :=
+                          Chaos.Parser.Parse_Trigger
+                            (Dlg.Transition_Trigger (I));
+                     end if;
+                     if Transition.Has_Action then
+                        Transition.Action :=
+                          Chaos.Parser.Parse_Trigger
+                            (Dlg.Transition_Action (I));
+                     end if;
+                     if not Transition.End_State then
+                        Transition.Next_State :=
+                          Natural
+                            (Dlg.Transition_Next_State (I));
+                     end if;
+                     Dialog.Transitions.Append (Transition);
                   end;
                end loop;
             end Configure;

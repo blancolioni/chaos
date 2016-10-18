@@ -31,6 +31,10 @@ package Chaos.Resources.Dlg is
       Transition : WL.Binary_IO.Word_32)
       return WL.Binary_IO.Word_32;
 
+   function Transition_Count
+     (Dlg  : Dlg_Resource'Class)
+      return WL.Binary_IO.Word_32;
+
    function Transition_Flags
      (Dlg        : Dlg_Resource'Class;
       Transition : WL.Binary_IO.Word_32)
@@ -40,6 +44,16 @@ package Chaos.Resources.Dlg is
      (Dlg        : Dlg_Resource'Class;
       Transition : WL.Binary_IO.Word_32)
       return WL.Binary_IO.Word_32;
+
+   function Transition_Trigger
+     (Dlg        : Dlg_Resource'Class;
+      Transition : WL.Binary_IO.Word_32)
+      return String;
+
+   function Transition_Action
+     (Dlg        : Dlg_Resource'Class;
+      Transition : WL.Binary_IO.Word_32)
+      return String;
 
    function Transition_Next_State
      (Dlg        : Dlg_Resource'Class;
@@ -70,6 +84,7 @@ private
          Next_State_Reference : Resource_Reference;
          Next_State_Index     : Word_32;
          Trigger              : Ada.Strings.Unbounded.Unbounded_String;
+         Action               : Ada.Strings.Unbounded.Unbounded_String;
       end record;
 
    package Transition_Table_Vectors is

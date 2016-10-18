@@ -61,6 +61,43 @@ package body Chaos.Resources.Dlg is
             Dlg.Get (Transition.Action_Index);
             Dlg.Get (Transition.Next_State_Reference);
             Dlg.Get (Transition.Next_State_Index);
+
+            if (Transition.Flags and 2) = 2 then
+               Dlg.Push_Offset
+                 (Dlg.Transition_Trigger_Offset
+                  + 8 * Transition.Trigger_Index);
+               declare
+                  Offset, Length : Word_32;
+               begin
+                  Dlg.Get (Offset);
+                  Dlg.Get (Length);
+                  Dlg.Push_Offset (Offset);
+                  Transition.Trigger :=
+                    Ada.Strings.Unbounded.To_Unbounded_String
+                      (Dlg.Get (Natural (Length)));
+                  Dlg.Pop_Offset;
+               end;
+               Dlg.Pop_Offset;
+            end if;
+
+            if (Transition.Flags and 4) = 4 then
+               Dlg.Push_Offset
+                 (Dlg.Action_Offset
+                  + 8 * Transition.Action_Index);
+               declare
+                  Offset, Length : Word_32;
+               begin
+                  Dlg.Get (Offset);
+                  Dlg.Get (Length);
+                  Dlg.Push_Offset (Offset);
+                  Transition.Action :=
+                    Ada.Strings.Unbounded.To_Unbounded_String
+                      (Dlg.Get (Natural (Length)));
+                  Dlg.Pop_Offset;
+               end;
+               Dlg.Pop_Offset;
+            end if;
+
             Dlg.Transition_Table.Append (Transition);
          end;
       end loop;
@@ -134,6 +171,32 @@ package body Chaos.Resources.Dlg is
         (Dlg.State_Table.Element (Natural (State)).Trigger);
    end State_Trigger;
 
+   -----------------------
+   -- Transition_Action --
+   -----------------------
+
+   function Transition_Action
+     (Dlg        : Dlg_Resource'Class;
+      Transition : WL.Binary_IO.Word_32)
+      return String
+   is
+   begin
+      return Ada.Strings.Unbounded.To_String
+        (Dlg.Transition_Table.Element (Natural (Transition)).Action);
+   end Transition_Action;
+
+   ----------------------
+   -- Transition_Count --
+   ----------------------
+
+   function Transition_Count
+     (Dlg  : Dlg_Resource'Class)
+      return WL.Binary_IO.Word_32
+   is
+   begin
+      return Dlg.Transition_Count;
+   end Transition_Count;
+
    ----------------------
    -- Transition_Flags --
    ----------------------
@@ -173,5 +236,19 @@ package body Chaos.Resources.Dlg is
    begin
       return Dlg.Transition_Table.Element (Natural (Transition)).Text;
    end Transition_Text;
+
+   ------------------------
+   -- Transition_Trigger --
+   ------------------------
+
+   function Transition_Trigger
+     (Dlg        : Dlg_Resource'Class;
+      Transition : WL.Binary_IO.Word_32)
+      return String
+   is
+   begin
+      return Ada.Strings.Unbounded.To_String
+        (Dlg.Transition_Table.Element (Natural (Transition)).Trigger);
+   end Transition_Trigger;
 
 end Chaos.Resources.Dlg;

@@ -30,10 +30,16 @@ package Chaos.Dialog is
 
    function Choice_Count (Position : Dialog_Cursor) return Natural;
 
+   function Choice_Has_Text
+     (Position : Dialog_Cursor;
+      Index    : Positive)
+      return Boolean;
+
    function Choice_Text
      (Position : Dialog_Cursor;
       Index    : Positive)
-      return String;
+      return String
+     with Pre => Choice_Has_Text (Position, Index);
 
    function Choice (Position : Dialog_Cursor;
                     Index    : Positive)
@@ -46,9 +52,10 @@ private
 
    type Dialog_Cursor is
       record
-         Dialog : Chaos_Dialog;
-         State  : Natural;
-         Owner  : Chaos.Objects.Chaos_Object;
+         Dialog   : Chaos_Dialog;
+         State    : Natural;
+         Owner    : Chaos.Objects.Chaos_Object;
+         Finished : Boolean;
       end record;
 
    type Dialog_Transition is
@@ -63,17 +70,22 @@ private
          Done_Quest            : Boolean := False;
          Transition_Text_Index : Chaos.Localisation.Local_Text_Index;
          Journal_Text_Index    : Chaos.Localisation.Local_Text_Index;
+         Trigger               : Lith.Objects.Object;
+         Action                : Lith.Objects.Object;
          Next_State            : Natural;
       end record;
 
    package Dialog_Transition_Vectors is
       new Ada.Containers.Vectors (Natural, Dialog_Transition);
 
+   package Dialog_Transition_Index_Vectors is
+     new Ada.Containers.Vectors (Positive, Natural);
+
    type Dialog_State is
       record
          Response_Index : Chaos.Localisation.Local_Text_Index;
          Trigger        : Lith.Objects.Object;
-         Transitions    : Dialog_Transition_Vectors.Vector;
+         Transitions    : Dialog_Transition_Index_Vectors.Vector;
       end record;
 
    package Dialog_State_Vectors is
@@ -82,7 +94,8 @@ private
    type Chaos_Dialog_Record is
      new Chaos.Objects.Root_Chaos_Object_Record with
       record
-         States : Dialog_State_Vectors.Vector;
+         States      : Dialog_State_Vectors.Vector;
+         Transitions : Dialog_Transition_Vectors.Vector;
       end record;
 
    overriding function Object_Database
