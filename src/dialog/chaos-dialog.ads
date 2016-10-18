@@ -18,7 +18,8 @@ package Chaos.Dialog is
 
    type Dialog_Cursor is private;
 
-   function Finished (Position : Dialog_Cursor) return Boolean;
+   function Has_State (Position : Dialog_Cursor) return Boolean;
+   function Is_Finished (Position : Dialog_Cursor) return Boolean;
 
    function Start (Dialog : not null access constant
                      Chaos_Dialog_Record'Class;

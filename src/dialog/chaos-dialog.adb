@@ -104,14 +104,23 @@ package body Chaos.Dialog is
       end if;
    end Choose;
 
-   --------------
-   -- Finished --
-   --------------
+   ---------------
+   -- Has_State --
+   ---------------
 
-   function Finished (Position : Dialog_Cursor) return Boolean is
+   function Has_State (Position : Dialog_Cursor) return Boolean is
+   begin
+      return Position.Dialog /= null;
+   end Has_State;
+
+   -----------------
+   -- Is_Finished --
+   -----------------
+
+   function Is_Finished (Position : Dialog_Cursor) return Boolean is
    begin
       return Position.Finished;
-   end Finished;
+   end Is_Finished;
 
    ----------
    -- Mark --
@@ -161,7 +170,7 @@ package body Chaos.Dialog is
       State : Natural := 0;
    begin
       while State <= Dialog.States.Last_Index loop
-         if False then
+         if True then
             Chaos.Logging.Log
               ("DIALOG",
                "state" & State'Img & ": "
