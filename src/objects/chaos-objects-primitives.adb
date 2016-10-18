@@ -6,6 +6,8 @@ with Chaos.Objects.Search;
 with Chaos.Entities;
 with Chaos.Items;
 
+with Chaos.Logging;
+
 package body Chaos.Objects.Primitives is
 
    function Evaluate_Chaos_Flag
@@ -20,6 +22,11 @@ package body Chaos.Objects.Primitives is
      (Store : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
 
+   function Evaluate_Chaos_Set_Trigger
+     (Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is (Store.Argument (1));
+
    --------------------
    -- Add_Primitives --
    --------------------
@@ -32,6 +39,8 @@ package body Chaos.Objects.Primitives is
         ("chaos-has-item", 2, Evaluate_Chaos_Has_Item'Access);
       Lith.Objects.Interfaces.Define_Function
         ("chaos-object-with-code", 1, Evaluate_Chaos_Object_With_Code'Access);
+      Lith.Objects.Interfaces.Define_Function
+        ("chaos-set-trigger", 2, Evaluate_Chaos_Set_Trigger'Access);
    end Add_Primitives;
 
    -------------------------
@@ -85,9 +94,10 @@ package body Chaos.Objects.Primitives is
                        (Lith.Objects.Symbols.Get_Name
                           (Lith.Objects.To_Symbol
                              (Store.Argument (2))));
+            Result : constant Boolean :=
+                       Inv.Has_Entity (Chaos.Entities.Chaos_Entity (Item));
          begin
-            return Lith.Objects.To_Object
-              (Inv.Has_Entity (Chaos.Entities.Chaos_Entity (Item)));
+            return Lith.Objects.To_Object (Result);
          end;
       else
          raise Constraint_Error with
@@ -111,9 +121,9 @@ package body Chaos.Objects.Primitives is
                  Chaos.Objects.Search.Find_Object (Code);
    begin
       if Result = null then
-         raise Constraint_Error with
-           "cannot find object with code '"
-           & Code & "'";
+         Chaos.Logging.Log ("SCRIPT", "warning: object with code '"
+                              & Code & "' cannot be found");
+         return Lith.Objects.Nil;
       end if;
       return Result.To_Expression;
    end Evaluate_Chaos_Object_With_Code;
