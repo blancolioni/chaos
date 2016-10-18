@@ -12,6 +12,7 @@ with Chaos.Areas.Primitives;
 with Chaos.Game.Primitives;
 with Chaos.Expressions;
 with Chaos.Objects.Primitives;
+with Chaos.Creatures.Primitives;
 
 with Chaos.Expressions.Import.Actions;
 with Chaos.Expressions.Import.Objects;
@@ -37,6 +38,7 @@ package body Chaos.Configuration is
       Chaos.Identifiers.Import.Import_Identifiers ("reaction");
 
       Chaos.Areas.Primitives.Create_Primitives;
+      Chaos.Creatures.Primitives.Add_Primitives;
       Chaos.Game.Primitives.Add_Primitives;
       Chaos.Objects.Primitives.Add_Primitives;
 
