@@ -104,7 +104,7 @@ package body Chaos.Dialog.Import is
                      end if;
                      if Transition.Has_Action then
                         Transition.Action :=
-                          Chaos.Parser.Parse_Trigger
+                          Chaos.Parser.Parse_Action
                             (Dlg.Transition_Action (I));
                      end if;
                      if not Transition.End_State then

@@ -79,6 +79,71 @@ package body Chaos.Expressions.Import is
      (Resource : Chaos.Resources.Bcs.Bcs_Resource'Class;
       Index    : in out Positive);
 
+   -----------------------------
+   -- Add_Coordinate_Argument --
+   -----------------------------
+
+   procedure Add_Coordinate_Argument
+     (Call  : in out Function_Call;
+      X, Y  : Integer)
+   is
+   begin
+      Call.Args.Append ((Coordinate_Argument, X, Y));
+   end Add_Coordinate_Argument;
+
+   -----------------------------
+   -- Add_Identifier_Argument --
+   -----------------------------
+
+   procedure Add_Identifier_Argument
+     (Call : in out Function_Call;
+      Name : String)
+   is
+   begin
+      Call.Args.Append ((Identifier_Argument,
+                        Ada.Strings.Unbounded.To_Unbounded_String (Name)));
+   end Add_Identifier_Argument;
+
+   --------------------------
+   -- Add_Integer_Argument --
+   --------------------------
+
+   procedure Add_Integer_Argument
+     (Call  : in out Function_Call;
+      Value : Integer)
+   is
+   begin
+      Call.Args.Append ((Integer_Argument, Value));
+   end Add_Integer_Argument;
+
+   -------------------------
+   -- Add_String_Argument --
+   -------------------------
+
+   procedure Add_String_Argument
+     (Call : in out Function_Call;
+      Text : String)
+   is
+   begin
+      Call.Args.Append ((Text_Argument,
+                        Ada.Strings.Unbounded.To_Unbounded_String (Text)));
+   end Add_String_Argument;
+
+   --------------------------
+   -- Create_Function_Call --
+   --------------------------
+
+   procedure Create_Function_Call
+     (Call    : in out Function_Call;
+      Name    : String;
+      Negated : Boolean := False)
+   is
+   begin
+      Call.Name := Ada.Strings.Unbounded.To_Unbounded_String (Name);
+      Call.Negated := Negated;
+      Call.Args.Clear;
+   end Create_Function_Call;
+
    -----------
    -- Error --
    -----------

@@ -6,8 +6,12 @@ with Lith.Environment;
 with Lith.Objects.Interfaces;
 with Lith.Objects.Symbols;
 
+with Chaos.Identifiers;
+
 with Chaos.Logging;
 with Chaos.Paths;
+
+with Chaos.Expressions.Import.Objects;
 
 package body Chaos.Expressions.Import.Triggers is
 
@@ -226,6 +230,115 @@ package body Chaos.Expressions.Import.Triggers is
          Store.Swap;
          Store.Create_List (2);
       end if;
+
+   end Import_Trigger;
+
+   --------------------
+   -- Import_Trigger --
+   --------------------
+
+   procedure Import_Trigger
+     (Call : Function_Call)
+   is
+      use Ada.Strings.Unbounded;
+      Trigger_Name : constant String :=
+                       To_String (Call.Name);
+      Trigger_Id   : constant Natural :=
+                       Get_Trigger_Id (Trigger_Name);
+      Integer_1_Value, Integer_2_Value : Integer := 0;
+      Text_1_Value, Text_2_Value       : Unbounded_String;
+      Found : array (Trigger_Argument_Name) of Boolean :=
+                (others => False);
+   begin
+
+      if Trigger_Id = 0 then
+         Chaos.Logging.Log
+           ("TRIGGER", "unknown trigger: " & Trigger_Name);
+         Chaos.Expressions.Store.Push (Lith.Objects.False_Value);
+         return;
+      end if;
+
+      for Arg of Call.Args loop
+         case Arg.Arg_Type is
+            when Integer_Argument =>
+               if not Found (Integer_1) then
+                  Integer_1_Value := Arg.Integer_Value;
+                  Found (Integer_1) := True;
+               elsif not Found (Integer_2) then
+                  Integer_2_Value := Arg.Integer_Value;
+                  Found (Integer_2) := True;
+               else
+                  Chaos.Logging.Log
+                    ("TRIGGER",
+                     "warning: too many integer arguments in call to "
+                     & Trigger_Name);
+               end if;
+            when Text_Argument =>
+               if not Found (Text_1) then
+                  Text_1_Value := Arg.Text_Value;
+                  Found (Text_1) := True;
+               elsif not Found (Text_2) then
+                  Text_2_Value := Arg.Text_Value;
+                  Found (Text_2) := True;
+               else
+                  Chaos.Logging.Log
+                    ("TRIGGER",
+                     "warning: too many string arguments in call to "
+                     & Trigger_Name);
+               end if;
+
+            when Identifier_Argument =>
+               declare
+                  Id : constant String := To_String (Arg.Identifier_Name);
+               begin
+                  if Chaos.Identifiers.Exists (Id) then
+                     if Chaos.Identifiers.Group (Id) = "object"
+                       and then not Found (Object_Reference)
+                     then
+                        Objects.Import_Object_Identifier (Id);
+                        Found (Object_Reference) := True;
+                     elsif not Found (Integer_1) then
+                        Integer_1_Value := Chaos.Identifiers.Value (Id);
+                     elsif not Found (Integer_2) then
+                        Integer_2_Value := Chaos.Identifiers.Value (Id);
+                     else
+                        Chaos.Logging.Log
+                          ("TRIGGER",
+                           "warning: too many integer or identifier "
+                           & "arguments in call to "
+                           & Trigger_Name);
+                     end if;
+                  else
+                     Chaos.Logging.Log
+                       ("TRIGGER",
+                        "warning: undeclared identifier '"
+                        & Id
+                        & " in call to "
+                        & Trigger_Name);
+                  end if;
+               end;
+
+            when Coordinate_Argument =>
+               Chaos.Logging.Log
+                 ("TRIGGER",
+                  "warning: point argument not allowed for trigger "
+                  & Trigger_Name);
+         end case;
+      end loop;
+
+      if not Found (Object_Reference) then
+         Chaos.Expressions.Store.Push
+           (Lith.Objects.Symbols.Quote_Symbol);
+         Chaos.Expressions.Store.Push_Nil;
+         Chaos.Expressions.Store.Create_List (2);
+         Chaos.Expressions.Store.Push
+           (Chaos.Expressions.Store.Pop, Lith.Objects.Secondary);
+      end if;
+
+      Chaos.Expressions.Import.Triggers.Import_Trigger
+        (Trigger_Id, Integer_1_Value,
+         Boolean'Pos (Call.Negated), Integer_2_Value,
+         To_String (Text_1_Value), To_String (Text_2_Value));
 
    end Import_Trigger;
 

@@ -12,6 +12,9 @@ package Chaos.Expressions.Import.Triggers is
       Text_1     : String;
       Text_2     : String);
 
+   procedure Import_Trigger
+     (Call : Function_Call);
+
    function Get_Trigger_Id
      (Name : String)
       return Natural;

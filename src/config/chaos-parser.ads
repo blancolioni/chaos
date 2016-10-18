@@ -26,5 +26,6 @@ package Chaos.Parser is
       return Lith.Objects.Object;
 
    function Parse_Trigger (Text : String) return Lith.Objects.Object;
+   function Parse_Action (Text : String) return Lith.Objects.Object;
 
 end Chaos.Parser;

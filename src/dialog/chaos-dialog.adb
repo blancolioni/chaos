@@ -4,6 +4,8 @@ with Chaos.Dialog.Db;
 
 with Chaos.Expressions;
 
+with Chaos.Logging;
+
 package body Chaos.Dialog is
 
    ------------
@@ -79,15 +81,24 @@ package body Chaos.Dialog is
                            .Transitions;
       Transition_Index : constant Natural :=
                            Transitions (Index);
-      Next_State       : constant Natural :=
-                           Position.Dialog.Transitions (Transition_Index)
-                           .Next_State;
+      Transition       : Dialog_Transition renames
+                           Position.Dialog.Transitions (Transition_Index);
    begin
-      if Position.Dialog.Transitions (Transition_Index).End_State then
+      if Transition.Has_Action then
+         Chaos.Logging.Log
+           ("DIALOG", "action: "
+            & Chaos.Expressions.Store.Show (Transition.Action));
+         Chaos.Expressions.Store.Evaluate
+           (Transition.Action,
+            Lith.Objects.Symbols.Get_Symbol ("this"),
+            Position.Owner.To_Expression);
+      end if;
+
+      if Transition.End_State then
          Position.Owner.On_End_Dialog;
          Position.Finished := True;
       else
-         Position.State := Next_State;
+         Position.State := Transition.Next_State;
       end if;
    end Choose;
 
@@ -148,6 +159,13 @@ package body Chaos.Dialog is
       State : Natural := 0;
    begin
       while State <= Dialog.States.Last_Index loop
+         if False then
+            Chaos.Logging.Log
+              ("DIALOG",
+               "state" & State'Img & ": "
+               & Chaos.Expressions.Store.Show
+                 (Dialog.States.Element (State).Trigger));
+         end if;
          exit when Chaos.Expressions.Store.Evaluate
            (Dialog.States.Element (State).Trigger,
             Symbols.Get_Symbol ("this"), Owner.To_Expression)

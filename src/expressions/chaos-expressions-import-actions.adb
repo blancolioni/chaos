@@ -9,6 +9,10 @@ with Lith.Objects.Symbols;
 with Chaos.Logging;
 with Chaos.Paths;
 
+with Chaos.Identifiers;
+
+with Chaos.Expressions.Import.Objects;
+
 package body Chaos.Expressions.Import.Actions is
 
    Argument_Names     : array (Action_Argument_Name)
@@ -157,6 +161,22 @@ package body Chaos.Expressions.Import.Actions is
    end Get_Action_Arguments;
 
    -------------------
+   -- Get_Action_Id --
+   -------------------
+
+   function Get_Action_Id
+     (Name : String)
+      return Natural
+   is
+   begin
+      if Action_Id_Map.Contains (Name) then
+         return Action_Id_Map (Name);
+      else
+         return 0;
+      end if;
+   end Get_Action_Id;
+
+   -------------------
    -- Import_Action --
    -------------------
 
@@ -220,6 +240,148 @@ package body Chaos.Expressions.Import.Actions is
       end if;
       Store.Create_List (2);
       Store.Create_List (11);
+
+   end Import_Action;
+
+   procedure Import_Action
+     (Call : Function_Call)
+   is
+      use Ada.Strings.Unbounded;
+      Action_Name     : constant String :=
+                          To_String (Call.Name);
+      Action_Id       : constant Natural :=
+                          Get_Action_Id (Action_Name);
+      Integer_1_Value : Integer := 0;
+      Integer_2_Value : Integer := 0;
+      Integer_3_Value : Integer := 0;
+      Text_1_Value    : Unbounded_String;
+      Text_2_Value    : Unbounded_String;
+      X, Y            : Integer := 0;
+      Found           : array (Action_Argument_Name) of Boolean :=
+                          (others => False);
+   begin
+
+      if Action_Id = 0 then
+         Chaos.Logging.Log
+           ("Action", "unknown Action: " & Action_Name);
+         Chaos.Expressions.Store.Push (Lith.Objects.False_Value);
+         return;
+      end if;
+
+      for Arg of Call.Args loop
+         case Arg.Arg_Type is
+            when Integer_Argument =>
+               if not Found (Integer_1) then
+                  Integer_1_Value := Arg.Integer_Value;
+                  Found (Integer_1) := True;
+               elsif not Found (Integer_2) then
+                  Integer_2_Value := Arg.Integer_Value;
+                  Found (Integer_2) := True;
+               elsif not Found (Integer_3) then
+                  Integer_3_Value := Arg.Integer_Value;
+                  Found (Integer_3) := True;
+               else
+                  Chaos.Logging.Log
+                    ("Action",
+                     "warning: too many integer arguments in call to "
+                     & Action_Name);
+               end if;
+            when Text_Argument =>
+               if not Found (Text_1) then
+                  Text_1_Value := Arg.Text_Value;
+                  Found (Text_1) := True;
+               elsif not Found (Text_2) then
+                  Text_2_Value := Arg.Text_Value;
+                  Found (Text_2) := True;
+               else
+                  Chaos.Logging.Log
+                    ("Action",
+                     "warning: too many string arguments in call to "
+                     & Action_Name);
+               end if;
+
+            when Identifier_Argument =>
+               declare
+                  Id : constant String := To_String (Arg.Identifier_Name);
+               begin
+                  if Chaos.Identifiers.Exists (Id) then
+                     if Chaos.Identifiers.Group (Id) = "object" then
+                        if not Found (Object_1)
+                          or else not Found (Object_2)
+                          or else not Found (Object_3)
+                        then
+                           Objects.Import_Object_Identifier (Id);
+                           if not Found (Object_1) then
+                              Found (Object_1) := True;
+                           elsif not Found (Object_2) then
+                              Found (Object_2) := True;
+                           else
+                              Found (Object_3) := True;
+                           end if;
+                        else
+                           Chaos.Logging.Log
+                             ("Action",
+                              "warning: too many object arguments in call to "
+                              & Action_Name);
+                        end if;
+                     elsif not Found (Integer_1) then
+                        Integer_1_Value := Chaos.Identifiers.Value (Id);
+                        Found (Integer_1) := True;
+                     elsif not Found (Integer_2) then
+                        Integer_2_Value := Chaos.Identifiers.Value (Id);
+                        Found (Integer_2) := True;
+                     elsif not Found (Integer_3) then
+                        Integer_3_Value := Chaos.Identifiers.Value (Id);
+                        Found (Integer_3) := True;
+                     else
+                        Chaos.Logging.Log
+                          ("Action",
+                           "warning: too many integer or identifier "
+                           & "arguments in call to "
+                           & Action_Name);
+                     end if;
+                  else
+                     Chaos.Logging.Log
+                       ("Action",
+                        "warning: undeclared identifier '"
+                        & Id
+                        & " in call to "
+                        & Action_Name);
+                  end if;
+               end;
+
+            when Coordinate_Argument =>
+               if not Found (Point_X) then
+                  X := Arg.X;
+                  Y := Arg.Y;
+                  Found (Point_X) := True;
+                  Found (Point_Y) := True;
+               else
+                  Chaos.Logging.Log
+                    ("Action",
+                     "warning: extra point arguments in call to "
+                     & Action_Name);
+               end if;
+
+         end case;
+      end loop;
+
+      for Obj in Object_Argument loop
+         if not Found (Obj) then
+            Chaos.Expressions.Store.Push
+              (Lith.Objects.Symbols.Quote_Symbol);
+            Chaos.Expressions.Store.Push_Nil;
+            Chaos.Expressions.Store.Create_List (2);
+            Chaos.Expressions.Store.Push
+              (Chaos.Expressions.Store.Pop, Lith.Objects.Secondary);
+         end if;
+      end loop;
+
+      Chaos.Expressions.Import.Actions.Import_Action
+        (WL.Binary_IO.Word_32 (Action_Id),
+         Integer_1_Value, Integer_2_Value, Integer_3_Value,
+         X, Y,
+         To_String (Text_1_Value), To_String (Text_2_Value));
 
    end Import_Action;
 
