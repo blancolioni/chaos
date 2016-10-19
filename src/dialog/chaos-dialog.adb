@@ -170,7 +170,7 @@ package body Chaos.Dialog is
       State : Natural := 0;
    begin
       while State <= Dialog.States.Last_Index loop
-         if True then
+         if False then
             Chaos.Logging.Log
               ("DIALOG",
                "state" & State'Img & ": "

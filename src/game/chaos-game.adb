@@ -409,10 +409,6 @@ package body Chaos.Game is
          Chaos.UI.Current_UI.Put_Line
            (Listener.Display_Name
             & " has nothing to say to you");
-      else
-         Ada.Text_IO.Put_Line
-           ("choices:"
-            & Natural'Image (Chaos.Dialog.Choice_Count (Game.Dialog_State)));
       end if;
 
    end Start_Dialog;
