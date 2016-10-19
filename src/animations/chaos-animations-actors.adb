@@ -27,7 +27,8 @@ package body Chaos.Animations.Actors is
            (Actor.Creature.Animation_Id);
       else
          return 'C' & Actor.Creature.Race.Animation_Code
-           & 'F' & Actor.Creature.Class.Animation_Code;
+           & 'F' & Actor.Creature.Class.Animation_Code
+           & '1';
       end if;
    end Base_Code;
 
@@ -44,12 +45,18 @@ package body Chaos.Animations.Actors is
       use Chaos.Locations;
       Orientation : constant Chaos.Locations.Orientation := Actor.Orientation;
       Western     : constant Boolean := Actor.Orientation in South .. North;
+      Base        : constant String := Base_Code (Actor);
       Code        : constant String :=
                       Base_Code (Actor)
-                      & Suffix
-                      & (if Western then "" else "E");
+                    & (if Base'Length < 6
+                       then Suffix & (if Western then "" else "E")
+                       else "");
+      Orient_Pos  : constant Natural :=
+                      Chaos.Locations.Orientation'Pos (Orientation);
       Index       : constant Positive :=
-                      Offset + Chaos.Locations.Orientation'Pos (Orientation);
+                      (if Base'Length < 6
+                       then Offset + Orient_Pos
+                       else 1 + Orient_Pos);
    begin
       return Get_Animation (Code, Index);
    end Get_Animation;
@@ -64,9 +71,9 @@ package body Chaos.Animations.Actors is
    is
    begin
       if Actor.Has_Path then
-         return Get_Animation (Actor, "1G1", 1);
+         return Get_Animation (Actor, "G1", 1);
       else
-         return Get_Animation (Actor, "1G1", 25);
+         return Get_Animation (Actor, "G1", 25);
       end if;
    end Get_Animation;
 
