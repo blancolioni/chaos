@@ -193,7 +193,11 @@ package body Chaos.Game is
    begin
       Game.Interaction := Interaction;
       Game.Target := Target;
-      Actor.Update (Move'Access);
+      if not Chaos.Locations.Adjacent (Actor.Location, Target.Location) then
+         Actor.Update (Move'Access);
+      else
+         Game.Arrive (Actor);
+      end if;
    end Interact;
 
    -----------
