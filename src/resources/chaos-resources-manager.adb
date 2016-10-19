@@ -1,3 +1,4 @@
+with Ada.Directories;
 with Ada.Strings.Fixed;
 
 with WL.String_Maps;
@@ -19,6 +20,7 @@ with Chaos.Resources.Tis;
 with Chaos.Resources.Wed;
 
 with Chaos.Infinity_Engine;
+with Chaos.Paths;
 
 package body Chaos.Resources.Manager is
 
@@ -98,53 +100,71 @@ package body Chaos.Resources.Manager is
    is
       Key : constant String := To_Key (Reference, Res_Type);
       Base_Path : constant String := Chaos.Infinity_Engine.Infinity_Path;
+      File_Name : constant String := To_String (Reference) & "."
+                    & Extension (Res_Type);
+      Override_Path : constant String :=
+                        Base_Path & "/override/" & File_Name;
+      Local_Override : constant String :=
+                         Chaos.Paths.Config_File
+                           ("infinity/override/" & File_Name);
+
+      Resource       : Resource_Access;
    begin
       if not Resource_Map.Contains (Key) then
-         if not Got_Keys then
-            Keys.Open ("CHITIN  ", Base_Path & "chitin.key");
-            Keys.Load;
-            Keys.Close;
-            Got_Keys := True;
+         Resource := Create_Resource (Res_Type);
+
+         if Ada.Directories.Exists (Local_Override) then
+            Resource.Open (Reference, Local_Override);
+         elsif Ada.Directories.Exists (Override_Path) then
+            Resource.Open (Reference, Override_Path);
+         else
+            if not Got_Keys then
+               Keys.Open ("CHITIN  ", Base_Path & "chitin.key");
+               Keys.Load;
+               Keys.Close;
+               Got_Keys := True;
+            end if;
+
+            declare
+               Locator : Word_32;
+               Path    : constant String :=
+                           Keys.Get_Resource_Location
+                             (Reference, Res_Type, Locator);
+            begin
+
+               if Path = "" then
+                  return null;
+               end if;
+
+               if not Biff_Map.Contains (Path) then
+                  declare
+                     use Ada.Strings.Fixed;
+                     Reference : constant String :=
+                                   Path (Index (Path, "/") + 1 .. Path'Last);
+                     Biff      : constant Biff_Resource_Access :=
+                                   new Chaos.Resources.Biff.Biff_Resource;
+                  begin
+                     Biff.Open (To_Reference (Reference), Base_Path & Path);
+                     Biff.Load;
+                     Biff_Map.Insert (Path, Biff);
+                  end;
+               end if;
+
+               Biff_Map.Element (Path).Open_Resource
+                 (Reference, Resource.all, Locator);
+
+               Resource_Map.Insert (Key, Resource);
+
+            end;
          end if;
 
-         declare
-            Locator : Word_32;
-            Path    : constant String :=
-                        Keys.Get_Resource_Location
-                          (Reference, Res_Type, Locator);
-            Resource : Resource_Access;
-         begin
+         Resource.Load;
 
-            if Path = "" then
-               return null;
-            end if;
-
-            Resource := Create_Resource (Res_Type);
-            if not Biff_Map.Contains (Path) then
-               declare
-                  use Ada.Strings.Fixed;
-                  Reference : constant String :=
-                                Path (Index (Path, "/") + 1 .. Path'Last);
-                  Biff : constant Biff_Resource_Access :=
-                           new Chaos.Resources.Biff.Biff_Resource;
-               begin
-                  Biff.Open (To_Reference (Reference), Base_Path & Path);
-                  Biff.Load;
-                  Biff_Map.Insert (Path, Biff);
-               end;
-            end if;
-
-            Biff_Map.Element (Path).Open_Resource
-              (Reference, Resource.all, Locator);
-
-            Resource.Load;
-
-            Resource_Map.Insert (Key, Resource);
-
-         end;
+      else
+         Resource := Resource_Map.Element (Key);
       end if;
 
-      return Resource_Map.Element (Key);
+      return Resource;
 
    end Load_Resource;
 

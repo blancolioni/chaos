@@ -50,6 +50,10 @@ package Chaos.Resources is
    Tileset_Resource    : constant Resource_Type;
    Wed_Resource        : constant Resource_Type;
 
+   function Extension
+     (Resource : Resource_Type)
+      return String;
+
    type Chaos_Resource is abstract tagged limited private;
 
    function Is_Text_Resource

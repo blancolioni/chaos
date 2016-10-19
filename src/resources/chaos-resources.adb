@@ -29,6 +29,46 @@ package body Chaos.Resources is
         >= Resource.Length;
    end End_Of_Resource;
 
+   ---------------
+   -- Extension --
+   ---------------
+
+   function Extension
+     (Resource : Resource_Type)
+      return String
+   is
+   begin
+      case Resource is
+         when Area_Resource =>
+            return "ARE";
+         when Bam_Resource =>
+            return "BAM";
+         when Bmp_Resource =>
+            return "BMP";
+         when Creature_Resource =>
+            return "CRE";
+         when Dialog_Resource =>
+            return "DLG";
+         when Identifier_Resource =>
+            return "IDS";
+         when Item_Resource =>
+            return "ITM";
+         when Script_Resource =>
+            return "BCS";
+         when Table_Resource =>
+            return "2DA";
+         when Tileset_Resource =>
+            return "TIS";
+         when Wed_Resource =>
+            return "WED";
+         when others =>
+            raise Constraint_Error with
+              "unknown resource type: "
+              & WL.Binary_IO.Hex_Image
+              (WL.Binary_IO.Word_16 (Resource));
+      end case;
+   end Extension;
+
    ---------
    -- Get --
    ---------
@@ -337,6 +377,9 @@ package body Chaos.Resources is
         ("RESOURCE", "loading: " & Path);
       Resource.Reference := Reference;
       Open (Resource.File, In_File, Path);
+
+      Resource.Length :=
+        WL.Binary_IO.Length (Resource.File);
 
       if Resource.Has_Header then
          for I in Required'Range loop
