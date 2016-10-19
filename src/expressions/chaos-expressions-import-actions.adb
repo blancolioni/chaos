@@ -118,8 +118,8 @@ package body Chaos.Expressions.Import.Actions is
       Store.Push (Get_Symbol ("object-2"));
       Store.Push (Get_Symbol ("object-3"));
       Store.Push (Get_Symbol ("integer-1"));
-      Store.Push (Get_Symbol ("point-x"));
-      Store.Push (Get_Symbol ("point-y"));
+      Store.Push (Get_Symbol ("x"));
+      Store.Push (Get_Symbol ("y"));
       Store.Push (Get_Symbol ("integer-2"));
       Store.Push (Get_Symbol ("integer-3"));
       Store.Push (Get_Symbol ("text-1"));
