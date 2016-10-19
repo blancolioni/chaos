@@ -119,6 +119,42 @@ package body Chaos.Parser is
          elsif Tok = Tok_String_Constant then
             Add_String_Argument (Call, Tok_Text);
             Scan;
+         elsif Tok = Tok_Left_Bracket then
+            Scan;
+            declare
+               X, Y : Integer := 0;
+            begin
+               if Tok = Tok_Identifier and then Is_Number (Tok_Text) then
+                  X := Integer'Value (Tok_Text);
+                  Scan;
+               else
+                  Error ("missing X coordinate");
+                  Skip_To
+                    (Tok_Dot, Tok_Right_Bracket, Tok_Comma,
+                     Tok_Right_Paren);
+               end if;
+               if Tok = Tok_Dot then
+                  Scan;
+               else
+                  Error ("missing '.'");
+               end if;
+               if Tok = Tok_Identifier and then Is_Number (Tok_Text) then
+                  Y := Integer'Value (Tok_Text);
+                  Scan;
+               else
+                  Error ("missing Y coordinate");
+                  Skip_To
+                    (Tok_Right_Bracket, Tok_Comma,
+                     Tok_Right_Paren, Tok_Identifier);
+               end if;
+               if Tok = Tok_Right_Bracket then
+                  Scan;
+               else
+                  Error ("missing ']'");
+                  Skip_To (Tok_Right_Bracket, Tok_Right_Paren, Tok_Comma);
+               end if;
+               Add_Coordinate_Argument (Call, X, Y);
+            end;
          else
             Error ("unexpected '" & Tok_Text & "'");
             Skip_To (Tok_Identifier, Tok_Right_Paren);
@@ -131,7 +167,10 @@ package body Chaos.Parser is
          if Tok = Tok_Comma then
             Scan;
          elsif Tok /= Tok_Right_Paren then
-            if Tok = Tok_Identifier or else Tok = Tok_String_Constant then
+            if Tok = Tok_Identifier
+              or else Tok = Tok_String_Constant
+              or else Tok = Tok_Left_Bracket
+            then
                Warning ("inserted ','");
             else
                Error ("syntax error");

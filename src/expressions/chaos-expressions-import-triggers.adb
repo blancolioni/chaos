@@ -91,8 +91,6 @@ package body Chaos.Expressions.Import.Triggers is
          Got_Argument_Names := True;
       end if;
 
-      Chaos.Logging.Log ("TRIGGER", "checking arguments: "
-                         & Store.Show (Fn));
       Check_Arg (Fn);
 
       while Triggers.Last_Index < Index loop

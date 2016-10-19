@@ -129,7 +129,7 @@ package body Chaos.Expressions.Import.Actions is
       Store.Create_List (3);
       Chaos.Logging.Log
         ("ACTION",
-         Get_Name (Full_Name)
+         Get_Name (Action_Name)
          & " = " & Store.Show (Store.Top));
       Lith.Environment.Define (Full_Name, Store.Pop);
 
