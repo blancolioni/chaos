@@ -86,6 +86,28 @@ package body Chaos.Resources.Tables is
       return Table.Get (Row_Index, Col_Index);
    end Get;
 
+   ---------
+   -- Get --
+   ---------
+
+   function Get
+     (Table : Table_Resource'Class;
+      Row   : Positive;
+      Col   : Positive)
+      return Integer
+   is
+      Value : constant String := Table.Get (Row, Col);
+   begin
+      if Value'Length > 2
+        and then Value (Value'First .. Value'First + 1) = "0x"
+      then
+         return Integer'Value
+           ("16#" & Value (Value'First + 2 .. Value'Last) & "#");
+      else
+         return Integer'Value (Value);
+      end if;
+   end Get;
+
    ----------
    -- Load --
    ----------

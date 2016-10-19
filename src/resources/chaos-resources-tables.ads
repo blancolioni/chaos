@@ -37,6 +37,13 @@ package Chaos.Resources.Tables is
 
    function Get
      (Table : Table_Resource'Class;
+      Row   : Positive;
+      Col   : Positive)
+      return Integer
+     with Pre => Row <= Table.Row_Count and then Col <= Table.Column_Count;
+
+   function Get
+     (Table : Table_Resource'Class;
       Row   : String;
       Col   : String)
       return String;
