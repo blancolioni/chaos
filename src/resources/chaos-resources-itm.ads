@@ -7,7 +7,7 @@ package Chaos.Resources.Itm is
       Gauntlets, Helms, Keys, Potions, Rings,
       Scrolls, Shields, Food, Bullets, Bows,
       Daggers, Maces, Slings, Small_Swords,
-      Large_Words, Hammers, Morning_Stars,
+      Large_Swords, Hammers, Morning_Stars,
       Flails, Darts, Axes, Quarterstaff,
       Crossbow, Fists, Spears, Halberds,
       Bolts, Clothes, Gold, Gems, Wands,
