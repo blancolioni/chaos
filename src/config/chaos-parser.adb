@@ -371,7 +371,16 @@ package body Chaos.Parser is
       end loop;
 
       Close;
-      Chaos.Expressions.Store.Create_List (Count);
+
+      if Count = 1 then
+         Chaos.Expressions.Store.Drop;
+         Chaos.Expressions.Store.Push (Lith.Objects.False_Value);
+      elsif Count = 2 then
+         Chaos.Expressions.Store.Swap;
+         Chaos.Expressions.Store.Drop;
+      else
+         Chaos.Expressions.Store.Create_List (Count);
+      end if;
 
       return Chaos.Expressions.Store.Pop;
    end Parse_Action;
