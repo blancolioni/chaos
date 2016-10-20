@@ -1,4 +1,8 @@
+with Ada.Text_IO;
+
 package body Chaos.Resources.Text is
+
+   Write_Text_Contents : constant Boolean := False;
 
    type Array_Of_Bytes is array (Positive range <>) of Word_8;
 
@@ -11,6 +15,9 @@ package body Chaos.Resources.Text is
    function To_Xor_Key
      (Text_Key : String)
       return Array_Of_Bytes;
+
+   procedure Write_Line (Index : Positive;
+                         Line  : String);
 
    ----------
    -- Line --
@@ -73,6 +80,13 @@ package body Chaos.Resources.Text is
             if not Got_NL then
                Resource.Lines.Append (Buffer (1 .. Length));
                Length := 0;
+
+               if Write_Text_Contents then
+                  Write_Line
+                    (Resource.Lines.Last_Index,
+                     Resource.Lines.Last_Element);
+               end if;
+
             end if;
             Got_NL := True;
          else
@@ -117,5 +131,20 @@ package body Chaos.Resources.Text is
       end loop;
       return Result;
    end To_Xor_Key;
+
+   ----------------
+   -- Write_Line --
+   ----------------
+
+   procedure Write_Line
+     (Index : Positive;
+      Line  : String)
+   is
+      Line_Image : constant String := Positive'Image (Index);
+      Fixed_Image : String (1 .. 5) := (others => ' ');
+   begin
+      Fixed_Image (6 - Line_Image'Length .. 5) := Line_Image;
+      Ada.Text_IO.Put_Line (Fixed_Image & ": " & Line);
+   end Write_Line;
 
 end Chaos.Resources.Text;
