@@ -36,6 +36,7 @@ package body Chaos.Configuration is
       Chaos.Identifiers.Import.Import_Identifiers ("object");
       Chaos.Identifiers.Import.Import_Identifiers ("ea");
       Chaos.Identifiers.Import.Import_Identifiers ("reaction");
+      Chaos.Identifiers.Import.Import_Identifiers ("state");
 
       Chaos.Areas.Primitives.Create_Primitives;
       Chaos.Creatures.Primitives.Add_Primitives;
