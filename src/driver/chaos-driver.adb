@@ -137,6 +137,32 @@ begin
                  (Chaos.Creatures.Get ("PHLYDI")));
          end loop;
 
+         Chaos.Game.Current_Game.Start_Dialog
+           (Chaos.Game.Current_Game.Party.Party_Member (1),
+            Chaos.Game.Current_Game.Area.Actor
+              (Chaos.Creatures.Get ("DREPPI")));
+
+         Chaos.Game.Current_Game.Travel ("AR2616", "EXIT2600");
+
+         Chaos.Game.Current_Game.Start_Dialog
+           (Chaos.Game.Current_Game.Party.Party_Member (1),
+            Chaos.Game.Current_Game.Area.Actor
+              (Chaos.Creatures.Get ("FIREB1")));
+
+         Chaos.Game.Current_Game.Travel ("AR2600", "EXIT2616");
+
+         Chaos.Game.Current_Game.Start_Dialog
+           (Chaos.Game.Current_Game.Party.Party_Member (1),
+            Chaos.Game.Current_Game.Area.Actor
+              (Chaos.Creatures.Get ("TETHTO")));
+
+         Chaos.Game.Current_Game.Travel ("AR2616", "EXIT2600");
+
+         Chaos.Game.Current_Game.Start_Dialog
+           (Chaos.Game.Current_Game.Party.Party_Member (1),
+            Chaos.Game.Current_Game.Area.Actor
+              (Chaos.Creatures.Get ("FIREB1")));
+
          UI.Stop;
       end;
    else
