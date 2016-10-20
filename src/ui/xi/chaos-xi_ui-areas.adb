@@ -836,12 +836,12 @@ package body Chaos.Xi_UI.Areas is
                                         .Cursor_Index
                                         else 0);
                New_Cursor_Index : constant Positive :=
-                                    (if not Area.Passable (Mouse_Square)
-                                     then 8
+                                    (if Square_Cursor_Index > 0
+                                     then Square_Cursor_Index
                                      elsif Area.Has_Actor (Mouse_Square)
                                      then 19
-                                     elsif Square_Cursor_Index > 0
-                                     then Square_Cursor_Index
+                                     elsif not Area.Passable (Mouse_Square)
+                                     then 8
                                      else 1);
             begin
                if New_Cursor_Index /= Model.Cursor_Index then
