@@ -17,7 +17,7 @@
 (chaos-add-trigger #x30 'False #f)
 (chaos-add-trigger #x36 'OnCreation '(not (chaos-flag this 'script-executed)))
 (chaos-add-trigger #x39 'NumTimesTalkedTo '(= (chaos-get-property this 'num-times-talked-to) integer-1))
-(chaos-add-trigger #x39 'NumTimesTalkedToGT '(> (chaos-get-property this 'num-times-talked-to) integer-1))
+(chaos-add-trigger #x3A 'NumTimesTalkedToGT '(> (chaos-get-property this 'num-times-talked-to) integer-1))
 (chaos-add-trigger #x3B 'NumTimesTalkedToLT '(< (chaos-get-property this 'num-times-talked-to) integer-1))
 (chaos-add-trigger #x3C 'Reaction '(= (chaos-get-reaction this object) integer-1))
 (chaos-add-trigger #x3D 'ReactionGT '(> (chaos-get-reaction this object) integer-1))
