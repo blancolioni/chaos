@@ -8,6 +8,8 @@ with Chaos.Logging;
 
 package body Chaos.Dialog is
 
+   Trace_Dialog : constant Boolean := False;
+
    ------------
    -- Choice --
    ------------
@@ -85,7 +87,7 @@ package body Chaos.Dialog is
                            Position.Dialog.Transitions (Transition_Index);
    begin
       if Transition.Has_Action then
-         if False then
+         if Trace_Dialog then
             Chaos.Logging.Log
               ("DIALOG", "action: "
                & Chaos.Expressions.Store.Show (Transition.Action));
@@ -169,8 +171,9 @@ package body Chaos.Dialog is
       use Lith.Objects, Chaos.Expressions;
       State : Natural := 0;
    begin
+      Chaos.Expressions.Store.Reset;
       while State <= Dialog.States.Last_Index loop
-         if False then
+         if Trace_Dialog then
             Chaos.Logging.Log
               ("DIALOG",
                "state" & State'Img & ": "
