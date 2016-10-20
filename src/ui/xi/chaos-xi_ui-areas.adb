@@ -542,6 +542,44 @@ package body Chaos.Xi_UI.Areas is
 
    procedure Create_Base_Model is
       Model : Base_Model_Record renames Base_Model;
+
+      function Create_Tile_Square
+        (X, Y : Xi.Xi_Float;
+         Size : Xi.Xi_Non_Negative_Float)
+         return Xi.Entity.Xi_Entity;
+
+      ------------------------
+      -- Create_Tile_Square --
+      ------------------------
+
+      function Create_Tile_Square
+        (X, Y : Xi.Xi_Float;
+         Size : Xi.Xi_Non_Negative_Float)
+         return Xi.Entity.Xi_Entity
+      is
+         use type Xi.Xi_Float;
+         Entity : constant Xi.Entity.Xi_Entity := Xi.Entity.Create;
+      begin
+         Entity.Begin_Operation (Xi.Render_Operation.Triangle_Fan);
+         Entity.Texture_Coordinate (0.0, 0.0);
+         Entity.Normal (0.0, 0.0, 1.0);
+         Entity.Vertex (X - Size, Y - Size, 0.0);
+
+         Entity.Texture_Coordinate (1.0, 0.0);
+         Entity.Normal (0.0, 0.0, 1.0);
+         Entity.Vertex (X + Size, Y - Size, 0.0);
+
+         Entity.Texture_Coordinate (1.0, 1.0);
+         Entity.Normal (0.0, 0.0, 1.0);
+         Entity.Vertex (X + Size, Y + Size, 0.0);
+
+         Entity.Texture_Coordinate (0.0, 1.0);
+         Entity.Normal (0.0, 0.0, 1.0);
+         Entity.Vertex (X - Size, Y + Size, 0.0);
+         Entity.End_Operation;
+         return Entity;
+      end Create_Tile_Square;
+
    begin
       Model.Scene := Xi.Scene.Create_Scene;
       Model.Camera := Model.Scene.Active_Camera;
@@ -591,9 +629,9 @@ package body Chaos.Xi_UI.Areas is
                   Node       : constant Xi.Node.Xi_Node :=
                                  Model.Map_Top.Create_Child (Name);
                   Square     : constant Xi.Entity.Xi_Entity :=
-                                 Xi.Shapes.Square (32.0);
+                                 Create_Tile_Square (X, Y, 32.0);
                begin
-                  Node.Set_Position (X, Y, 0.0);
+                  --  Node.Set_Position (X, Y, 0.0);
                   Node.Set_Entity (Square);
                   Node.Set_Visible (False);
                   Model.Tile_Nodes (Tile_X, Tile_Y) := Node;
