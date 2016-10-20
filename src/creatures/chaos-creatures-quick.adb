@@ -49,7 +49,7 @@ package body Chaos.Creatures.Quick is
          Creature.Set_Equipment
            (Chaos.Equipment.Weapon_1,
             Chaos.Items.Create
-              (Chaos.Entities.Weapons.Get ("quarterstaff")));
+              (Chaos.Entities.Weapons.Get ("staf01")));
 
          Creature.Set_Active_Weapon_Slot (Chaos.Equipment.Weapon_1);
       end Create;
