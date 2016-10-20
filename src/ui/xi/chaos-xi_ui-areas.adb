@@ -112,6 +112,8 @@ package body Chaos.Xi_UI.Areas is
 
    type Area_Model_Access is access all Area_Model_Record'Class;
 
+   Current_Area_Model : Area_Model_Access := null;
+
    overriding function Scene
      (Model : Area_Model_Record)
       return Xi.Scene.Xi_Scene
@@ -274,6 +276,8 @@ package body Chaos.Xi_UI.Areas is
                  Chaos.Xi_UI.Images.Xi_Image_Container
                    (Area.Images);
    begin
+
+      Current_Area_Model := null;
 
       if not Base_Model_Created then
          Create_Base_Model;
@@ -438,19 +442,9 @@ package body Chaos.Xi_UI.Areas is
          Camera.Perspective (45.0, 100.0, 2000.0);
       end;
 
-      declare
-         Listener : constant Xi.Frame_Event.Xi_Frame_Listener :=
-                      new Area_Frame_Listener'
-                        (Last_Script_Execution => Ada.Calendar.Clock,
-                         Last_Walk_Execution   => Ada.Calendar.Clock,
-                         Model                 => Model,
-                         Mouse_X               => 0.0,
-                         Mouse_Y               => 0.0,
-                         Key                   => Character'Val (0));
-      begin
-         Xi.Main.Add_Frame_Listener (Listener);
-         return Chaos.Xi_UI.Models.Chaos_Xi_Model (Model);
-      end;
+      Current_Area_Model := Model;
+
+      return Chaos.Xi_UI.Models.Chaos_Xi_Model (Model);
 
    end Area_Model;
 
@@ -643,6 +637,18 @@ package body Chaos.Xi_UI.Areas is
          --           Model.Highlight_Square.Rotate (45.0, 0.0, 0.0, 1.0);
       end;
 
+      declare
+         Listener : constant Xi.Frame_Event.Xi_Frame_Listener :=
+                      new Area_Frame_Listener'
+                        (Last_Script_Execution => Ada.Calendar.Clock,
+                         Last_Walk_Execution   => Ada.Calendar.Clock,
+                         Mouse_X               => 0.0,
+                         Mouse_Y               => 0.0,
+                         Key                   => Character'Val (0));
+      begin
+         Xi.Main.Add_Frame_Listener (Listener);
+      end;
+
       Base_Model_Created := True;
 
    end Create_Base_Model;
@@ -659,8 +665,9 @@ package body Chaos.Xi_UI.Areas is
       use Ada.Calendar;
       Now : constant Time := Clock;
 
-      Model : constant Area_Model_Access := Listener.Model;
-      Area  : constant Chaos.Areas.Chaos_Area := Model.Area;
+      Model : constant Area_Model_Access := Current_Area_Model;
+      Area  : constant Chaos.Areas.Chaos_Area :=
+                (if Model /= null then Model.Area else null);
 
       Got_Mouse_Square : Boolean := False;
       Mouse_X, Mouse_Y : Xi_Float;
@@ -706,10 +713,10 @@ package body Chaos.Xi_UI.Areas is
 
             World_X :=
               (Mouse_X - Event.Render_Target.Width / 2.0)
-              + Listener.Model.Centre_X;
+              + Current_Area_Model.Centre_X;
             World_Y :=
               (Mouse_Y - Event.Render_Target.Height / 2.0)
-              + Listener.Model.Centre_Y;
+              + Current_Area_Model.Centre_Y;
 
             Pixel_Loc :=
               (Integer (World_X) + Area.Pixels_Across / 2,
@@ -738,6 +745,10 @@ package body Chaos.Xi_UI.Areas is
 
    begin
 
+      if Model = null then
+         return;
+      end if;
+
       Mouse_X := Xi.Mouse.Current_Mouse.State.X;
       Mouse_Y := Xi.Mouse.Current_Mouse.State.Y;
 
@@ -746,12 +757,12 @@ package body Chaos.Xi_UI.Areas is
          Listener.Last_Script_Execution := Now;
       end if;
 
-      for I in 1 .. Listener.Model.Actors.Last_Index loop
+      for I in 1 .. Model.Actors.Last_Index loop
          declare
-            Actor : Actor_Node := Listener.Model.Actors (I);
+            Actor : Actor_Node := Model.Actors (I);
          begin
-            Listener.Model.Animate (Actor);
-            Listener.Model.Actors (I) := Actor;
+            Model.Animate (Actor);
+            Model.Actors (I) := Actor;
          end;
       end loop;
 
@@ -766,13 +777,13 @@ package body Chaos.Xi_UI.Areas is
 
          declare
             Pixel  : constant Chaos.Locations.Pixel_Location :=
-                       Listener.Model.Area.To_Pixels
+                       Model.Area.To_Pixels
                          (Mouse_Square);
          begin
 
             Base_Model.Highlight_Square.Set_Position
-              (Xi_Float (Pixel.X - Listener.Model.Area.Pixels_Across / 2),
-               Xi_Float (Listener.Model.Area.Pixels_Down / 2 - Pixel.Y),
+              (Xi_Float (Pixel.X - Model.Area.Pixels_Across / 2),
+               Xi_Float (Model.Area.Pixels_Down / 2 - Pixel.Y),
                1.0);
 
             Base_Model.Mouse_Cursor.Set_Position
@@ -796,7 +807,7 @@ package body Chaos.Xi_UI.Areas is
                                      then Square_Cursor_Index
                                      else 1);
             begin
-               if New_Cursor_Index /= Listener.Model.Cursor_Index then
+               if New_Cursor_Index /= Model.Cursor_Index then
                   declare
                      Texture  : constant Xi.Texture.Xi_Texture :=
                                   Chaos.Xi_UI.Animations.Xi_Animation
@@ -808,7 +819,7 @@ package body Chaos.Xi_UI.Areas is
                                   Base_Model.Mouse_Cursor.Entity.Material;
                   begin
                      Material.Technique (1).Pass (1).Set_Texture (Texture);
-                     Listener.Model.Cursor_Index := New_Cursor_Index;
+                     Model.Cursor_Index := New_Cursor_Index;
                   end;
                end if;
             end;
@@ -823,28 +834,28 @@ package body Chaos.Xi_UI.Areas is
          Camera_Moved : Boolean := False;
       begin
          if Mouse_X < 50.0 then
-            Listener.Model.Centre_X :=
-              Listener.Model.Centre_X - 5.0;
+            Model.Centre_X :=
+              Model.Centre_X - 5.0;
             Camera_Moved := True;
          elsif Mouse_X > Event.Render_Target.Width - 50.0 then
-            Listener.Model.Centre_X :=
-              Listener.Model.Centre_X + 5.0;
+            Model.Centre_X :=
+              Model.Centre_X + 5.0;
             Camera_Moved := True;
          end if;
 
          if Mouse_Y < 50.0 then
-            Listener.Model.Centre_Y :=
-              Listener.Model.Centre_Y - 5.0;
+            Model.Centre_Y :=
+              Model.Centre_Y - 5.0;
             Camera_Moved := True;
          elsif Mouse_Y > Event.Render_Target.Height - 50.0 then
-            Listener.Model.Centre_Y :=
-              Listener.Model.Centre_Y + 5.0;
+            Model.Centre_Y :=
+              Model.Centre_Y + 5.0;
             Camera_Moved := True;
          end if;
 
          if Camera_Moved then
             Base_Model.Camera.Set_Position
-              (Listener.Model.Centre_X, Listener.Model.Centre_Y, 1000.0);
+              (Model.Centre_X, Model.Centre_Y, 1000.0);
             Base_Model.Camera.Look_At
               (Listener.Model.Centre_X, Listener.Model.Centre_Y, 0.0);
          end if;
@@ -854,9 +865,9 @@ package body Chaos.Xi_UI.Areas is
          use Xi.Mouse;
       begin
          if Current_Mouse.State.Button (Left) = Down then
-            Listener.Model.Left_Click := True;
-         elsif Listener.Model.Left_Click then
-            Listener.Model.Left_Click := False;
+            Model.Left_Click := True;
+         elsif Model.Left_Click then
+            Model.Left_Click := False;
             Check_Mouse_Square;
             Listener.Model.On_Square_Click
               (Mouse_Square);
