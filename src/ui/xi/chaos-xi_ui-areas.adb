@@ -155,7 +155,6 @@ package body Chaos.Xi_UI.Areas is
       record
          Last_Script_Execution : Ada.Calendar.Time;
          Last_Walk_Execution   : Ada.Calendar.Time;
-         Model                 : Area_Model_Access;
          Mouse_X               : Xi.Xi_Float;
          Mouse_Y               : Xi.Xi_Float;
          Key                   : Character;
