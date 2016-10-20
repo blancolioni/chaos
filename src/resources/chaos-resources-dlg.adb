@@ -45,7 +45,20 @@ package body Chaos.Resources.Dlg is
                end;
                Dlg.Pop_Offset;
             end if;
-            Dlg.State_Table.Append (State);
+            declare
+               Index : Integer := Dlg.State_Table.Last_Index;
+            begin
+               Dlg.State_Table.Append (State);
+               while Index >= 0
+                 and then State.State_Trigger <
+                   Dlg.State_Table.Element (Index).State_Trigger
+               loop
+                  Dlg.State_Table (Index + 1) :=
+                    Dlg.State_Table (Index);
+                  Index := Index - 1;
+               end loop;
+               Dlg.State_Table (Index + 1) := State;
+            end;
          end;
       end loop;
 
