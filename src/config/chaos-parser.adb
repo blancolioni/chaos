@@ -116,6 +116,16 @@ package body Chaos.Parser is
                Add_Identifier_Argument (Call, Tok_Text);
             end if;
             Scan;
+            if Tok = Tok_Left_Paren then
+               Scan;
+               if Tok = Tok_Right_Paren then
+                  Scan;
+               else
+                  Warning ("function calls not implemented");
+                  Skip_To (Tok_Right_Paren);
+                  Scan;
+               end if;
+            end if;
          elsif Tok = Tok_String_Constant then
             Add_String_Argument (Call, Tok_Text);
             Scan;
