@@ -894,7 +894,7 @@ package body Chaos.Xi_UI.Areas is
             Base_Model.Camera.Set_Position
               (Model.Centre_X, Model.Centre_Y, 1000.0);
             Base_Model.Camera.Look_At
-              (Listener.Model.Centre_X, Listener.Model.Centre_Y, 0.0);
+              (Model.Centre_X, Model.Centre_Y, 0.0);
          end if;
       end;
 
@@ -906,7 +906,7 @@ package body Chaos.Xi_UI.Areas is
          elsif Model.Left_Click then
             Model.Left_Click := False;
             Check_Mouse_Square;
-            Listener.Model.On_Square_Click
+            Model.On_Square_Click
               (Mouse_Square);
          end if;
       end;
