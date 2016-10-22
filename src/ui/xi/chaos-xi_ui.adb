@@ -6,7 +6,7 @@ with Xi.Render_Window;
 with Xi.Scene;
 
 with Xtk;
-with Xtk.FPS;
+with Xtk.Builder;
 with Xtk.Panel;
 with Xtk.Text.Buffer;
 with Xtk.Text.View;
@@ -20,7 +20,6 @@ with Chaos.Xi_UI.Models;
 with Chaos.Xi_UI.Areas;
 
 with Chaos.Xi_UI.Animations;
-with Chaos.Xi_UI.Fonts;
 with Chaos.Xi_UI.Images;
 
 with Chaos.Paths;
@@ -76,24 +75,22 @@ package body Chaos.Xi_UI is
         Xi.Main.Current_Renderer.Create_Top_Level_Window;
       Result.Window.Set_Wireframe (False);
       Result.Window.Set_Full_Screen (True);
-      Result.Font := Chaos.Xi_UI.Fonts.Interface_Font;
-      Xtk.Text.View.Xtk_New (Result.Log_View);
-      Result.Log := Result.Log_View.Text_Buffer;
-      Result.Log.Set_Font (Xi.Font.Get_Font ("SegoeUI", 12.0));
-      Xtk.Panel.Xtk_New (Result.Log_Panel, Result.Log_View);
-      Result.Log_Panel.Set_Element_Id ("log-panel");
-      Result.Log_Panel.Position_Anchor (Xtk.Right, Xtk.Bottom);
-      Result.Log_Panel.Set_Layout_Size (1000.0, 200.0);
-
-      Result.Log_Panel.Show_All;
-      Result.Window.Add_Top_Level (Result.Log_Panel);
 
       declare
-         FPS_Panel : Xtk.Panel.Xtk_Panel;
+         Builder : constant Xtk.Builder.Xtk_Builder :=
+                     Xtk.Builder.Xtk_New_From_File
+                       (Chaos.Paths.Config_File
+                          ("ui/area.html"));
+         View    : constant Xtk.Text.View.Xtk_Text_View :=
+                     Xtk.Text.View.Xtk_Text_View
+                       (Builder.Get ("log"));
       begin
-         Xtk.Panel.Xtk_New (FPS_Panel, Xtk.FPS.Create_FPS_Widget);
-         FPS_Panel.Show_All;
-         Result.Window.Add_Top_Level (FPS_Panel);
+         Result.Log := View.Text_Buffer;
+         Result.Log.Set_Font
+           (Xi.Font.Get_Font ("SegoeUI", 14.0));
+         Builder.Get_Page.Set_Viewport (Result.Window.Full_Viewport);
+         Builder.Get_Page.Show_All;
+         Result.Window.Add_Top_Level (Builder.Get_Page);
       end;
 
       return new Root_Xi_UI'(Result);
