@@ -29,9 +29,14 @@ package Chaos.Features is
       return Feature_Polygon
      with Pre => Index <= Feature.Polygon_Count;
 
+   function Sensitive
+     (Feature : Chaos_Feature_Record'Class)
+      return Boolean;
+
    function Sensitive_Area
      (Feature : Chaos_Feature_Record'Class)
-      return Feature_Polygon;
+      return Feature_Polygon
+     with Pre => Feature.Sensitive;
 
    function Bounding_Box
      (Feature : Chaos_Feature_Record'Class)
@@ -99,5 +104,9 @@ private
 
    overriding procedure Add_Properties
      (Feature : Chaos_Feature_Record);
+
+   function Sensitive (Feature : Chaos_Feature_Record'Class)
+                       return Boolean
+   is (not Feature.Sensitive_Areas.Is_Empty);
 
 end Chaos.Features;

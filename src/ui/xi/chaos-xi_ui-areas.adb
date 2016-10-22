@@ -372,24 +372,27 @@ package body Chaos.Xi_UI.Areas is
                end;
             end loop;
 
-            declare
-               Boundary : constant Chaos.Features.Feature_Polygon :=
-                            Feature.Sensitive_Area;
-               Node     : constant Xi.Node.Xi_Node :=
-                            Base_Model.Feature_Top.Create_Child
-                              ("sensitive" & Integer'Image (-Feature_Index));
-               Entity   : Xi.Entity.Xi_Entity;
-            begin
-               Xi.Entity.Xi_New (Entity);
-               Entity.Begin_Operation (Xi.Render_Operation.Triangle_Fan);
-               for Loc of Boundary loop
-                  Entity.Normal (0.0, 0.0, 1.0);
-                  Entity.Vertex (Model.To_World_Position (Loc, 1.0));
-               end loop;
-               Entity.End_Operation;
-               Entity.Set_Material (Xi.Assets.Material ("Xi.Purple"));
-               Node.Set_Entity (Entity);
-            end;
+            if Feature.Sensitive then
+               declare
+                  Boundary : constant Chaos.Features.Feature_Polygon :=
+                               Feature.Sensitive_Area;
+                  Node     : constant Xi.Node.Xi_Node :=
+                               Base_Model.Feature_Top.Create_Child
+                                 ("sensitive"
+                                  & Integer'Image (-Feature_Index));
+                  Entity   : Xi.Entity.Xi_Entity;
+               begin
+                  Xi.Entity.Xi_New (Entity);
+                  Entity.Begin_Operation (Xi.Render_Operation.Triangle_Fan);
+                  for Loc of Boundary loop
+                     Entity.Normal (0.0, 0.0, 1.0);
+                     Entity.Vertex (Model.To_World_Position (Loc, 1.0));
+                  end loop;
+                  Entity.End_Operation;
+                  Entity.Set_Material (Xi.Assets.Material ("Xi.Purple"));
+                  Node.Set_Entity (Entity);
+               end;
+            end if;
          end;
       end loop;
 
