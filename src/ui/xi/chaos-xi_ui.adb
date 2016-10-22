@@ -68,7 +68,7 @@ package body Chaos.Xi_UI is
    begin
       Xi.Main.Init;
       Xtk.Initialize
-        (Chaos.Paths.Config_File ("styles/chaos.css"));
+        (Chaos.Paths.Config_File ("ui/chaos.css"));
       Xtk.Text.Buffer.Xtk_New (Result.Log);
       Result.Initialize;
       Result.Window :=
@@ -83,7 +83,7 @@ package body Chaos.Xi_UI is
                           ("ui/area.html"));
          View    : constant Xtk.Text.View.Xtk_Text_View :=
                      Xtk.Text.View.Xtk_Text_View
-                       (Builder.Get ("log"));
+                       (Builder.Get ("log-text-view"));
       begin
          Result.Log := View.Text_Buffer;
          Result.Log.Set_Font
