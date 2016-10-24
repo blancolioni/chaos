@@ -1,9 +1,10 @@
 with Ada.Containers.Ordered_Maps;
-with Ada.IO_Exceptions;
+with Ada.Directories;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO;
 
 with Tropos.Reader;
+with Tropos.Writer;
 with Chaos.Paths;
 
 with Chaos.Resources.Manager;
@@ -116,17 +117,26 @@ package body Chaos.Infinity_Engine is
    --------------------------
 
    procedure Read_Infinity_Config is
+      Override_Path : constant String :=
+                        Chaos.Paths.Config_File ("infinity-local.txt");
+      Infinity_Path : constant String :=
+                        Chaos.Paths.Config_File
+                          ("infinity/infinity.txt");
    begin
-      Infinity_Config :=
-        Tropos.Reader.Read_Config
-          (Chaos.Paths.Config_File ("infinity/infinity.txt"));
-   exception
-      when Ada.IO_Exceptions.Status_Error =>
+      if Ada.Directories.Exists (Override_Path) then
+         Infinity_Config :=
+           Tropos.Reader.Read_Config (Override_Path);
+      elsif Ada.Directories.Exists (Infinity_Path) then
+         Infinity_Config :=
+           Tropos.Reader.Read_Config (Infinity_Path);
+         Tropos.Writer.Write_Config (Infinity_Config, Override_Path);
+      else
          Ada.Text_IO.Put_Line
            (Ada.Text_IO.Standard_Error,
             "Cannot find infinity engine config in "
             & Chaos.Paths.Config_File ("infinity/infinity.txt"));
-            raise;
+         raise Program_Error;
+      end if;
    end Read_Infinity_Config;
 
 end Chaos.Infinity_Engine;
