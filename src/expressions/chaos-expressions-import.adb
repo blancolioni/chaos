@@ -3,7 +3,6 @@ with Ada.Text_IO;
 
 with WL.Binary_IO;                     use WL.Binary_IO;
 
-with Lith.Environment;
 with Lith.Objects.Symbols;
 
 with Chaos.Expressions.Maps;
@@ -393,8 +392,9 @@ package body Chaos.Expressions.Import is
    begin
       if Script_Cache = Lith.Objects.Nil then
          Script_Cache := Chaos.Expressions.Maps.Create;
-         Lith.Environment.Define
-           ("chaos-script-cache", Script_Cache);
+         Store.Define_Top_Level
+           (Lith.Objects.Symbols.Get_Symbol ("chaos-script-cache"),
+            Script_Cache);
       end if;
 
       if Chaos.Expressions.Maps.Contains

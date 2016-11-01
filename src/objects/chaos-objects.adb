@@ -1,6 +1,5 @@
 with Ada.Characters.Handling;
 
-with Lith.Environment;
 with Lith.Objects.Symbols;
 
 with Chaos.Expressions;
@@ -80,8 +79,10 @@ package body Chaos.Objects is
      (Object : Root_Chaos_Object_Record'Class)
    is
    begin
-      Lith.Environment.Define
-        (Object.Object_Database.Database_Class_Name & "-" & Object.Identifier,
+      Chaos.Expressions.Store.Define_Top_Level
+        (Lith.Objects.Symbols.Get_Symbol
+           (Object.Object_Database.Database_Class_Name
+            & "-" & Object.Identifier),
          Object.To_Expression);
    end Define_Object;
 
@@ -347,17 +348,17 @@ package body Chaos.Objects is
       List        : Lith.Objects.Object;
       Have_List   : Boolean;
    begin
-      Lith.Environment.Get (List_Symbol, List, Have_List);
+      Store.Get_Top_Level (List_Symbol, List, Have_List);
       if not Have_List then
          List := Lith.Objects.Nil;
-         Lith.Environment.Define (List_Symbol, List);
+         Store.Define_Top_Level (List_Symbol, List);
          Object.Add_Properties;
       end if;
 
       Store.Push (Object.To_Expression);
       Store.Push (List);
       Store.Cons;
-      Lith.Environment.Replace
+      Store.Define_Top_Level
         (List_Symbol, Store.Pop);
    end Save_Object;
 

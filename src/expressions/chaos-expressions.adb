@@ -1,4 +1,3 @@
-with Lith.Environment;
 with Lith.Library;
 with Lith.Objects.Symbols;
 
@@ -14,8 +13,9 @@ package body Chaos.Expressions is
    procedure Create_Environment is
    begin
       Lith.Library.Initialise (256 * 1024);
-      Lith.Environment.Define
-        ("global", Chaos.Expressions.Maps.Create);
+      Store.Define_Top_Level
+        (Lith.Objects.Symbols.Get_Symbol ("global"),
+         Chaos.Expressions.Maps.Create);
       Chaos.Expressions.Primitives.Create_Primitives;
    end Create_Environment;
 
@@ -25,7 +25,7 @@ package body Chaos.Expressions is
 
    function Store return access Lith.Objects.Object_Store'Class is
    begin
-      return Lith.Library.Store;
+      return Lith.Library.Library_Store;
    end Store;
 
    -----------------

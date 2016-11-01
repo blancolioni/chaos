@@ -1,5 +1,7 @@
 with Tropos.Reader;
 
+with Lith.Objects.Interfaces;
+
 with Chaos.Paths;
 with Chaos.Classes.Configure;
 with Chaos.Entities.Weapons.Configure;
@@ -51,6 +53,8 @@ package body Chaos.Configuration is
       Chaos.Creatures.Primitives.Add_Primitives;
       Chaos.Game.Primitives.Add_Primitives;
       Chaos.Objects.Primitives.Add_Primitives;
+
+      Lith.Objects.Interfaces.Bind_Primitives (Chaos.Expressions.Store.all);
 
       Chaos.Expressions.Import.Triggers.Load_Triggers;
       Chaos.Expressions.Import.Actions.Load_Actions;

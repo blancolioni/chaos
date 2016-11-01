@@ -1,6 +1,6 @@
 with WL.String_Maps;
 
-with Lith.Environment;
+with Lith.Objects.Symbols;
 
 with Chaos.Logging;
 with Chaos.Paths;
@@ -198,8 +198,8 @@ package body Chaos.Powers.Configure is
       Value : Lith.Objects.Object)
    is
    begin
-      Lith.Environment.Define
-        (Power.Attack_Setting, Value);
+      Chaos.Expressions.Store.Define_Top_Level
+        (Lith.Objects.Symbols.Get_Symbol (Power.Attack_Setting), Value);
    end Set_Attack;
 
    -----------------
@@ -211,8 +211,8 @@ package body Chaos.Powers.Configure is
       Value : Lith.Objects.Object)
    is
    begin
-      Lith.Environment.Define
-        (Power.Defence_Setting, Value);
+      Chaos.Expressions.Store.Define_Top_Level
+        (Lith.Objects.Symbols.Get_Symbol (Power.Defence_Setting), Value);
    end Set_Defence;
 
    -----------------

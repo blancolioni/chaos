@@ -4,7 +4,6 @@ with Ada.Exceptions;
 
 with WL.String_Maps;
 
-with Lith.Environment;
 with Lith.Objects.Interfaces;
 with Lith.Objects.Symbols;
 
@@ -92,7 +91,7 @@ package body Chaos.Expressions.Primitives is
                       Ada.Characters.Handling.To_Lower
                         (Get_Name (To_Symbol (Map)));
             begin
-               return Get (Lith.Environment.Get (Get_Symbol (Id)), Name);
+               return Get (Store.Get_Top_Level (Get_Symbol (Id)), Name);
             end;
          elsif Chaos.Objects.Is_Object (Map) then
             return Chaos.Objects.To_Object (Map).Property (Name);
@@ -121,7 +120,8 @@ package body Chaos.Expressions.Primitives is
             Prop_Name : constant String :=
                           Full_Name (Full_Name'First + 6 .. Full_Name'Last);
             Map       : constant Lith.Objects.Object :=
-                          Lith.Environment.Get (Map_Name);
+                          Store.Get_Top_Level
+                            (Lith.Objects.Symbols.Get_Symbol (Map_Name));
          begin
             return Get (Map, Prop_Name);
          exception
@@ -180,7 +180,7 @@ package body Chaos.Expressions.Primitives is
                       Ada.Characters.Handling.To_Lower
                         (Get_Name (To_Symbol (Map)));
             begin
-               Set (Lith.Environment.Get (Get_Symbol (Id)), Name);
+               Set (Store.Get_Top_Level (Get_Symbol (Id)), Name);
             end;
          elsif Chaos.Objects.Is_Object (Map) then
             raise Constraint_Error with
@@ -208,7 +208,8 @@ package body Chaos.Expressions.Primitives is
             Prop_Name : constant String :=
                           Full_Name (Full_Name'First + 6 .. Full_Name'Last);
             Map       : constant Lith.Objects.Object :=
-                          Lith.Environment.Get (Map_Name);
+                          Store.Get_Top_Level
+                            (Lith.Objects.Symbols.Get_Symbol (Map_Name));
          begin
             Set (Map, Prop_Name);
          exception

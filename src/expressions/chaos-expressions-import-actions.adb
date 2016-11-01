@@ -2,7 +2,6 @@ with Ada.Containers.Vectors;
 
 with WL.String_Maps;
 
-with Lith.Environment;
 with Lith.Objects.Interfaces;
 with Lith.Objects.Symbols;
 
@@ -131,7 +130,8 @@ package body Chaos.Expressions.Import.Actions is
         ("ACTION",
          Get_Name (Action_Name)
          & " = " & Store.Show (Store.Top));
-      Lith.Environment.Define (Full_Name, Store.Pop);
+      Store.Define_Top_Level
+        (Full_Name, Store.Pop);
 
       Actions (Index) := Info;
 
@@ -436,7 +436,8 @@ package body Chaos.Expressions.Import.Actions is
    procedure Load_Actions is
    begin
       Lith.Objects.Interfaces.Define_Function
-        ("chaos-add-action", 3, Evaluate_Chaos_Add_Action'Access);
+        (Chaos.Expressions.Store, "chaos-add-action",
+         Evaluate_Chaos_Add_Action'Access);
       No_Action := Lith.Objects.Symbols.Get_Symbol ("no-action");
 
       if not Chaos.Expressions.Store.Load

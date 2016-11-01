@@ -2,7 +2,6 @@ with Ada.Containers.Vectors;
 
 with WL.String_Maps;
 
-with Lith.Environment;
 with Lith.Objects.Interfaces;
 with Lith.Objects.Symbols;
 
@@ -118,7 +117,8 @@ package body Chaos.Expressions.Import.Triggers is
       Chaos.Logging.Log
         ("TRIGGER",
          Get_Name (Info.Script_Name) & " = " & Store.Show (Store.Top));
-      Lith.Environment.Define (Info.Function_Name, Store.Pop);
+      Store.Define_Top_Level
+        (Info.Function_Name, Store.Pop);
 
       Triggers (Index) := Info;
 
@@ -347,7 +347,7 @@ package body Chaos.Expressions.Import.Triggers is
    procedure Load_Triggers is
    begin
       Lith.Objects.Interfaces.Define_Function
-        ("chaos-add-trigger", 3, Evaluate_Chaos_Add_Trigger'Access);
+        (Store, "chaos-add-trigger", Evaluate_Chaos_Add_Trigger'Access);
       No_Trigger := Lith.Objects.Symbols.Get_Symbol ("no-trigger");
       if not Chaos.Expressions.Store.Load
         (Chaos.Paths.Config_File

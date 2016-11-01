@@ -1,6 +1,8 @@
 with Lith.Objects;
 with Lith.Objects.Interfaces;
 
+with Chaos.Expressions;
+
 package body Chaos.UI is
 
    Local_Current_UI : Chaos_UI;
@@ -69,7 +71,8 @@ package body Chaos.UI is
       pragma Unreferenced (UI);
    begin
       Lith.Objects.Interfaces.Define_Function
-        ("ui-display-string", 1,
+        (Chaos.Expressions.Store,
+         "ui-display-string",
          Evaluate_UI_Display_String'Access);
    end Initialize;
 
