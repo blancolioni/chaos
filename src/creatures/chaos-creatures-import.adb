@@ -59,7 +59,10 @@ package body Chaos.Creatures.Import is
             else Creature.Short_Name);
 
          Chaos.Expressions.Import.Import_Scripts (Cre.Scripts);
-         Creature.Script := Chaos.Expressions.Store.Pop;
+         Creature.Set_Script (Chaos.Expressions.Store.Pop);
+
+         Creature.Log ("imported script: "
+                       & Chaos.Expressions.Store.Show (Creature.Script));
 
          Creature.Race :=
            Chaos.Races.Import.Import_Race (Natural (Cre.Ids (Race)));
