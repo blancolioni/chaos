@@ -8,6 +8,7 @@ with Chaos.Powers.Configure;
 with Chaos.Races.Configure;
 with Chaos.Teams.Configure;
 
+with Chaos.Actors.Primitives;
 with Chaos.Areas.Primitives;
 with Chaos.Game.Primitives;
 with Chaos.Expressions;
@@ -34,10 +35,18 @@ package body Chaos.Configuration is
       Chaos.Expressions.Create_Environment;
 
       Chaos.Identifiers.Import.Import_Identifiers ("object");
-      Chaos.Identifiers.Import.Import_Identifiers ("ea");
       Chaos.Identifiers.Import.Import_Identifiers ("reaction");
       Chaos.Identifiers.Import.Import_Identifiers ("state");
 
+      Chaos.Identifiers.Import.Import_Identifiers ("ea");
+      Chaos.Identifiers.Import.Import_Identifiers ("general");
+      Chaos.Identifiers.Import.Import_Identifiers ("race");
+      Chaos.Identifiers.Import.Import_Identifiers ("class");
+      Chaos.Identifiers.Import.Import_Identifiers ("specific");
+      Chaos.Identifiers.Import.Import_Identifiers ("gender");
+      Chaos.Identifiers.Import.Import_Identifiers ("align");
+
+      Chaos.Actors.Primitives.Add_Primitives;
       Chaos.Areas.Primitives.Create_Primitives;
       Chaos.Creatures.Primitives.Add_Primitives;
       Chaos.Game.Primitives.Add_Primitives;
