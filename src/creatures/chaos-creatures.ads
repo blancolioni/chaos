@@ -244,7 +244,6 @@ private
          Inventory           : Inventory_Entity_Array := (others => null);
          Active_Weapon       : Chaos.Equipment.Weapon_Slot :=
                                  Chaos.Equipment.Weapon_1;
-         Script              : Lith.Objects.Object;
          Last_Talked_To_By   : Chaos_Creature;
          Num_Times_Talked_To : Natural := 0;
       end record;
