@@ -163,6 +163,9 @@ begin
             Chaos.Game.Current_Game.Area.Actor
               (Chaos.Creatures.Get ("FIREB1")));
 
+         Chaos.Game.Current_Game.Travel ("AR2602", "EXIT2600");
+         Chaos.Game.Current_Game.Script_Round;
+
          UI.Stop;
       end;
    else
