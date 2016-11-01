@@ -70,6 +70,38 @@ package body Chaos.Actors.Visibility is
       Actor.Area.Scan_Visible_Actors (Actor, Process'Access);
    end Add_Actor_Can_See;
 
+   -------------
+   -- Can_See --
+   -------------
+
+   function Can_See
+     (Actor    : Chaos_Actor;
+      Location : Chaos.Locations.Square_Location)
+      return Boolean
+   is
+   begin
+      return Actor.Area.Visible (Actor.Location, Location);
+   end Can_See;
+
+   -------------
+   -- Can_See --
+   -------------
+
+   function Can_See
+     (Actor  : Chaos_Actor;
+      Target : not null access constant
+        Chaos.Objects.Root_Chaos_Object_Record'Class)
+      return Boolean
+   is
+   begin
+      if Target.all in Chaos_Actor_Record'Class then
+         return Actor.Area.Visible (Actor.Location,
+                                    Chaos_Actor (Target).Location);
+      else
+         return False;
+      end if;
+   end Can_See;
+
    -----------
    -- Clear --
    -----------

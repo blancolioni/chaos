@@ -4,6 +4,17 @@ with Chaos.Teams;
 
 package Chaos.Actors.Visibility is
 
+   function Can_See
+     (Actor    : Chaos_Actor;
+      Location : Chaos.Locations.Square_Location)
+      return Boolean;
+
+   function Can_See
+     (Actor  : Chaos_Actor;
+      Target : not null access constant
+        Chaos.Objects.Root_Chaos_Object_Record'Class)
+      return Boolean;
+
    type Actor_Groups is private;
 
    procedure Clear (Groups : in out Actor_Groups);
