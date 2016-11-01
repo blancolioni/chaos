@@ -316,10 +316,10 @@ package body Chaos.Expressions.Import.Triggers is
                   end if;
                end;
 
-            when Coordinate_Argument =>
+            when Tuple_Argument =>
                Chaos.Logging.Log
                  ("TRIGGER",
-                  "warning: point argument not allowed for trigger "
+                  "warning: tuple argument not allowed for trigger "
                   & Trigger_Name);
          end case;
       end loop;

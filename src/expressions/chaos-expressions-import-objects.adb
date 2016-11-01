@@ -25,8 +25,7 @@ package body Chaos.Expressions.Import.Objects is
       Id_5      : Natural;
       Name      : String)
    is
-      pragma Unreferenced (Team, Faction, EA, General, Race, Class,
-                           Specific, Gender, Alignment,
+      pragma Unreferenced (Team, Faction,
                            Id_1, Id_2, Id_3, Id_4, Id_5);
    begin
       if Name /= "" then
@@ -38,10 +37,8 @@ package body Chaos.Expressions.Import.Objects is
          Store.Create_List (2);
          Store.Push (Store.Pop, Lith.Objects.Secondary);
       else
-         Store.Push (Lith.Objects.Symbols.Quote_Symbol);
-         Store.Push_Nil;
-         Store.Create_List (2);
-         Store.Push (Store.Pop, Lith.Objects.Secondary);
+         Import_Object_Tuple
+           ((EA, General, Race, Class, Specific, Gender, Alignment));
       end if;
    end Import_Object;
 
@@ -75,6 +72,31 @@ package body Chaos.Expressions.Import.Objects is
       Store.Create_List (2);
       Store.Push (Store.Pop, Lith.Objects.Secondary);
    end Import_Object_Name;
+
+   -------------------------
+   -- Import_Object_Tuple --
+   -------------------------
+
+   procedure Import_Object_Tuple
+     (Tuple : Script_Tuple)
+   is
+   begin
+      if (for all X of Tuple => X = 0) then
+         Store.Push (Lith.Objects.False_Value, Lith.Objects.Secondary);
+         return;
+      end if;
+
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-match-object"));
+      for I in 1 .. 7 loop
+         if I <= Tuple'Last then
+            Store.Push (Tuple (I));
+         else
+            Store.Push (0);
+         end if;
+      end loop;
+      Store.Create_List (8);
+      Store.Push (Store.Pop, Lith.Objects.Secondary);
+   end Import_Object_Tuple;
 
    ------------------
    -- Load_Objects --

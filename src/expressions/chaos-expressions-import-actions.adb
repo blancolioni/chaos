@@ -376,12 +376,30 @@ package body Chaos.Expressions.Import.Actions is
                   end if;
                end;
 
-            when Coordinate_Argument =>
-               if Available (Point_X) then
-                  X := Arg.X;
-                  Y := Arg.Y;
+            when Tuple_Argument =>
+               if Available (Point_X)
+                 and then Arg.Tuple.Element'Length = 2
+               then
+                  X := Arg.Tuple.Element (1);
+                  Y := Arg.Tuple.Element (2);
                   Available (Point_X) := False;
                   Available (Point_Y) := False;
+               elsif Available (Object_1)
+                 or else Available (Object_2)
+                 or else Available (Object_3)
+               then
+                  Objects.Import_Object_Tuple
+                    (Arg.Tuple.Element);
+                  if Available (Object_1) then
+                     Available (Object_1) := False;
+                     Have_Object (Object_1) := True;
+                  elsif Available (Object_2) then
+                     Available (Object_2) := False;
+                     Have_Object (Object_2) := True;
+                  else
+                     Available (Object_3) := False;
+                     Have_Object (Object_3) := True;
+                  end if;
                else
                   Chaos.Logging.Log
                     ("Action",

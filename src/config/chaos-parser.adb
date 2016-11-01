@@ -15,6 +15,8 @@ with Chaos.Expressions.Vectors;
 with Chaos.Expressions.Import.Actions;
 with Chaos.Expressions.Import.Triggers;
 
+with Chaos.Identifiers;
+
 with Chaos.Logging;
 
 package body Chaos.Parser is
@@ -132,38 +134,45 @@ package body Chaos.Parser is
          elsif Tok = Tok_Left_Bracket then
             Scan;
             declare
-               X, Y : Integer := 0;
+               Tuple : Script_Tuple (1 .. 10);
+               Count : Natural := 0;
             begin
-               if Tok = Tok_Identifier and then Is_Number (Tok_Text) then
-                  X := Integer'Value (Tok_Text);
-                  Scan;
-               else
-                  Error ("missing X coordinate");
-                  Skip_To
-                    (Tok_Dot, Tok_Right_Bracket, Tok_Comma,
-                     Tok_Right_Paren);
-               end if;
-               if Tok = Tok_Dot then
-                  Scan;
-               else
-                  Error ("missing '.'");
-               end if;
-               if Tok = Tok_Identifier and then Is_Number (Tok_Text) then
-                  Y := Integer'Value (Tok_Text);
-                  Scan;
-               else
-                  Error ("missing Y coordinate");
-                  Skip_To
-                    (Tok_Right_Bracket, Tok_Comma,
-                     Tok_Right_Paren, Tok_Identifier);
-               end if;
+               while Tok /= Tok_Right_Bracket loop
+                  Count := Count + 1;
+                  if Count > Tuple'Last then
+                     Error ("too many tuple elements");
+                     Skip_To (Tok_Right_Bracket);
+                     exit;
+                  end if;
+
+                  if Is_Number (Tok_Text) then
+                     Tuple (Count) := Integer'Value (Tok_Text);
+                  elsif Chaos.Identifiers.Exists (Tok_Text) then
+                     Tuple (Count) := Chaos.Identifiers.Value (Tok_Text);
+                  else
+                     Error ("undefined: " & Tok_Text);
+                     Tuple (Count) := 0;
+                  end if;
+
+                  if Tok = Tok_Dot then
+                     Scan;
+                     if Tok = Tok_Right_Bracket then
+                        Error ("extra '.' ignored");
+                     end if;
+                  else
+                     if Tok = Tok_Identifier then
+                        Error ("missing '.'");
+                     elsif Tok /= Tok_Right_Bracket then
+                        Error ("syntax error");
+                     end if;
+                  end if;
+               end loop;
+
                if Tok = Tok_Right_Bracket then
                   Scan;
-               else
-                  Error ("missing ']'");
-                  Skip_To (Tok_Right_Bracket, Tok_Right_Paren, Tok_Comma);
                end if;
-               Add_Coordinate_Argument (Call, X, Y);
+
+               Add_Tuple_Argument (Call, Tuple (1 .. Count));
             end;
          else
             Error ("unexpected '" & Tok_Text & "'");

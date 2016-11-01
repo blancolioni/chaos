@@ -1,3 +1,4 @@
+private with Ada.Containers.Indefinite_Holders;
 private with Ada.Containers.Indefinite_Vectors;
 private with Ada.Strings.Unbounded;
 
@@ -30,14 +31,19 @@ package Chaos.Expressions.Import is
      (Call  : in out Function_Call;
       Value : Integer);
 
-   procedure Add_Coordinate_Argument
+   type Script_Tuple is array (Positive range <>) of Natural;
+
+   procedure Add_Tuple_Argument
      (Call  : in out Function_Call;
-      X, Y  : Integer);
+      Tuple : Script_Tuple);
 
 private
 
    type Argument_Type is (Integer_Argument, Text_Argument,
-                          Identifier_Argument, Coordinate_Argument);
+                          Identifier_Argument, Tuple_Argument);
+
+   package Tuple_Holder is
+     new Ada.Containers.Indefinite_Holders (Script_Tuple);
 
    type Actual_Argument (Arg_Type : Argument_Type) is
       record
@@ -48,8 +54,8 @@ private
                Text_Value    : Ada.Strings.Unbounded.Unbounded_String;
             when Identifier_Argument =>
                Identifier_Name : Ada.Strings.Unbounded.Unbounded_String;
-            when Coordinate_Argument =>
-               X, Y            : Integer;
+            when Tuple_Argument =>
+               Tuple           : Tuple_Holder.Holder;
          end case;
       end record;
 

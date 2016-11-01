@@ -12,8 +12,6 @@ with Chaos.Expressions.Import.Actions;
 with Chaos.Expressions.Import.Objects;
 with Chaos.Expressions.Import.Triggers;
 
-with Chaos.Parser;
-
 with Chaos.Resources.Manager;
 with Chaos.Resources.Bcs;
 
@@ -80,18 +78,6 @@ package body Chaos.Expressions.Import is
       Index    : in out Positive);
 
    -----------------------------
-   -- Add_Coordinate_Argument --
-   -----------------------------
-
-   procedure Add_Coordinate_Argument
-     (Call  : in out Function_Call;
-      X, Y  : Integer)
-   is
-   begin
-      Call.Args.Append ((Coordinate_Argument, X, Y));
-   end Add_Coordinate_Argument;
-
-   -----------------------------
    -- Add_Identifier_Argument --
    -----------------------------
 
@@ -128,6 +114,19 @@ package body Chaos.Expressions.Import is
       Call.Args.Append ((Text_Argument,
                         Ada.Strings.Unbounded.To_Unbounded_String (Text)));
    end Add_String_Argument;
+
+   ------------------------
+   -- Add_Tuple_Argument --
+   ------------------------
+
+   procedure Add_Tuple_Argument
+     (Call  : in out Function_Call;
+      Tuple : Script_Tuple)
+   is
+   begin
+      Call.Args.Append ((Tuple_Argument,
+                        Tuple_Holder.To_Holder (Tuple)));
+   end Add_Tuple_Argument;
 
    --------------------------
    -- Create_Function_Call --
@@ -434,18 +433,28 @@ package body Chaos.Expressions.Import is
    is
       Block_Count : Natural := 0;
    begin
-      Chaos.Parser.Parse_Expression
-        ("this.script-continue := true");
+      Store.Push (Lith.Objects.Symbols.Begin_Symbol);
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-set-flag"));
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("this"));
+      Store.Push (Lith.Objects.Symbols.Quote_Symbol);
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("script-continue"));
+      Store.Create_List (2);
+      Store.Create_List (3);
       for Resource of Scripts loop
          if Chaos.Resources.Has_Resource (Resource) then
             Store.Push (Lith.Objects.Symbols.If_Symbol);
-            Chaos.Parser.Parse_Expression ("this.script-continue");
+            Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-flag"));
+            Store.Push (Lith.Objects.Symbols.Get_Symbol ("this"));
+            Store.Push (Lith.Objects.Symbols.Quote_Symbol);
+            Store.Push (Lith.Objects.Symbols.Get_Symbol ("script-continue"));
+            Store.Create_List (2);
+            Store.Create_List (3);
             Import_Script (Resource);
             Store.Create_List (3);
             Block_Count := Block_Count + 1;
          end if;
       end loop;
-      Store.Create_List (Block_Count + 1);
+      Store.Create_List (Block_Count + 2);
    end Import_Scripts;
 
    ---------------

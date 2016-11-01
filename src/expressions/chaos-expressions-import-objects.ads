@@ -25,4 +25,7 @@ package Chaos.Expressions.Import.Objects is
    procedure Import_Object_Name
      (Name : String);
 
+   procedure Import_Object_Tuple
+     (Tuple : Script_Tuple);
+
 end Chaos.Expressions.Import.Objects;
