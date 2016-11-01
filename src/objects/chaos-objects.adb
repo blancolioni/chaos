@@ -298,7 +298,7 @@ package body Chaos.Objects is
    --------------
 
    function Property
-     (Object : Root_Chaos_Object_Record'Class;
+     (Object : Root_Chaos_Object_Record;
       Name   : String)
       return Lith.Objects.Object
    is

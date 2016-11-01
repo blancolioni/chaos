@@ -71,7 +71,7 @@ package Chaos.Objects is
       Get            : Property_Get_Function);
 
    function Property
-     (Object : Root_Chaos_Object_Record'Class;
+     (Object : Root_Chaos_Object_Record;
       Name   : String)
       return Lith.Objects.Object;
 

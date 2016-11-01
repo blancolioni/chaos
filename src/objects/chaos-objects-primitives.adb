@@ -8,6 +8,10 @@ with Chaos.Items;
 
 with Chaos.Logging;
 
+------------------------------
+-- Chaos.Objects.Primitives --
+------------------------------
+
 package body Chaos.Objects.Primitives is
 
    function Evaluate_Chaos_Clear_Flag
