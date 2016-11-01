@@ -219,10 +219,14 @@ package body Chaos.Objects is
      (Object  : Root_Chaos_Object_Record'Class;
       Message : String)
    is
+      Class_Name : constant String :=
+                     Ada.Characters.Handling.To_Upper
+                       (Object.Object_Database.Database_Class_Name);
+      Id         : constant String := Object.Identifier;
    begin
       Chaos.Logging.Log
-        (Ada.Characters.Handling.To_Upper
-           (Object.Object_Database.Database_Class_Name),
+        (Class_Name
+         & (if Id /= "" then ": " & Object.Identifier else ""),
          Message);
    end Log;
 
@@ -303,7 +307,8 @@ package body Chaos.Objects is
       return Lith.Objects.Object
    is
       Class_Name : constant String :=
-                     Object.Object_Database.Database_Class_Name;
+                     Root_Chaos_Object_Record'Class (Object)
+                     .Object_Database.Database_Class_Name;
       Empty_Map  : Property_Maps.Map;
    begin
       if not Class_Properties.Contains (Class_Name) then
