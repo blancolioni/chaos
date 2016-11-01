@@ -87,11 +87,13 @@ package body Chaos.Actors is
 
       procedure Create (Actor : in out Chaos_Actor_Record'Class) is
       begin
+         Actor.Initialize (From_Creature.Identifier);
          Actor.Area := Area;
          Actor.Creature := From_Creature;
          Actor.Location := Location;
          Actor.Orientation := Orientation;
          Actor.Hit_Points := From_Creature.Current_Hit_Points;
+         Actor.Set_Script (From_Creature.Script);
       end Create;
 
       Result : constant Chaos_Actor := Db.Create (Create'Access);
@@ -135,6 +137,19 @@ package body Chaos.Actors is
    begin
       return Chaos.Locations.First_Square (Actor.Path);
    end First_Path_Square;
+
+   ---------------
+   -- Get_Actor --
+   ---------------
+
+   function Get_Actor
+     (From_Object : Lith.Objects.Object)
+      return Chaos_Actor
+   is
+   begin
+      return Chaos_Actor_Record'Class
+        (Chaos.Objects.To_Object (From_Object).all)'Access;
+   end Get_Actor;
 
    ----------------------
    -- Has_Minor_Action --

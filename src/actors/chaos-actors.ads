@@ -1,5 +1,5 @@
 private with Memor;
-private with Lith.Objects;
+with Lith.Objects;
 
 limited with Chaos.Areas;
 
@@ -150,6 +150,13 @@ package Chaos.Actors is
       return Chaos.Teams.Chaos_Team
    is (Actor.Creature.Team);
 
+   function Get_Actor
+     (From_Object : Lith.Objects.Object)
+      return Chaos_Actor
+     with Pre => Chaos.Objects.Is_Object (From_Object)
+     and then Chaos.Objects.To_Object (From_Object).all
+     in Chaos_Actor_Record'Class;
+
    procedure Reset_Actions (Actor : in out Chaos_Actor_Record'Class);
 
    procedure Take_Damage
@@ -200,5 +207,11 @@ private
      (Actor : Chaos_Actor_Record)
       return String
    is (Actor.Creature.Display_Name);
+
+   overriding function Property
+     (Actor : Chaos_Actor_Record;
+      Name  : String)
+      return Lith.Objects.Object
+   is (Actor.Creature.Property (Name));
 
 end Chaos.Actors;
