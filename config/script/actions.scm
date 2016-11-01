@@ -1,6 +1,8 @@
 (chaos-add-action 0 'no-action #f)
 (chaos-add-action 3 'Attack '(chaos-attack this object-1))
 (chaos-add-action 7 'create-creature '(chaos-create-actor this text-1 x y integer-1))
+(chaos-add-action 8 'Dialog '(chaos-start-dialog this object-1))
+(chaos-add-action 10 'Enemy '(chaos-set-allegiance this 'ENEMY))
 (chaos-add-action 15 'GiveItem '(chaos-give-item this object-1 object-2))
 (chaos-add-action 30 'SetGlobal '(chaos-set-property text-2 text-1 integer-1))
 (chaos-add-action 31 'Spell '(chaos-cast-spell this object-1 integer-1))
