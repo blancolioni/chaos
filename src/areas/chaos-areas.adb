@@ -265,6 +265,25 @@ package body Chaos.Areas is
       return Area.Features.Last_Index;
    end Feature_Count;
 
+   -------------------------
+   -- Find_Matching_Actor --
+   -------------------------
+
+   function Find_Matching_Actor
+     (Area    : Chaos_Area_Record'Class;
+      Test    : not null access
+        function (Actor : Chaos.Actors.Chaos_Actor) return Boolean)
+      return Chaos.Actors.Chaos_Actor
+   is
+   begin
+      for Actor of Area.Actors loop
+         if Test (Actor) then
+            return Actor;
+         end if;
+      end loop;
+      return null;
+   end Find_Matching_Actor;
+
    ---------------
    -- Find_Path --
    ---------------
@@ -477,6 +496,25 @@ package body Chaos.Areas is
            & " in area " & Area.Identifier;
       end if;
    end Remove_Actor;
+
+   --------------------------
+   -- Scan_Matching_Actors --
+   --------------------------
+
+   procedure Scan_Matching_Actors
+     (Area    : Chaos_Area_Record'Class;
+      Test    : not null access
+        function (Actor : Chaos.Actors.Chaos_Actor) return Boolean;
+      Process : not null access
+        procedure (Actor : Chaos.Actors.Chaos_Actor))
+   is
+   begin
+      for Actor of Area.Actors loop
+         if Test (Actor) then
+            Process (Actor);
+         end if;
+      end loop;
+   end Scan_Matching_Actors;
 
    -------------------------
    -- Scan_Visible_Actors --

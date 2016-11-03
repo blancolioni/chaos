@@ -30,7 +30,8 @@ package body Chaos.Game.Primitives is
    begin
       Define_Function ("chaos-party-experience", 1,
                        Evaluate_Chaos_Party_Experience'Access);
-      Define_Function ("chaos-script-flag", 3,
+      Define_Function ("chaos-script-flag",
+                       (Any_Argument_Type, Symbol_Argument, Atom_Argument),
                        Evaluate_Chaos_Script_Flag'Access);
       Define_Function ("chaos-take-party-item", 2,
                        Evaluate_Chaos_Take_Party_Item'Access);
@@ -67,8 +68,7 @@ package body Chaos.Game.Primitives is
                  Lith.Objects.Symbols.Get_Name
                    (Lith.Objects.To_Symbol (Store.Argument (2)));
       Name   : constant String :=
-                 Lith.Objects.Symbols.Get_Name
-                   (Lith.Objects.To_Symbol (Store.Argument (3)));
+                 Store.Show (Store.Argument (3));
       Result : Boolean := False;
    begin
       if Chaos.Objects.Is_Object (Map) then

@@ -170,6 +170,22 @@ package Chaos.Creatures is
      (Creature : Chaos_Creature_Record'Class)
       return Natural;
 
+   type Creature_Match is
+      record
+         Enemy_Ally : Natural := 0;
+         General    : Natural := 0;
+         Race       : Natural := 0;
+         Class      : Natural := 0;
+         Specific   : Natural := 0;
+         Gender     : Natural := 0;
+         Alignment  : Natural := 0;
+      end record;
+
+   function Match
+     (Creature   : Chaos_Creature_Record'Class;
+      Properties : Creature_Match)
+      return Boolean;
+
    type Chaos_Creature is access constant Chaos_Creature_Record'Class;
 
    procedure On_Start_Dialog
@@ -206,6 +222,12 @@ private
    type Creature_Color_Map is
      array (Creature_Color_Part) of Natural;
 
+   type Creature_Object_Id is
+     (EA_Id, General_Id, Race_Id, Class_Id,
+      Specific_Id, Gender_Id, Alignment_Id);
+
+   type Creature_Object_Ids is array (Creature_Object_Id) of Integer;
+
    type Creature_Equipment is
      array (Chaos.Equipment.Chaos_Equipment_Slot) of Chaos.Items.Chaos_Item;
 
@@ -238,6 +260,7 @@ private
          Team                : Chaos.Teams.Chaos_Team;
          Dialog              : Chaos.Dialog.Chaos_Dialog;
          Animation_Id        : Natural := 0;
+         Object_Ids          : Creature_Object_Ids;
          Color_Map           : Creature_Color_Map;
          Cash                : Chaos.Coins.Coins_Type;
          Equipment           : Creature_Equipment := (others => null);

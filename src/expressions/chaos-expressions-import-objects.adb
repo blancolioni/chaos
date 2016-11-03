@@ -4,6 +4,33 @@ with Chaos.Paths;
 
 package body Chaos.Expressions.Import.Objects is
 
+   ----------------
+   -- Group_Name --
+   ----------------
+
+   function Group_Name
+     (Tuple_Index : Object_Tuple_Index)
+      return String
+   is
+   begin
+      case Tuple_Index is
+         when 1 =>
+            return "ea";
+         when 2 =>
+            return "general";
+         when 3 =>
+            return "race";
+         when 4 =>
+            return "class";
+         when 5 =>
+            return "specific";
+         when 6 =>
+            return "gender";
+         when 7 =>
+            return "alignment";
+      end case;
+   end Group_Name;
+
    -------------------
    -- Import_Object --
    -------------------

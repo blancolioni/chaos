@@ -13,6 +13,7 @@ with Chaos.Expressions.Maps;
 with Chaos.Expressions.Vectors;
 
 with Chaos.Expressions.Import.Actions;
+with Chaos.Expressions.Import.Objects;
 with Chaos.Expressions.Import.Triggers;
 
 with Chaos.Identifiers;
@@ -147,12 +148,20 @@ package body Chaos.Parser is
 
                   if Is_Number (Tok_Text) then
                      Tuple (Count) := Integer'Value (Tok_Text);
-                  elsif Chaos.Identifiers.Exists (Tok_Text) then
-                     Tuple (Count) := Chaos.Identifiers.Value (Tok_Text);
+                  elsif Chaos.Identifiers.Exists
+                    (Chaos.Expressions.Import.Objects.Group_Name (Count),
+                     Tok_Text)
+                  then
+                     Tuple (Count) :=
+                       Chaos.Identifiers.Value
+                         (Chaos.Expressions.Import.Objects.Group_Name (Count),
+                          Tok_Text);
                   else
                      Error ("undefined: " & Tok_Text);
                      Tuple (Count) := 0;
                   end if;
+
+                  Scan;
 
                   if Tok = Tok_Dot then
                      Scan;

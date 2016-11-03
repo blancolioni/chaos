@@ -35,12 +35,17 @@ package body Chaos.Actors.Primitives is
      (Store : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
+      use type Lith.Objects.Object;
+      use type Chaos.Objects.Chaos_Object;
       Actor : constant Chaos.Actors.Chaos_Actor :=
                 Get_Actor (Store.Argument (1));
       Target : constant Chaos.Objects.Chaos_Object :=
-                 Chaos.Objects.To_Object (Store.Argument (2));
+                 (if Store.Argument (2) = Lith.Objects.Nil
+                  then null
+                  else Chaos.Objects.To_Object (Store.Argument (2)));
       Can_See : constant Boolean :=
-                  Chaos.Actors.Visibility.Can_See (Actor, Target);
+                  (if Target = null then False
+                   else Chaos.Actors.Visibility.Can_See (Actor, Target));
    begin
       return Lith.Objects.To_Object (Can_See);
    end Evaluate_Chaos_Can_See;

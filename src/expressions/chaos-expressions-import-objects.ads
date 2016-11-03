@@ -28,4 +28,10 @@ package Chaos.Expressions.Import.Objects is
    procedure Import_Object_Tuple
      (Tuple : Script_Tuple);
 
+   subtype Object_Tuple_Index is Integer range 1 .. 7;
+
+   function Group_Name
+     (Tuple_Index : Object_Tuple_Index)
+      return String;
+
 end Chaos.Expressions.Import.Objects;

@@ -1,27 +1,19 @@
-with Ada.Containers.Indefinite_Vectors;
-with Ada.Strings.Unbounded;
-
 with WL.String_Maps;
-
-with Chaos.Logging;
 
 package body Chaos.Identifiers is
 
-   type Identifier_Entry is
+   package Identifier_Maps is
+     new WL.String_Maps (Integer);
+
+   type Group_Entry is
       record
-         Identifier  : Ada.Strings.Unbounded.Unbounded_String;
-         Group_Index : Positive;
-         Value       : Integer;
+         Id_Map : Identifier_Maps.Map;
       end record;
 
-   package Identifier_Maps is
-     new WL.String_Maps (Identifier_Entry);
+   package Group_Maps is
+     new WL.String_Maps (Group_Entry);
 
-   package Group_Vectors is
-     new Ada.Containers.Indefinite_Vectors (Positive, String);
-
-   Identifier_Map : Identifier_Maps.Map;
-   Group_Vector   : Group_Vectors.Vector;
+   Group_Map : Group_Maps.Map;
 
    ---------
    -- Add --
@@ -32,60 +24,53 @@ package body Chaos.Identifiers is
       Value      : Integer;
       Group_Name : String)
    is
+      Map : Group_Entry;
    begin
-      if Identifier_Map.Contains (Identifier) then
-         Chaos.Logging.Log
-           ("IDS", "warning: " & Group_Name & "." & Identifier
-            & " already exists as "
-            & Group (Identifier) & "." & Identifier);
-      else
-         declare
-            New_Entry : Identifier_Entry;
-            Group_Index : Natural :=
-                            Group_Vector.Find_Index (Group_Name);
-         begin
-            New_Entry.Identifier :=
-              Ada.Strings.Unbounded.To_Unbounded_String (Identifier);
-            New_Entry.Value := Value;
-            if Group_Index = 0 then
-               Group_Vector.Append (Group_Name);
-               Group_Index := Group_Vector.Last_Index;
-            end if;
-            New_Entry.Group_Index := Group_Index;
-            Identifier_Map.Insert (Identifier, New_Entry);
-            Chaos.Logging.Log
-              ("IDS", "added " & Group_Name & "." & Identifier & " = "
-                 & Integer'Image (Value));
-         end;
+      if Group_Map.Contains (Group_Name) then
+         Map := Group_Map.Element (Group_Name);
       end if;
+
+      if Map.Id_Map.Contains (Identifier) then
+         raise Constraint_Error with
+           "identifier '" & Identifier & "' already exists in group '"
+           & Group_Name & "'";
+      end if;
+
+      Map.Id_Map.Insert (Identifier, Value);
+
+      if Group_Map.Contains (Group_Name) then
+         Group_Map.Replace (Group_Name, Map);
+      else
+         Group_Map.Insert (Group_Name, Map);
+      end if;
+
    end Add;
 
    ------------
    -- Exists --
    ------------
 
-   function Exists (Name : String) return Boolean is
+   function Exists
+     (Group_Name : String;
+      Identifier : String)
+      return Boolean
+   is
    begin
-      return Identifier_Map.Contains (Name);
+      return Group_Map.Contains (Group_Name)
+        and then Group_Map (Group_Name).Id_Map.Contains (Identifier);
    end Exists;
-
-   -----------
-   -- Group --
-   -----------
-
-   function Group (Name : String) return String is
-   begin
-      return Group_Vector.Element
-        (Identifier_Map.Element (Name).Group_Index);
-   end Group;
 
    -----------
    -- Value --
    -----------
 
-   function Value (Name : String) return Integer is
+   function Value
+     (Group_Name : String;
+      Identifier : String)
+      return Integer
+   is
    begin
-      return Identifier_Map.Element (Name).Value;
+      return Group_Map (Group_Name).Id_Map (Identifier);
    end Value;
 
 end Chaos.Identifiers;

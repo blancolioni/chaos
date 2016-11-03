@@ -45,16 +45,40 @@ package body Chaos.Expressions.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
 
+   function Is_Object_Or_Map
+     (Store : in out Lith.Objects.Object_Store'Class;
+      Value : Lith.Objects.Object)
+      return Boolean
+   is (Chaos.Objects.Is_Object (Value)
+       or else Chaos.Expressions.Maps.Is_Map (Value)
+       or else (Lith.Objects.Is_Symbol (Value)
+                and then Is_Object_Or_Map
+                  (Store, Store.Get_Top_Level
+                     (Lith.Objects.To_Symbol (Value)))));
+
    -----------------------
    -- Create_Primitives --
    -----------------------
 
    procedure Create_Primitives is
       use Lith.Objects.Interfaces;
+      Object_Argument : constant Function_Argument_Type :=
+                          Custom_Argument (Is_Object_Or_Map'Access)
+                          with Unreferenced;
    begin
-      Define_Function ("chaos-set-property", 3, Evaluate_Chaos_Set'Access);
-      Define_Function ("chaos-get-property", 2, Evaluate_Chaos_Get'Access);
-      Define_Function ("chaos-roll-dice", 3, Evaluate_Roll_Dice'Access);
+      Define_Function
+        ("chaos-set-property",
+         Evaluate_Chaos_Set'Access);
+
+      Define_Function
+        ("chaos-get-property",
+         Evaluate_Chaos_Get'Access);
+
+      Define_Function
+        ("chaos-roll-dice",
+         (Integer_Argument, Integer_Argument, Integer_Argument),
+         Evaluate_Roll_Dice'Access);
+
       Define_Function ("chaos-set-timer", 3, Evaluate_Set_Timer'Access);
       Define_Function ("chaos-timer-expired", 2,
                        Evaluate_Timer_Expired'Access);

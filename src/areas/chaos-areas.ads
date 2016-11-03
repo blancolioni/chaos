@@ -178,6 +178,19 @@ package Chaos.Areas is
       Process : not null access
         procedure (Actor : Chaos.Actors.Chaos_Actor));
 
+   procedure Scan_Matching_Actors
+     (Area    : Chaos_Area_Record'Class;
+      Test    : not null access
+        function (Actor : Chaos.Actors.Chaos_Actor) return Boolean;
+      Process : not null access
+        procedure (Actor : Chaos.Actors.Chaos_Actor));
+
+   function Find_Matching_Actor
+     (Area    : Chaos_Area_Record'Class;
+      Test    : not null access
+        function (Actor : Chaos.Actors.Chaos_Actor) return Boolean)
+      return Chaos.Actors.Chaos_Actor;
+
    overriding function Find_Path
      (Area   : Chaos_Area_Record;
       Start  : Chaos.Locations.Square_Location;

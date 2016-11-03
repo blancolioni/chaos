@@ -345,6 +345,33 @@ package body Chaos.Creatures is
       Chaos.Objects.Root_Chaos_Object_Record (Creature).Mark (Mark_Value);
    end Mark;
 
+   -----------
+   -- Match --
+   -----------
+
+   function Match
+     (Creature   : Chaos_Creature_Record'Class;
+      Properties : Creature_Match)
+      return Boolean
+   is
+      Ids : Creature_Object_Ids renames Creature.Object_Ids;
+   begin
+      return (Properties.Enemy_Ally = 0
+              or else Properties.Enemy_Ally = Ids (EA_Id))
+        and then (Properties.General = 0
+                  or else Properties.General = Ids (General_Id))
+        and then (Properties.Race = 0
+                  or else Properties.Race = Ids (Race_Id))
+        and then (Properties.Class = 0
+                  or else Properties.Class = Ids (Class_Id))
+        and then (Properties.Specific = 0
+                  or else Properties.Specific = Ids (Specific_Id))
+        and then (Properties.Gender = 0
+                  or else Properties.Gender = Ids (Gender_Id))
+        and then (Properties.Alignment = 0
+                  or else Properties.Alignment = Ids (Alignment_Id));
+   end Match;
+
    --------------------
    -- Max_Hit_Points --
    --------------------

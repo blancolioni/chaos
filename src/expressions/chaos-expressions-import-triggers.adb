@@ -289,16 +289,10 @@ package body Chaos.Expressions.Import.Triggers is
                declare
                   Id : constant String := To_String (Arg.Identifier_Name);
                begin
-                  if Chaos.Identifiers.Exists (Id) then
-                     if Chaos.Identifiers.Group (Id) = "object"
-                       and then not Found (Object_Reference)
-                     then
+                  if Chaos.Identifiers.Exists ("object", Id) then
+                     if not Found (Object_Reference) then
                         Objects.Import_Object_Identifier (Id);
                         Found (Object_Reference) := True;
-                     elsif not Found (Integer_1) then
-                        Integer_1_Value := Chaos.Identifiers.Value (Id);
-                     elsif not Found (Integer_2) then
-                        Integer_2_Value := Chaos.Identifiers.Value (Id);
                      else
                         Chaos.Logging.Log
                           ("TRIGGER",

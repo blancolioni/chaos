@@ -327,49 +327,32 @@ package body Chaos.Expressions.Import.Actions is
                declare
                   Id : constant String := To_String (Arg.Identifier_Name);
                begin
-                  if Chaos.Identifiers.Exists (Id) then
-                     if Chaos.Identifiers.Group (Id) = "object" then
-                        if Available (Object_1)
-                          or else Available (Object_2)
-                          or else Available (Object_3)
-                        then
-                           Objects.Import_Object_Identifier (Id);
-                           if Available (Object_1) then
-                              Available (Object_1) := False;
-                              Have_Object (Object_1) := True;
-                           elsif Available (Object_2) then
-                              Available (Object_2) := False;
-                              Have_Object (Object_2) := True;
-                           else
-                              Available (Object_3) := False;
-                              Have_Object (Object_3) := True;
-                           end if;
+                  if Chaos.Identifiers.Exists ("object", Id) then
+                     if Available (Object_1)
+                       or else Available (Object_2)
+                       or else Available (Object_3)
+                     then
+                        Objects.Import_Object_Identifier (Id);
+                        if Available (Object_1) then
+                           Available (Object_1) := False;
+                           Have_Object (Object_1) := True;
+                        elsif Available (Object_2) then
+                           Available (Object_2) := False;
+                           Have_Object (Object_2) := True;
                         else
-                           Chaos.Logging.Log
-                             ("Action",
-                              "warning: too many object arguments in call to "
-                              & Action_Name);
+                           Available (Object_3) := False;
+                           Have_Object (Object_3) := True;
                         end if;
-                     elsif Available (Integer_1) then
-                        Integer_1_Value := Chaos.Identifiers.Value (Id);
-                        Available (Integer_1) := False;
-                     elsif Available (Integer_2) then
-                        Integer_2_Value := Chaos.Identifiers.Value (Id);
-                        Available (Integer_2) := False;
-                     elsif Available (Integer_3) then
-                        Integer_3_Value := Chaos.Identifiers.Value (Id);
-                        Available (Integer_3) := False;
                      else
                         Chaos.Logging.Log
                           ("Action",
-                           "warning: too many integer or identifier "
-                           & "arguments in call to "
+                           "warning: too many object arguments in call to "
                            & Action_Name);
                      end if;
                   else
                      Chaos.Logging.Log
                        ("Action",
-                        "warning: undeclared identifier '"
+                        "warning: undeclared object identifier '"
                         & Id
                         & " in call to "
                         & Action_Name);

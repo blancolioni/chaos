@@ -104,6 +104,21 @@ package body Chaos.Creatures.Import is
 
          Creature.Team := Chaos.Teams.Get ("neutral");
 
+         Creature.Object_Ids (EA_Id) :=
+           Integer (Cre.Ids (Chaos.Resources.Cre.Enemy_Ally));
+         Creature.Object_Ids (General_Id) :=
+           Integer (Cre.Ids (Chaos.Resources.Cre.General));
+         Creature.Object_Ids (Race_Id) :=
+           Integer (Cre.Ids (Chaos.Resources.Cre.Race));
+         Creature.Object_Ids (Class_Id) :=
+           Integer (Cre.Ids (Chaos.Resources.Cre.Class));
+         Creature.Object_Ids (Specific_Id) :=
+           Integer (Cre.Ids (Chaos.Resources.Cre.Specific));
+         Creature.Object_Ids (Gender_Id) :=
+           Integer (Cre.Ids (Chaos.Resources.Cre.Gender));
+         Creature.Object_Ids (Alignment_Id) :=
+           Integer (Cre.Ids (Chaos.Resources.Cre.Alignment));
+
          if Chaos.Resources.Has_Resource (Cre.Dialog_Ref) then
             begin
                Creature.Dialog :=

@@ -1,12 +1,15 @@
 package Chaos.Identifiers is
 
-   function Exists (Name : String) return Boolean;
+   function Exists
+     (Group_Name : String;
+      Identifier : String)
+      return Boolean;
 
-   function Value (Name : String) return Integer
-     with Pre => Exists (Name);
-
-   function Group (Name : String) return String
-     with Pre => Exists (Name);
+   function Value
+     (Group_Name : String;
+      Identifier : String)
+      return Integer
+     with Pre => Exists (Group_Name, Identifier);
 
 private
 
