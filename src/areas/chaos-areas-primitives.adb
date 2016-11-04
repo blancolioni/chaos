@@ -127,15 +127,23 @@ package body Chaos.Areas.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
+      use Lith.Objects;
+      use type Chaos.Objects.Chaos_Object;
+
+      Arg : constant Lith.Objects.Object := Store.Argument (1);
       Object : constant Chaos.Objects.Chaos_Object :=
-                 Chaos.Objects.To_Object (Store.Argument (1));
+                 (if Arg = False_Value or else Arg = Nil
+                  then null
+                  else Chaos.Objects.To_Object (Store.Argument (1)));
    begin
-      if Object.all in Chaos.Creatures.Chaos_Creature_Record'Class then
+      if Object = null then
+         return False_Value;
+      elsif Object.all in Chaos.Creatures.Chaos_Creature_Record'Class then
          return Lith.Objects.To_Object
            (Chaos.Game.Current_Game.Area.Has_Actor
               (Chaos.Creatures.Chaos_Creature (Object)));
       else
-         return Lith.Objects.False_Value;
+         return False_Value;
       end if;
    end Evaluate_Exists;
 
