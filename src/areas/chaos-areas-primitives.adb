@@ -18,6 +18,10 @@ package body Chaos.Areas.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
 
+   function Evaluate_Exists
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
+
    function Evaluate_Match_Object
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
@@ -31,6 +35,7 @@ package body Chaos.Areas.Primitives is
    begin
       Define_Function ("chaos-create-actor", Evaluate_Create_Actor'Access);
       Define_Function ("chaos-distance", Evaluate_Distance'Access);
+      Define_Function ("chaos-object-exists", Evaluate_Exists'Access);
       Define_Function ("chaos-match-object", Evaluate_Match_Object'Access);
    end Create_Primitives;
 
@@ -81,8 +86,29 @@ package body Chaos.Areas.Primitives is
       return Lith.Objects.Object
    is
       function Get_Loc (Value : Lith.Objects.Object)
+                        return Chaos.Locations.Square_Location;
+
+      -------------
+      -- Get_Loc --
+      -------------
+
+      function Get_Loc (Value : Lith.Objects.Object)
                         return Chaos.Locations.Square_Location
-      is (Chaos.Actors.Chaos_Actor (Chaos.Objects.To_Object (Value)).Location);
+      is
+         Object : constant Chaos.Objects.Chaos_Object :=
+                    Chaos.Objects.To_Object (Value);
+      begin
+         if Object.all in Chaos.Creatures.Chaos_Creature_Record'Class then
+            return Chaos.Game.Current_Game.Area.Actor
+              (Chaos.Creatures.Chaos_Creature (Object)).Location;
+         elsif Object.all in Chaos.Actors.Chaos_Actor_Record'Class then
+            return Chaos.Actors.Chaos_Actor (Object).Location;
+         else
+            raise Constraint_Error with
+              "expected a creature or an actor, but found "
+              & Object.Display_Name;
+         end if;
+      end Get_Loc;
 
       Loc_1 : constant Chaos.Locations.Square_Location :=
                 Get_Loc (Store.Argument (1));
@@ -92,6 +118,26 @@ package body Chaos.Areas.Primitives is
       return Lith.Objects.To_Object
         (Chaos.Locations.Minimum_Distance (Loc_1, Loc_2));
    end Evaluate_Distance;
+
+   ---------------------
+   -- Evaluate_Exists --
+   ---------------------
+
+   function Evaluate_Exists
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is
+      Object : constant Chaos.Objects.Chaos_Object :=
+                 Chaos.Objects.To_Object (Store.Argument (1));
+   begin
+      if Object.all in Chaos.Creatures.Chaos_Creature_Record'Class then
+         return Lith.Objects.To_Object
+           (Chaos.Game.Current_Game.Area.Has_Actor
+              (Chaos.Creatures.Chaos_Creature (Object)));
+      else
+         return Lith.Objects.False_Value;
+      end if;
+   end Evaluate_Exists;
 
    ---------------------------
    -- Evaluate_Match_Object --
@@ -132,7 +178,7 @@ package body Chaos.Areas.Primitives is
 
    begin
       if Result = null then
-         return Lith.Objects.Nil;
+         return Lith.Objects.False_Value;
       else
          return Result.To_Expression;
       end if;
