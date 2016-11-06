@@ -454,7 +454,12 @@ package body Chaos.Expressions.Import is
             Block_Count := Block_Count + 1;
          end if;
       end loop;
-      Store.Create_List (Block_Count + 2);
+      if Block_Count > 0 then
+         Store.Create_List (Block_Count + 2);
+      else
+         Store.Drop (2);
+         Store.Push_Nil;
+      end if;
    end Import_Scripts;
 
    ---------------
