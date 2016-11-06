@@ -45,6 +45,8 @@ package body Chaos.Creatures.Quick is
          Creature.Color_Map :=
            (Metal => 25, Minor => 41, Major => 47,
             Skin  => 12, Leather => 91, Armour => 25, Hair => 91);
+         Creature.Object_Ids :=
+           (EA_Id => 2, others => 0);
          Creature.Cash := Chaos.Coins.GP (100);
          Creature.Set_Equipment
            (Chaos.Equipment.Weapon_1,
@@ -57,6 +59,7 @@ package body Chaos.Creatures.Quick is
       Creature : constant Chaos_Creature := Db.Create (Create'Access);
    begin
       Chaos.Creatures.Reports.Report (Creature);
+      Creature.Save_Object;
       return Creature;
    end Quick_Creature;
 
