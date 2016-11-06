@@ -114,6 +114,42 @@ package body Chaos.Objects is
       return X.Db = Y.Db and then X.Reference = Y.Reference;
    end Equal;
 
+   --------------
+   -- Evaluate --
+   --------------
+
+   function Evaluate
+     (Object : Root_Chaos_Object_Record'Class;
+      Expr   : Lith.Objects.Object)
+      return Lith.Objects.Object
+   is
+      use Chaos.Expressions;
+   begin
+      Store.Push (Expr, Lith.Objects.Secondary);
+      Store.Push (Lith.Objects.Symbols.Lambda_Symbol);
+      Store.Push (This_Symbol);
+      Store.Create_List (1);
+      Store.Push (Store.Pop (Lith.Objects.Secondary));
+      Store.Create_List (3);
+      Store.Push (Object.To_Expression);
+      Store.Create_List (2);
+      return Store.Evaluate (Store.Pop);
+   end Evaluate;
+
+   --------------
+   -- Evaluate --
+   --------------
+
+   procedure Evaluate
+     (Object : Root_Chaos_Object_Record'Class;
+      Expr   : Lith.Objects.Object)
+   is
+      Unused : constant Lith.Objects.Object := Object.Evaluate (Expr);
+      pragma Unreferenced (Unused);
+   begin
+      null;
+   end Evaluate;
+
    --------------------
    -- Execute_Script --
    --------------------
@@ -140,9 +176,7 @@ package body Chaos.Objects is
 
    begin
       if Object.Script /= Lith.Objects.Nil then
-         Store.Evaluate (Object.Script,
-                         Lith.Objects.Symbols.Get_Symbol ("this"),
-                         Object.To_Expression);
+         Object.Evaluate (Object.Script);
          if not Object.Flag ("script_executed") then
             Object.Object_Database.Update
               (Object.Reference, Set_Script_Executed'Access);
@@ -156,6 +190,7 @@ package body Chaos.Objects is
          Chaos.Logging.Log
            (Object.Global_Setting_Name ("SCRIPT"),
             Store.Show (Object.Script));
+         Store.Report_State;
          raise;
    end Execute_Script;
 

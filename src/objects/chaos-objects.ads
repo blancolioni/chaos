@@ -105,6 +105,15 @@ package Chaos.Objects is
    procedure Execute_Script
      (Object : Root_Chaos_Object_Record'Class);
 
+   function Evaluate
+     (Object : Root_Chaos_Object_Record'Class;
+      Expr   : Lith.Objects.Object)
+      return Lith.Objects.Object;
+
+   procedure Evaluate
+     (Object : Root_Chaos_Object_Record'Class;
+      Expr   : Lith.Objects.Object);
+
    procedure On_End_Dialog
      (Object : Root_Chaos_Object_Record)
    is null;
