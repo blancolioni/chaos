@@ -47,7 +47,7 @@ package body Chaos.Objects.Search is
       if Creature then
          if Chaos.Creatures.Exists (Code) then
             return Chaos_Object (Chaos.Creatures.Get (Code));
-         elsif False and then Chaos.Resources.Manager.Resource_Exists
+         elsif Chaos.Resources.Manager.Resource_Exists
            (Chaos.Resources.To_Reference (Code),
             Chaos.Resources.Creature_Resource)
          then
