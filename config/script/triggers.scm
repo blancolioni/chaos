@@ -14,7 +14,7 @@
 (chaos-add-trigger #x20 'HitBy '(chaos-script-flag this (object->identifier object) 'hit-by))
 (chaos-add-trigger #x22 'TimerExpired '(chaos-timer-expired this integer-1))
 (chaos-add-trigger #x23 'True #t)
-(chaos-add-trigger #x2F 'Heard '(begin (display object) (newline) (and (<= (chaos-distance this object) 6) (chaos-script-flag object 'shout integer-1))))
+(chaos-add-trigger #x2F 'Heard '(and (<= (chaos-distance this object) 6) (chaos-script-flag object 'shout integer-1)))
 (chaos-add-trigger #x30 'False #f)
 (chaos-add-trigger #x31 'HaveSpell #f)
 (chaos-add-trigger #x36 'OnCreation '(not (chaos-flag this 'script-executed)))

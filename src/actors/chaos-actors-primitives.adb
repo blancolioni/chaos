@@ -63,8 +63,11 @@ package body Chaos.Actors.Primitives is
       Target : constant Chaos.Actors.Chaos_Actor :=
                  Get_Actor (Store.Argument (2));
    begin
-      Chaos.Game.Current_Game.Start_Dialog (Actor, Target);
-      return Lith.Objects.Nil;
+      if Chaos.Actors.Visibility.Can_See (Actor, Target) then
+         Chaos.Game.Current_Game.Start_Dialog (Actor, Target);
+         return Lith.Objects.True_Value;
+      end if;
+      return Lith.Objects.False_Value;
    end Evaluate_Chaos_Start_Dialog;
 
 end Chaos.Actors.Primitives;
