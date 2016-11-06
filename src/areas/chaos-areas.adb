@@ -387,8 +387,25 @@ package body Chaos.Areas is
       Mark_Value : not null access
         procedure (Value : in out Lith.Objects.Object))
    is
+      procedure Mark_Actor
+        (Actor : in out Chaos.Actors.Chaos_Actor_Record'Class);
+
+      ----------------
+      -- Mark_Actor --
+      ----------------
+
+      procedure Mark_Actor
+        (Actor : in out Chaos.Actors.Chaos_Actor_Record'Class)
+      is
+      begin
+         Actor.Mark (Mark_Value);
+      end Mark_Actor;
+
    begin
       Chaos.Objects.Root_Chaos_Object_Record (Area).Mark (Mark_Value);
+      for Actor of Area.Actors loop
+         Actor.Update (Mark_Actor'Access);
+      end loop;
    end Mark;
 
    ----------------
