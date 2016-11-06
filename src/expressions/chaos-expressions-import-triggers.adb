@@ -112,7 +112,14 @@ package body Chaos.Expressions.Import.Triggers is
       Store.Push (Get_Symbol ("text-2"));
       Store.Push (Get_Symbol ("object"));
       Store.Create_List (6);
-      Store.Push (Store.Argument (3));
+      if Info.Arguments (Object_Reference) then
+         Store.Push (Lith.Objects.Symbols.Get_Symbol ("and"));
+         Store.Push (Lith.Objects.Symbols.Get_Symbol ("object"));
+         Store.Push (Store.Argument (3));
+         Store.Create_List (3);
+      else
+         Store.Push (Store.Argument (3));
+      end if;
       Store.Create_List (3);
       Chaos.Logging.Log
         ("TRIGGER",
