@@ -169,7 +169,7 @@ package body Chaos.Objects.Primitives is
       if Result = null then
          Chaos.Logging.Log ("SCRIPT", "warning: object with code '"
                               & Code & "' cannot be found");
-         return Lith.Objects.Nil;
+         return Lith.Objects.False_Value;
       end if;
       return Result.To_Expression;
    end Evaluate_Chaos_Object_With_Code;
