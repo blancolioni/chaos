@@ -39,6 +39,13 @@ package body Chaos.Objects.Primitives is
       return Lith.Objects.Object
    is (Store.Argument (1));
 
+   function Evaluate_Object_Identifier
+     (Store : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is (Lith.Objects.To_Object
+         (Lith.Objects.Symbols.Get_Symbol
+          (To_Object (Store.Argument (1)).Identifier)));
+
    procedure Set_Flag_Value
      (Store : in out Lith.Objects.Object_Store'Class;
       Value : Boolean);
@@ -48,6 +55,9 @@ package body Chaos.Objects.Primitives is
    --------------------
 
    procedure Add_Primitives is
+      use Lith.Objects.Interfaces;
+      Object_Argument : constant Function_Argument_Type :=
+                          Custom_Argument (Is_Object'Access);
    begin
       Lith.Objects.Interfaces.Define_Function
         ("chaos-flag", 2, Evaluate_Chaos_Flag'Access);
@@ -61,6 +71,9 @@ package body Chaos.Objects.Primitives is
         ("chaos-object-with-code", 1, Evaluate_Chaos_Object_With_Code'Access);
       Lith.Objects.Interfaces.Define_Function
         ("chaos-set-trigger", 2, Evaluate_Chaos_Set_Trigger'Access);
+      Lith.Objects.Interfaces.Define_Function
+        ("object->identifier", (1 => Object_Argument),
+         Evaluate_Object_Identifier'Access);
    end Add_Primitives;
 
    -------------------------------
