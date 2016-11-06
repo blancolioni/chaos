@@ -1,5 +1,3 @@
-with Lith.Objects.Symbols;
-
 with Chaos.Dialog.Db;
 
 with Chaos.Expressions;
@@ -92,10 +90,7 @@ package body Chaos.Dialog is
               ("DIALOG", "action: "
                & Chaos.Expressions.Store.Show (Transition.Action));
          end if;
-         Chaos.Expressions.Store.Evaluate
-           (Transition.Action,
-            Lith.Objects.Symbols.Get_Symbol ("this"),
-            Position.Owner.To_Expression);
+         Position.Owner.Evaluate (Transition.Action);
       end if;
 
       if Transition.End_State then
@@ -171,7 +166,6 @@ package body Chaos.Dialog is
       use Lith.Objects, Chaos.Expressions;
       State : Natural := 0;
    begin
-      Chaos.Expressions.Store.Reset;
       while State <= Dialog.States.Last_Index loop
          if Trace_Dialog then
             Chaos.Logging.Log
@@ -180,10 +174,15 @@ package body Chaos.Dialog is
                & Chaos.Expressions.Store.Show
                  (Dialog.States.Element (State).Trigger));
          end if;
-         exit when Chaos.Expressions.Store.Evaluate
-           (Dialog.States.Element (State).Trigger,
-            Symbols.Get_Symbol ("this"), Owner.To_Expression)
-           /= False_Value;
+
+         declare
+            Trigger_Result : constant Object :=
+                               Owner.Evaluate
+                                 (Dialog.States.Element (State).Trigger);
+         begin
+            exit when Trigger_Result /= False_Value;
+         end;
+
          State := State + 1;
       end loop;
 
