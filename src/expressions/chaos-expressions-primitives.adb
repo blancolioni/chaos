@@ -37,6 +37,10 @@ package body Chaos.Expressions.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
 
+   function Evaluate_Set_Global_Timer
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
+
    function Evaluate_Set_Timer
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
@@ -63,8 +67,7 @@ package body Chaos.Expressions.Primitives is
    procedure Create_Primitives is
       use Lith.Objects.Interfaces;
       Object_Argument : constant Function_Argument_Type :=
-                          Custom_Argument (Is_Object_Or_Map'Access)
-                          with Unreferenced;
+                          Custom_Argument (Is_Object_Or_Map'Access);
    begin
       Define_Function
         ("chaos-set-property",
@@ -79,7 +82,12 @@ package body Chaos.Expressions.Primitives is
          (Integer_Argument, Integer_Argument, Integer_Argument),
          Evaluate_Roll_Dice'Access);
 
-      Define_Function ("chaos-set-timer", 3, Evaluate_Set_Timer'Access);
+      Define_Function ("chaos-set-timer",
+                       (Object_Argument, Integer_Argument, Integer_Argument),
+                       Evaluate_Set_Timer'Access);
+      Define_Function ("chaos-set-global-timer",
+                       (Symbol_Argument, Integer_Argument),
+                       Evaluate_Set_Global_Timer'Access);
       Define_Function ("chaos-timer-expired", 2,
                        Evaluate_Timer_Expired'Access);
    end Create_Primitives;
@@ -280,6 +288,32 @@ package body Chaos.Expressions.Primitives is
    begin
       return To_Object (Chaos.Dice.Roll (Dice));
    end Evaluate_Roll_Dice;
+
+   -------------------------------
+   -- Evaluate_Set_Global_Timer --
+   -------------------------------
+
+   function Evaluate_Set_Global_Timer
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is
+      use type Ada.Calendar.Time;
+      Target   : constant Lith.Objects.Object := Store.Argument (1);
+      Timeout  : constant Natural :=
+                   Lith.Objects.To_Integer (Store.Argument (2));
+      Key      : constant String :=
+                   Lith.Objects.Symbols.Get_Name
+                     (Lith.Objects.To_Symbol (Target));
+   begin
+      if Timeouts.Contains (Key) then
+         Timeouts.Delete (Key);
+      end if;
+
+      Timeouts.Insert
+        (Key,
+         Ada.Calendar.Clock + Duration (Timeout));
+      return Store.Argument (2);
+   end Evaluate_Set_Global_Timer;
 
    ------------------------
    -- Evaluate_Set_Timer --
