@@ -26,6 +26,10 @@ package body Chaos.Areas.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
 
+   function Exists
+     (Object : Lith.Objects.Object)
+      return Boolean;
+
    -----------------------
    -- Create_Primitives --
    -----------------------
@@ -85,6 +89,10 @@ package body Chaos.Areas.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
+
+      Area : constant Chaos.Areas.Chaos_Area :=
+               Chaos.Game.Current_Game.Area;
+
       function Get_Loc (Value : Lith.Objects.Object)
                         return Chaos.Locations.Square_Location;
 
@@ -99,7 +107,7 @@ package body Chaos.Areas.Primitives is
                     Chaos.Objects.To_Object (Value);
       begin
          if Object.all in Chaos.Creatures.Chaos_Creature_Record'Class then
-            return Chaos.Game.Current_Game.Area.Actor
+            return Area.Actor
               (Chaos.Creatures.Chaos_Creature (Object)).Location;
          elsif Object.all in Chaos.Actors.Chaos_Actor_Record'Class then
             return Chaos.Actors.Chaos_Actor (Object).Location;
@@ -110,13 +118,22 @@ package body Chaos.Areas.Primitives is
          end if;
       end Get_Loc;
 
-      Loc_1 : constant Chaos.Locations.Square_Location :=
-                Get_Loc (Store.Argument (1));
-      Loc_2 : constant Chaos.Locations.Square_Location :=
-                Get_Loc (Store.Argument (2));
    begin
-      return Lith.Objects.To_Object
-        (Chaos.Locations.Minimum_Distance (Loc_1, Loc_2));
+      if not Exists (Store.Argument (1))
+        or else not Exists (Store.Argument (2))
+      then
+         return Lith.Objects.To_Object (Integer'(9_999));
+      else
+         declare
+            Loc_1 : constant Chaos.Locations.Square_Location :=
+                      Get_Loc (Store.Argument (1));
+            Loc_2 : constant Chaos.Locations.Square_Location :=
+                      Get_Loc (Store.Argument (2));
+         begin
+            return Lith.Objects.To_Object
+              (Chaos.Locations.Minimum_Distance (Loc_1, Loc_2));
+         end;
+      end if;
    end Evaluate_Distance;
 
    ---------------------
@@ -127,24 +144,8 @@ package body Chaos.Areas.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
-      use Lith.Objects;
-      use type Chaos.Objects.Chaos_Object;
-
-      Arg : constant Lith.Objects.Object := Store.Argument (1);
-      Object : constant Chaos.Objects.Chaos_Object :=
-                 (if Arg = False_Value or else Arg = Nil
-                  then null
-                  else Chaos.Objects.To_Object (Store.Argument (1)));
    begin
-      if Object = null then
-         return False_Value;
-      elsif Object.all in Chaos.Creatures.Chaos_Creature_Record'Class then
-         return Lith.Objects.To_Object
-           (Chaos.Game.Current_Game.Area.Has_Actor
-              (Chaos.Creatures.Chaos_Creature (Object)));
-      else
-         return False_Value;
-      end if;
+      return Lith.Objects.To_Object (Exists (Store.Argument (1)));
    end Evaluate_Exists;
 
    ---------------------------
@@ -191,5 +192,33 @@ package body Chaos.Areas.Primitives is
          return Result.To_Expression;
       end if;
    end Evaluate_Match_Object;
+
+   ------------
+   -- Exists --
+   ------------
+
+   function Exists
+     (Object : Lith.Objects.Object)
+      return Boolean
+   is
+      use Lith.Objects;
+      use type Chaos.Objects.Chaos_Object;
+
+      Item : constant Chaos.Objects.Chaos_Object :=
+               (if Object = False_Value
+                or else Object = Nil
+                or else not Chaos.Objects.Is_Object (Object)
+                then null
+                else Chaos.Objects.To_Object (Object));
+   begin
+      if Item = null then
+         return False;
+      elsif Item.all in Chaos.Creatures.Chaos_Creature_Record'Class then
+         return Chaos.Game.Current_Game.Area.Has_Actor
+           (Chaos.Creatures.Chaos_Creature (Item));
+      else
+         return False;
+      end if;
+   end Exists;
 
 end Chaos.Areas.Primitives;
