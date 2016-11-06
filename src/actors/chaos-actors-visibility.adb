@@ -80,7 +80,8 @@ package body Chaos.Actors.Visibility is
       return Boolean
    is
    begin
-      return Actor.Area.Visible (Actor.Location, Location);
+      return Actor.Area.Visible (Actor.Visible_Range (Actor.Area.Visibility),
+                                 Actor.Location, Location);
    end Can_See;
 
    -------------
@@ -95,8 +96,10 @@ package body Chaos.Actors.Visibility is
    is
    begin
       if Target.all in Chaos_Actor_Record'Class then
-         return Actor.Area.Visible (Actor.Location,
-                                    Chaos_Actor (Target).Location);
+         return Actor.Area.Visible
+           (Actor.Visible_Range (Actor.Area.Visibility),
+            Actor.Location,
+            Chaos_Actor (Target).Location);
       else
          return False;
       end if;

@@ -160,8 +160,13 @@ package Chaos.Areas is
       return Boolean
    is (False);
 
+   function Visibility
+     (Area : Chaos_Area_Record'Class)
+      return Chaos.Vision.Chaos_Vision;
+
    function Visible
      (Area     : Chaos_Area_Record'Class;
+      Max      : Natural;
       Square_1 : Chaos.Locations.Square_Location;
       Square_2 : Chaos.Locations.Square_Location)
       return Boolean;
@@ -286,5 +291,10 @@ private
      (Area         : Chaos_Area_Record'Class;
       Square_Index : Positive)
       return Chaos.Locations.Square_Location;
+
+   function Visibility
+     (Area : Chaos_Area_Record'Class)
+      return Chaos.Vision.Chaos_Vision
+   is (Area.Visibility);
 
 end Chaos.Areas;

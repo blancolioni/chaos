@@ -553,7 +553,9 @@ package body Chaos.Areas is
                            (Looker.Location, Actor.Location);
          begin
             if Distance <= Max_Range
-              and then Area.Visible (Looker.Location, Actor.Location)
+              and then Area.Visible
+                (Looker.Visible_Range (Area.Visibility),
+                 Looker.Location, Actor.Location)
             then
                Process (Actor);
             end if;
@@ -581,7 +583,9 @@ package body Chaos.Areas is
                            (Actor.Location, Lookee.Location);
          begin
             if Distance <= Max_Range
-              and then Area.Visible (Actor.Location, Lookee.Location)
+              and then Area.Visible
+                (Actor.Visible_Range (Area.Visibility),
+                 Actor.Location, Lookee.Location)
             then
                Process (Actor);
             end if;
@@ -770,6 +774,7 @@ package body Chaos.Areas is
 
    function Visible
      (Area     : Chaos_Area_Record'Class;
+      Max      : Natural;
       Square_1 : Chaos.Locations.Square_Location;
       Square_2 : Chaos.Locations.Square_Location)
       return Boolean
@@ -785,7 +790,7 @@ package body Chaos.Areas is
                   Area.Squares_Across, Area.Squares_Down,
                   OK'Access);
    begin
-      return Chaos.Locations.Length (Path) > 0;
+      return Chaos.Locations.Length (Path) in 1 .. Max;
    end Visible;
 
 end Chaos.Areas;
