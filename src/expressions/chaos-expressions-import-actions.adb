@@ -410,6 +410,8 @@ package body Chaos.Expressions.Import.Actions is
          X, Y,
          To_String (Text_1_Value), To_String (Text_2_Value));
 
+      Store.Drop (3, Lith.Objects.Secondary);
+
    end Import_Action;
 
    ------------------
