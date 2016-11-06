@@ -495,7 +495,6 @@ package body Chaos.Expressions.Import is
          Chaos.Expressions.Import.Triggers.Import_Trigger
            (Positive (Trigger_Id), Integer_1, Flags, Integer_2,
             Text_1, Text_2);
-         Store.Drop (1, Lith.Objects.Secondary);
       end;
       Skip_Line (Resource, "TR", Index);
    end Import_TR;
