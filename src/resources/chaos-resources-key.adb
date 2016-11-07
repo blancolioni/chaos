@@ -27,19 +27,26 @@ package body Chaos.Resources.Key is
          end if;
       end loop;
 
-      for I in 1 .. Key.Resource_Entries.Last_Index loop
-         declare
-            Res : Resource_Entry renames Key.Resource_Entries.Element (I);
-         begin
-            if Res.Resource_Name = Ref
-              and then Resource_Type (Res.Resource_Type) = Res_Type
-            then
+      declare
+         Key_Text : constant String :=
+                      String (Reference)
+                    & Character'Val (Res_Type / 256)
+                      & Character'Val (Res_Type mod 256);
+         Position : constant Resource_Entry_Maps.Cursor :=
+                      Key.Resource_Map.Find (Key_Text);
+      begin
+         if Resource_Entry_Maps.Has_Element (Position) then
+            declare
+               Res : constant Resource_Entry :=
+                       Resource_Entry_Maps.Element (Position);
+            begin
                Locator := Res.Locator mod 2 ** 20;
                return To_String
                  (Key.Biff_Entries.Element (Res.Biff_Index).Path);
-            end if;
-         end;
-      end loop;
+            end;
+         end if;
+      end;
+
       Chaos.Logging.Log
         ("KEY",
          "resource " & To_String (Reference)
@@ -110,6 +117,14 @@ package body Chaos.Resources.Key is
             Resource.Biff_Index :=
               Natural (Resource.Locator / 2 ** 20);
             Key.Resource_Entries.Append (Resource);
+            declare
+               Key_Text : constant String :=
+                            String (Resource.Resource_Name)
+                          & Character'Val (Resource.Resource_Type / 256)
+                            & Character'Val (Resource.Resource_Type mod 256);
+            begin
+               Key.Resource_Map.Insert (Key_Text, Resource);
+            end;
          end;
       end loop;
 

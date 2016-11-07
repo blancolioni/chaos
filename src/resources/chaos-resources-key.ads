@@ -1,6 +1,8 @@
 private with Ada.Containers.Vectors;
 private with Ada.Strings.Unbounded;
 
+private with WL.String_Maps;
+
 package Chaos.Resources.Key is
 
    type Key_Resource is
@@ -38,11 +40,15 @@ private
    package Resource_Entry_Vectors is
       new Ada.Containers.Vectors (Positive, Resource_Entry);
 
+   package Resource_Entry_Maps is
+     new WL.String_Maps (Resource_Entry);
+
    type Key_Resource is
      new Chaos_Resource with
       record
          Biff_Entries     : Biff_Entry_Vectors.Vector;
          Resource_Entries : Resource_Entry_Vectors.Vector;
+         Resource_Map     : Resource_Entry_Maps.Map;
       end record;
 
    overriding function Signature
