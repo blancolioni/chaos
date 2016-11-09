@@ -603,7 +603,7 @@ package body Chaos.Expressions.Import is
             end if;
          end if;
       end if;
-      Store.Set_Context (Resource.Name, Line_Number);
+      Store.Set_File_Context (Resource.Name, Line_Number);
    end Skip_Line;
 
    -----------------
