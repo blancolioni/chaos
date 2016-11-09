@@ -214,4 +214,8 @@ private
       return Lith.Objects.Object
    is (Actor.Creature.Property (Name));
 
+   overriding function Internal_Name
+     (Actor : Chaos_Actor_Record)
+      return String;
+
 end Chaos.Actors;

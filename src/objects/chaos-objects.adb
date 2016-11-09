@@ -315,7 +315,9 @@ package body Chaos.Objects is
       return String
    is
    begin
-      return Entity.Db.Database_Class_Name;
+      return Entity.Db.Database_Class_Name
+        & "-"
+        & Chaos_Object (Entity.Db.Element (Entity.Reference)).Internal_Name;
    end Name;
 
    -----------
