@@ -95,8 +95,21 @@ package body Chaos.Actors.Visibility is
    is
    begin
       if Target.all in Chaos_Actor_Record'Class then
+
          return Actor.Area.Visible (Actor.Location,
                                     Chaos_Actor (Target).Location);
+      elsif Target.all in Chaos.Creatures.Chaos_Creature_Record'Class then
+         declare
+            Creature : constant Chaos.Creatures.Chaos_Creature :=
+                         Chaos.Creatures.Chaos_Creature (Target);
+         begin
+            if Actor.Area.Has_Actor (Creature) then
+               return Actor.Area.Visible
+                 (Actor.Location, Actor.Area.Actor (Creature).Location);
+            else
+               return False;
+            end if;
+         end;
       else
          return False;
       end if;
