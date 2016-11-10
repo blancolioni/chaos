@@ -2,6 +2,8 @@ with Chaos.Creatures.Db;
 with Chaos.Abilities.Able_Objects;
 with Chaos.Defences.Defender_Objects;
 
+with Chaos.Identifiers;
+
 package body Chaos.Creatures is
 
    package Ability_Properties is
@@ -253,6 +255,19 @@ package body Chaos.Creatures is
    begin
       return Creature.Dialog /= null;
    end Has_Dialog;
+
+   -------------
+   -- Hostile --
+   -------------
+
+   function Hostile
+     (Creature : Chaos_Creature_Record'Class)
+      return Boolean
+   is
+   begin
+      return Creature.Object_Ids (EA_Id)
+        >= Chaos.Identifiers.Value ("ea", "evilcutoff");
+   end Hostile;
 
    ----------------
    -- Individual --

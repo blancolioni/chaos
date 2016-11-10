@@ -191,6 +191,10 @@ package Chaos.Creatures is
       Name     : String;
       Value    : Natural);
 
+   function Hostile
+     (Creature : Chaos_Creature_Record'Class)
+      return Boolean;
+
    type Chaos_Creature is access constant Chaos_Creature_Record'Class;
 
    procedure On_Start_Dialog
