@@ -186,6 +186,10 @@ package Chaos.Creatures is
       Properties : Creature_Match)
       return Boolean;
 
+   procedure Set_Enemy_Ally
+     (Creature : in out Chaos_Creature_Record'Class;
+      EA       : Natural);
+
    type Chaos_Creature is access constant Chaos_Creature_Record'Class;
 
    procedure On_Start_Dialog
