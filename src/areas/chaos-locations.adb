@@ -290,7 +290,8 @@ package body Chaos.Locations is
       if Across > Down then
          for X in X1 .. X2 loop
             declare
-               Mid_Y   : constant Natural := (X - X1) * (Y2 - Y1) / (X2 - X1);
+               Mid_Y   : constant Natural :=
+                           (X - X1) * (Y2 - Y1) / (X2 - X1) + Y1;
             begin
                if OK ((X, Mid_Y)) then
                   Chaos.Locations.Append (Result, (X, Mid_Y));
@@ -306,7 +307,8 @@ package body Chaos.Locations is
       elsif Down > Across then
          for Y in Y1 .. Y2 loop
             declare
-               Mid_X   : constant Natural := (Y - Y1) * (X2 - X1) / (Y2 - Y1);
+               Mid_X   : constant Natural :=
+                           (Y - Y1) * (X2 - X1) / (Y2 - Y1) + X1;
             begin
                if OK ((Mid_X, Y)) then
                   Chaos.Locations.Append (Result, (Mid_X, Y));
