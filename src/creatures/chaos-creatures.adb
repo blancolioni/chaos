@@ -529,18 +529,6 @@ package body Chaos.Creatures is
       Creature.HP := Hit_Points;
    end Set_Current_Hit_Points;
 
-   --------------------
-   -- Set_Enemy_Ally --
-   --------------------
-
-   procedure Set_Enemy_Ally
-     (Creature : in out Chaos_Creature_Record'Class;
-      EA       : Natural)
-   is
-   begin
-      Creature.Object_Ids (EA_Id) := EA;
-   end Set_Enemy_Ally;
-
    -------------------
    -- Set_Equipment --
    -------------------
@@ -553,6 +541,23 @@ package body Chaos.Creatures is
    begin
       Creature.Equipment (Slot) := Item;
    end Set_Equipment;
+
+   -------------------
+   -- Set_Object_Id --
+   -------------------
+
+   procedure Set_Object_Id
+     (Creature : in out Chaos_Creature_Record'Class;
+      Name     : String;
+      Value    : Natural)
+   is
+      Group : constant Creature_Object_Id :=
+                Creature_Object_Id'Value
+                  (Name & "_Id");
+   begin
+      Creature.Log (Group'Img & " :=" & Value'Img);
+      Creature.Object_Ids (Group) := Value;
+   end Set_Object_Id;
 
    ----------------
    -- Short_Name --
