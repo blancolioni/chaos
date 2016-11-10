@@ -12,7 +12,7 @@ package body Chaos.Expressions is
 
    procedure Create_Environment is
    begin
-      Lith.Library.Initialise (256 * 1024);
+      Lith.Library.Initialise (512 * 1024);
       Store.Define_Top_Level
         (Lith.Objects.Symbols.Get_Symbol ("global"),
          Chaos.Expressions.Maps.Create);
