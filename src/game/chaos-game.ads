@@ -105,9 +105,13 @@ private
          Dialog       : Chaos.Dialog.Chaos_Dialog;
          Dialog_State : Chaos.Dialog.Dialog_Cursor;
          Script_Flags : Script_Flag_Maps.Map;
+         In_Combat    : Boolean := False;
       end record;
 
    procedure Show_Dialog_State
+     (Game : in out Chaos_Game_Record'Class);
+
+   procedure Check_Combat
      (Game : in out Chaos_Game_Record'Class);
 
 end Chaos.Game;
