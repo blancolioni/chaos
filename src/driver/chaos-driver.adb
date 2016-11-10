@@ -169,6 +169,7 @@ begin
          Chaos.Game.Current_Game.Travel ("AR2602", "EXIT2600");
          Chaos.Game.Current_Game.Script_Round;
          Chaos.Game.Current_Game.Select_Option (1);
+         Chaos.Game.Current_Game.Script_Round;
 
          UI.Stop;
       end;
