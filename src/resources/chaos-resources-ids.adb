@@ -82,8 +82,17 @@ package body Chaos.Resources.Ids is
 
             if Index <= S'Last then
                if Hex then
-                  Value :=
-                    Integer'Value ("16#" & S (Start .. Index - 1) & "#");
+                  declare
+                     W : constant Word_32 :=
+                           Word_32'Value
+                             ("16#" & S (Start .. Index - 1) & "#");
+                  begin
+                     if W < 2 ** 31 then
+                        Value := Integer (W);
+                     else
+                        Value := Integer'Last;
+                     end if;
+                  end;
                else
                   Value :=
                     Integer'Value (S (Start .. Index - 1));
