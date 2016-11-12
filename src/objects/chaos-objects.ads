@@ -27,6 +27,11 @@ package Chaos.Objects is
       return String
    is (Object.Identifier);
 
+   function Internal_Name
+     (Object : Root_Chaos_Object_Record)
+      return String
+   is (Object.Identifier);
+
    function Global_Setting_Name
      (Object  : Root_Chaos_Object_Record'Class;
       Setting : String)

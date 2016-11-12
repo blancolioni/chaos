@@ -95,6 +95,16 @@ package body Chaos.Resources.Text is
             Buffer (Length) := Character'Val (X);
          end if;
       end loop;
+
+      if Length > 0 then
+         Resource.Lines.Append (Buffer (1 .. Length));
+         if Write_Text_Contents then
+            Write_Line
+              (Resource.Lines.Last_Index,
+               Resource.Lines.Last_Element);
+         end if;
+      end if;
+
    end Load;
 
    ----------------

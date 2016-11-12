@@ -199,6 +199,19 @@ package body Chaos.Actors is
       return Actor.Standard_Action;
    end Has_Standard_Action;
 
+   -------------------
+   -- Internal_Name --
+   -------------------
+
+   overriding function Internal_Name
+     (Actor : Chaos_Actor_Record)
+      return String
+   is
+   begin
+      return Chaos.Objects.Root_Chaos_Object_Record (Actor).Internal_Name
+        & "--" & Actor.Area.Identifier;
+   end Internal_Name;
+
    ----------
    -- Kill --
    ----------

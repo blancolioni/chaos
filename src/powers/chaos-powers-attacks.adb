@@ -36,21 +36,23 @@ package body Chaos.Powers.Attacks is
 
       Normal_Damage   : Integer := 0;
       Damage_Type     : Power_Damage_Type := Normal;
+
    begin
-      Store.New_Environment;
-      Store.Create_Binding (Get_Symbol ("actor"), Actor.To_Expression);
-      Store.Create_Binding (Get_Symbol ("defender"), Defender.To_Expression);
-      Store.Create_Binding (Get_Symbol ("power"), Power.To_Expression);
-      Store.Create_Binding
+
+      Store.New_Evaluation_Environment;
+      Store.Add_Binding (Get_Symbol ("actor"), Actor.To_Expression);
+      Store.Add_Binding (Get_Symbol ("defender"), Defender.To_Expression);
+      Store.Add_Binding (Get_Symbol ("power"), Power.To_Expression);
+      Store.Add_Binding
         (Get_Symbol ("roll"), Lith.Objects.To_Object (Roll));
 
-      Store.Create_Binding (Get_Symbol ("hit"),
-                        Lith.Objects.To_Object (Hit));
-      Store.Create_Binding (Get_Symbol ("critical"),
-                        Lith.Objects.To_Object (Critical));
+      Store.Add_Binding (Get_Symbol ("hit"),
+                            Lith.Objects.To_Object (Hit));
+      Store.Add_Binding (Get_Symbol ("critical"),
+                            Lith.Objects.To_Object (Critical));
 
       if Power.Implement = Weapon then
-         Store.Create_Binding
+         Store.Add_Binding
            (Get_Symbol ("weapon"),
             Chaos.Dice.To_Expression
               (Actor.Creature.Active_Weapon.Damage));
@@ -63,7 +65,7 @@ package body Chaos.Powers.Attacks is
             Store.Push (It, Stack => Secondary);
             declare
                Effect : constant Object :=
-                          Store.Evaluate
+                          Store.Evaluate_With_Environment
                             (Store.Car (Store.Top (1, Secondary)));
             begin
                if Is_Power_Damage_Type (Effect) then
@@ -98,7 +100,7 @@ package body Chaos.Powers.Attacks is
               ("takes-damage",
                Defender.Short_Name, Normal_Damage'Img));
       end if;
-      Store.Pop_Environment;
+
    end Apply_Power_Effects;
 
    ------------

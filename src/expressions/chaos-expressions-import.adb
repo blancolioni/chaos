@@ -312,6 +312,7 @@ package body Chaos.Expressions.Import is
       Response_Count : Natural := 0;
    begin
       Skip_Line (Resource, "RS", Index);
+      Store.Push (Lith.Objects.Symbols.Get_Symbol ("random-choice"));
       while Resource.Line (Index) = "RE" loop
          Skip_Line (Resource, "RE", Index);
          declare
@@ -345,19 +346,11 @@ package body Chaos.Expressions.Import is
       if Response_Count = 1 then
          Store.Swap;
          Store.Drop;
-      else
-         Store.Push_Nil;
-         for I in 1 .. Response_Count loop
-            Store.Push (Store.Pop, Lith.Objects.Secondary);
-            Store.Cons;
-            Store.Push (Store.Pop (Lith.Objects.Secondary));
-            Store.Cons;
-         end loop;
-         Store.Push (Lith.Objects.Symbols.Get_Symbol ("random-choice"));
          Store.Swap;
-         Store.Cons;
+         Store.Drop;
+      else
+         Store.Create_List (Response_Count * 2 + 1);
       end if;
-      --  Chaos.Logging.Log ("RE", Store.Show (Store.Top));
    end Import_RS;
 
    ---------------
@@ -610,7 +603,7 @@ package body Chaos.Expressions.Import is
             end if;
          end if;
       end if;
-      Store.Set_Context (Resource.Name, Line_Number);
+      Store.Set_File_Context (Resource.Name, Line_Number);
    end Skip_Line;
 
    -----------------

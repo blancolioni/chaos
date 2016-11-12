@@ -186,6 +186,15 @@ package Chaos.Creatures is
       Properties : Creature_Match)
       return Boolean;
 
+   procedure Set_Object_Id
+     (Creature : in out Chaos_Creature_Record'Class;
+      Name     : String;
+      Value    : Natural);
+
+   function Hostile
+     (Creature : Chaos_Creature_Record'Class)
+      return Boolean;
+
    type Chaos_Creature is access constant Chaos_Creature_Record'Class;
 
    procedure On_Start_Dialog

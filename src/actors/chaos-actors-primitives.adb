@@ -20,10 +20,11 @@ package body Chaos.Actors.Primitives is
 
    procedure Add_Primitives is
       use Lith.Objects.Interfaces;
+
    begin
-      Define_Function ("chaos-can-see", 2,
+      Define_Function ("chaos-can-see",
                        Evaluate_Chaos_Can_See'Access);
-      Define_Function ("chaos-start-dialog", 2,
+      Define_Function ("chaos-start-dialog",
                        Evaluate_Chaos_Start_Dialog'Access);
    end Add_Primitives;
 
@@ -58,12 +59,15 @@ package body Chaos.Actors.Primitives is
      (Store : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
+      use type Chaos.Objects.Chaos_Object;
       Actor  : constant Chaos.Actors.Chaos_Actor :=
                  Get_Actor (Store.Argument (1));
       Target : constant Chaos.Actors.Chaos_Actor :=
                  Get_Actor (Store.Argument (2));
    begin
-      if Chaos.Actors.Visibility.Can_See (Actor, Target) then
+      if Target /= null
+        and then Chaos.Actors.Visibility.Can_See (Actor, Target)
+      then
          Chaos.Game.Current_Game.Start_Dialog (Actor, Target);
          return Lith.Objects.True_Value;
       end if;

@@ -116,6 +116,53 @@ package body Chaos.Game is
       end if;
    end Arrive;
 
+   ------------------
+   -- Check_Combat --
+   ------------------
+
+   procedure Check_Combat
+     (Game : in out Chaos_Game_Record'Class)
+   is
+      Have_Hostiles : Boolean := False;
+
+      function Hostile
+        (Actor : Chaos.Actors.Chaos_Actor)
+         return Boolean
+      is (Actor.Creature.Hostile);
+
+      procedure Update_Hostile
+        (Actor : Chaos.Actors.Chaos_Actor);
+
+      --------------------
+      -- Update_Hostile --
+      --------------------
+
+      procedure Update_Hostile
+        (Actor : Chaos.Actors.Chaos_Actor)
+      is
+      begin
+         if Actor.Creature.Hostile then
+            Have_Hostiles := True;
+         end if;
+      end Update_Hostile;
+
+   begin
+      Game.Area.Scan_Matching_Actors
+        (Hostile'Access, Update_Hostile'Access);
+
+      if Game.In_Combat then
+         if not Have_Hostiles then
+            Game.Area.Log ("end of combat");
+         end if;
+      else
+         if Have_Hostiles then
+            Game.Area.Log ("combat start");
+         end if;
+      end if;
+
+      Game.In_Combat := Have_Hostiles;
+   end Check_Combat;
+
    -----------------
    -- Create_Game --
    -----------------
@@ -239,6 +286,9 @@ package body Chaos.Game is
 
    procedure Script_Round (Game : in out Chaos_Game_Record'Class) is
    begin
+
+      Game.Check_Combat;
+
       Game.Script_Flags.Clear;
       Game.Area.Execute_Script;
       for I in 1 .. Game.Area.Actor_Count loop

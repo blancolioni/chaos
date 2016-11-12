@@ -125,15 +125,8 @@ package body Chaos.Objects is
    is
       use Chaos.Expressions;
    begin
-      Store.Push (Expr, Lith.Objects.Secondary);
-      Store.Push (Lith.Objects.Symbols.Lambda_Symbol);
-      Store.Push (This_Symbol);
-      Store.Create_List (1);
-      Store.Push (Store.Pop (Lith.Objects.Secondary));
-      Store.Create_List (3);
-      Store.Push (Object.To_Expression);
-      Store.Create_List (2);
-      return Store.Evaluate (Store.Pop);
+      return Store.Evaluate
+        (Expr, This_Symbol, Object.To_Expression);
    end Evaluate;
 
    --------------
@@ -315,7 +308,9 @@ package body Chaos.Objects is
       return String
    is
    begin
-      return Entity.Db.Database_Class_Name;
+      return Entity.Db.Database_Class_Name
+        & "-"
+        & Chaos_Object (Entity.Db.Element (Entity.Reference)).Internal_Name;
    end Name;
 
    -----------

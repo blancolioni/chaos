@@ -411,7 +411,7 @@ package body Chaos.Parser is
       use Chaos.Expressions;
    begin
       if Tok_Line > 0 then
-         Store.Set_Context (Tok_File_Name, Tok_Line - 1);
+         Store.Set_File_Context (Tok_File_Name, Tok_Line - 1);
       end if;
 
       if Tok = Tok_Identifier then
@@ -580,7 +580,7 @@ package body Chaos.Parser is
       use Chaos.Expressions;
    begin
       if Tok_Line > 0 then
-         Store.Set_Context (Tok_File_Name, Tok_Line - 1);
+         Store.Set_File_Context (Tok_File_Name, Tok_Line - 1);
       end if;
 
       if Tok = Tok_If then

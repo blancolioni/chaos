@@ -1,6 +1,7 @@
 with Ada.Text_IO;
 
 with Lith.Objects;
+with Lith.Options;
 
 with Chaos.Actors;
 with Chaos.Areas;
@@ -102,7 +103,9 @@ begin
 
          UI.Start;
 
-         for I in 1 .. 3 loop
+         Lith.Options.Trace_GC := True;
+
+         for I in 1 .. 1000 loop
             Ada.Text_IO.Put_Line ("area script" & I'Img);
             Chaos.Game.Current_Game.Script_Round;
          end loop;
@@ -164,6 +167,8 @@ begin
               (Chaos.Creatures.Get ("FIREB1")));
 
          Chaos.Game.Current_Game.Travel ("AR2602", "EXIT2600");
+         Chaos.Game.Current_Game.Script_Round;
+         Chaos.Game.Current_Game.Select_Option (1);
          Chaos.Game.Current_Game.Script_Round;
 
          UI.Stop;
