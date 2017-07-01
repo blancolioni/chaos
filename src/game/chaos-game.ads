@@ -100,6 +100,7 @@ private
       record
          Area         : Chaos.Areas.Chaos_Area;
          Party        : Chaos.Party.Party_Type;
+         Protagonist  : Chaos.Actors.Chaos_Actor;
          Interaction  : Interaction_Type;
          Target       : Chaos.Actors.Chaos_Actor;
          Dialog       : Chaos.Dialog.Chaos_Dialog;
