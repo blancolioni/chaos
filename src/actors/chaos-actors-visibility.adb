@@ -106,8 +106,15 @@ package body Chaos.Actors.Visibility is
                          Chaos.Creatures.Chaos_Creature (Target);
          begin
             if Actor.Area.Has_Actor (Creature) then
-               return Actor.Area.Visible
-                 (Actor.Location, Actor.Area.Actor (Creature).Location);
+               declare
+                  Target_Actor : constant Chaos_Actor :=
+                                   Actor.Area.Actor (Creature);
+               begin
+                  return Actor.Area.Visible
+                    (Actor.Visible_Range (Actor.Area.Visibility),
+                     Actor.Location,
+                     Target_Actor.Location);
+               end;
             else
                return False;
             end if;
