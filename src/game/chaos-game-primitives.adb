@@ -9,6 +9,10 @@ with Chaos.Items;
 
 package body Chaos.Game.Primitives is
 
+   function Evaluate_Chaos_Num_In_Party
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object;
+
    function Evaluate_Chaos_Party_Experience
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object;
@@ -28,6 +32,8 @@ package body Chaos.Game.Primitives is
    procedure Add_Primitives is
       use Lith.Objects.Interfaces;
    begin
+      Define_Function ("chaos-num-in-party", 0,
+                       Evaluate_Chaos_Num_In_Party'Access);
       Define_Function ("chaos-party-experience", 1,
                        Evaluate_Chaos_Party_Experience'Access);
       Define_Function ("chaos-script-flag",
@@ -36,6 +42,20 @@ package body Chaos.Game.Primitives is
       Define_Function ("chaos-take-party-item", 2,
                        Evaluate_Chaos_Take_Party_Item'Access);
    end Add_Primitives;
+
+   ---------------------------
+   -- Evaluate_Num_In_Party --
+   ---------------------------
+
+   function Evaluate_Chaos_Num_In_Party
+     (Store       : in out Lith.Objects.Object_Store'Class)
+      return Lith.Objects.Object
+   is
+      pragma Unreferenced (Store);
+   begin
+      return Lith.Objects.To_Object
+        (Current_Game.Party.Party_Size);
+   end Evaluate_Chaos_Num_In_Party;
 
    -------------------------------------
    -- Evaluate_Chaos_Party_Experience --
