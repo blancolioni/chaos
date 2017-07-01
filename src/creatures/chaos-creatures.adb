@@ -480,6 +480,7 @@ package body Chaos.Creatures is
          else
             C.Last_Talked_To_By := Creature_1;
          end if;
+         C.Num_Times_Talked_To := C.Num_Times_Talked_To + 1;
       end Update_Creature;
 
    begin
