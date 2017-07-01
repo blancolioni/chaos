@@ -30,6 +30,10 @@ package Chaos.Party is
      (Party    : in out Chaos_Party_Record'Class;
       Actor    : Chaos.Actors.Chaos_Actor);
 
+   function Party_Size
+     (Party : Chaos_Party_Record'Class)
+     return Natural;
+
    procedure Clear
      (Party : in out Chaos_Party_Record'Class);
 

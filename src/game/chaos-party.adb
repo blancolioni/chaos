@@ -8,6 +8,10 @@ with Chaos.Creatures;
 
 package body Chaos.Party is
 
+   ----------------------
+   -- Add_Party_Member --
+   ----------------------
+
    procedure Add_Party_Member
      (Party    : in out Chaos_Party_Record'Class;
       Actor    : Chaos.Actors.Chaos_Actor)
@@ -151,6 +155,25 @@ package body Chaos.Party is
    begin
       return Party.Members (Position);
    end Party_Member;
+
+   ----------------
+   -- Party_Size --
+   ----------------
+
+   function Party_Size
+     (Party : Chaos_Party_Record'Class)
+      return Natural
+   is
+      use type Chaos.Actors.Chaos_Actor;
+   begin
+      return Size : Natural := 0 do
+         for Member of Party.Members loop
+            if Member /= null then
+               Size := Size + 1;
+            end if;
+         end loop;
+      end return;
+   end Party_Size;
 
    -------------------------
    -- Remove_Party_Member --
