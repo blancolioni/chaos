@@ -287,7 +287,7 @@ package body Chaos.Locations is
       Down   : constant Natural := Y2 - Y1;
       Result : Chaos.Locations.Square_Path;
    begin
-      if Across > Down then
+      if Across >= Down then
          for X in X1 .. X2 loop
             declare
                Mid_Y   : constant Natural :=
@@ -304,7 +304,7 @@ package body Chaos.Locations is
                end if;
             end;
          end loop;
-      elsif Down > Across then
+      else
          for Y in Y1 .. Y2 loop
             declare
                Mid_X   : constant Natural :=
@@ -321,9 +321,6 @@ package body Chaos.Locations is
                end if;
             end;
          end loop;
-      else
-         pragma Assert (Start = Finish);
-         Append (Result, Start);
       end if;
 
       return Result;
