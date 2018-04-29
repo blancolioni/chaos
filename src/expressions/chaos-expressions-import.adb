@@ -349,7 +349,18 @@ package body Chaos.Expressions.Import is
          Store.Swap;
          Store.Drop;
       else
-         Store.Create_List (Response_Count * 2 + 1);
+         if False then
+            Store.Create_List (Response_Count * 2 + 1);
+         else
+            Store.Set_Temporary (1, Store.Pop);
+            for I in 1 .. Response_Count * 2 loop
+               Store.Drop;
+            end loop;
+            Store.Push (Store.Get_Temporary (1));
+         end if;
+
+         Ada.Text_IO.Put_Line
+           ("random response: " & Store.Show (Store.Top));
       end if;
    end Import_RS;
 
