@@ -210,18 +210,21 @@ package body Chaos.Objects.Primitives is
                  Lith.Objects.Symbols.Get_Name
                    (Lith.Objects.To_Symbol (Store.Argument (2)));
 
-      procedure Update_Flag (Rec : in out Memor.Root_Record_Type'Class);
+      procedure Update_Flag (Rec : not null access
+                               Memor.Root_Record_Type'Class);
 
       -----------------
       -- Update_Flag --
       -----------------
 
-      procedure Update_Flag (Rec : in out Memor.Root_Record_Type'Class) is
+      procedure Update_Flag (Rec : not null access
+                               Memor.Root_Record_Type'Class)
+      is
       begin
          if Value then
-            Root_Chaos_Object_Record'Class (Rec).Set_Flag (Flag);
+            Root_Chaos_Object_Record'Class (Rec.all).Set_Flag (Flag);
          else
-            Root_Chaos_Object_Record'Class (Rec).Clear_Flag (Flag);
+            Root_Chaos_Object_Record'Class (Rec.all).Clear_Flag (Flag);
          end if;
       end Update_Flag;
 

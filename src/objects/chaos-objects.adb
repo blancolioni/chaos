@@ -154,17 +154,18 @@ package body Chaos.Objects is
       use Chaos.Expressions;
 
       procedure Set_Script_Executed
-        (Entity : in out Memor.Root_Record_Type'Class);
+        (Entity : not null access Memor.Root_Record_Type'Class);
 
       -------------------------
       -- Set_Script_Executed --
       -------------------------
 
       procedure Set_Script_Executed
-        (Entity : in out Memor.Root_Record_Type'Class)
+        (Entity : not null access Memor.Root_Record_Type'Class)
       is
       begin
-         Root_Chaos_Object_Record'Class (Entity).Set_Flag ("script-executed");
+         Root_Chaos_Object_Record'Class (Entity.all).Set_Flag
+           ("script-executed");
       end Set_Script_Executed;
 
    begin
@@ -271,15 +272,18 @@ package body Chaos.Objects is
    is
       pragma Unreferenced (Store);
 
-      procedure Mark_Object (Object : in out Memor.Root_Record_Type'Class);
+      procedure Mark_Object
+        (Object : not null access Memor.Root_Record_Type'Class);
 
       -----------------
       -- Mark_Object --
       -----------------
 
-      procedure Mark_Object (Object : in out Memor.Root_Record_Type'Class) is
+      procedure Mark_Object
+        (Object : not null access Memor.Root_Record_Type'Class)
+      is
       begin
-         Root_Chaos_Object_Record'Class (Object).Mark (Mark);
+         Root_Chaos_Object_Record'Class (Object.all).Mark (Mark);
       end Mark_Object;
 
    begin
