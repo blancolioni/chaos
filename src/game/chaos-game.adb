@@ -448,9 +448,6 @@ package body Chaos.Game is
          return;
       end if;
 
-      Chaos.Creatures.On_Start_Dialog
-        (Talker.Creature, Listener.Creature);
-
       Game.Dialog := Dialog;
       Game.Dialog_State := Dialog.Start (Creature);
 
@@ -458,6 +455,9 @@ package body Chaos.Game is
       Listener.Update (Update_Listener_Orientation'Access);
 
       Ada.Text_IO.Put_Line ("Starting dialog: " & Dialog.Identifier);
+
+      Chaos.Creatures.On_Start_Dialog
+        (Talker.Creature, Listener.Creature);
 
       Game.Show_Dialog_State;
 
