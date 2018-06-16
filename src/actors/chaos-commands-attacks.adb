@@ -102,6 +102,7 @@ package body Chaos.Commands.Attacks is
       Location : Chaos.Locations.Square_Location)
       return Chaos.Locations.Square_Path
    is
+      pragma Unreferenced (Command, Location);
    begin
       return Chaos.Locations.No_Path;
    end Area_Effect;
