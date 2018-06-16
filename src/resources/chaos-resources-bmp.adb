@@ -9,8 +9,8 @@ package body Chaos.Resources.Bmp is
       X, Y     : Natural)
       return Resource_Color
    is
-      Result : constant WL.Bitmap_IO.Colour_Type :=
-                 WL.Bitmap_IO.Colour (Resource.BM, X, Y);
+      Result : constant WL.Bitmap_IO.Color_Type :=
+                 WL.Bitmap_IO.Color (Resource.BM, X, Y);
    begin
       return (WL.Binary_IO.Word_8 (Result.R),
               WL.Binary_IO.Word_8 (Result.G),
@@ -29,7 +29,7 @@ package body Chaos.Resources.Bmp is
       return Natural
    is
    begin
-      return Natural (WL.Bitmap_IO.Colour_Index (Resource.BM, X, Y));
+      return Natural (WL.Bitmap_IO.Color_Index (Resource.BM, X, Y));
    end Color_Index;
 
    ------------

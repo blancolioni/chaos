@@ -294,7 +294,6 @@ package body Chaos.Areas is
       Finish : Chaos.Locations.Square_Location)
       return Chaos.Locations.Square_Path
    is
-      use type Chaos.Actors.Chaos_Actor;
       function OK
         (Location : Chaos.Locations.Square_Location)
          return Boolean
@@ -448,6 +447,20 @@ package body Chaos.Areas is
    begin
       return Db.Get_Database;
    end Object_Database;
+
+   --------------------
+   -- Part_Of_Battle --
+   --------------------
+
+   function Part_Of_Battle
+     (Area  : Chaos_Area_Record'Class;
+      Actor : Chaos.Actors.Chaos_Actor)
+      return Boolean
+   is
+      pragma Unreferenced (Area, Actor);
+   begin
+      return False;
+   end Part_Of_Battle;
 
    --------------
    -- Passable --

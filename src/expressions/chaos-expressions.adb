@@ -1,5 +1,4 @@
 with Lith.Library;
-with Lith.Objects.Symbols;
 
 with Chaos.Expressions.Maps;
 with Chaos.Expressions.Primitives;
@@ -14,7 +13,7 @@ package body Chaos.Expressions is
    begin
       Lith.Library.Initialise (512 * 1024);
       Store.Define_Top_Level
-        (Lith.Objects.Symbols.Get_Symbol ("global"),
+        (Lith.Objects.Get_Symbol ("global"),
          Chaos.Expressions.Maps.Create);
       Chaos.Expressions.Primitives.Create_Primitives;
    end Create_Environment;
@@ -34,7 +33,7 @@ package body Chaos.Expressions is
 
    function This_Symbol return Lith.Objects.Symbol_Type is
    begin
-      return Lith.Objects.Symbols.Get_Symbol ("this");
+      return Lith.Objects.Get_Symbol ("this");
    end This_Symbol;
 
 end Chaos.Expressions;

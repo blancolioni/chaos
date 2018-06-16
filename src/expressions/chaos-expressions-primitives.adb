@@ -5,7 +5,6 @@ with Ada.Exceptions;
 with WL.String_Maps;
 
 with Lith.Objects.Interfaces;
-with Lith.Objects.Symbols;
 
 with Chaos.Objects;
 
@@ -100,7 +99,7 @@ package body Chaos.Expressions.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
-      use Lith.Objects, Lith.Objects.Symbols;
+      use Lith.Objects;
 
       function Get
         (Map  : Object;
@@ -153,7 +152,7 @@ package body Chaos.Expressions.Primitives is
                           Full_Name (Full_Name'First + 6 .. Full_Name'Last);
             Map       : constant Lith.Objects.Object :=
                           Store.Get_Top_Level
-                            (Lith.Objects.Symbols.Get_Symbol (Map_Name));
+                            (Lith.Objects.Get_Symbol (Map_Name));
          begin
             return Get (Map, Prop_Name);
          exception
@@ -166,7 +165,7 @@ package body Chaos.Expressions.Primitives is
       else
          begin
             return Get (Store.Argument (1),
-                        Lith.Objects.Symbols.Get_Name
+                        Lith.Objects.Get_Name
                           (Lith.Objects.To_Symbol (Store.Argument (2))));
          exception
             when E : others =>
@@ -188,7 +187,7 @@ package body Chaos.Expressions.Primitives is
      (Store       : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
-      use Lith.Objects, Lith.Objects.Symbols;
+      use Lith.Objects;
 
       Value : constant Lith.Objects.Object :=
                 Store.Argument (3);
@@ -241,7 +240,7 @@ package body Chaos.Expressions.Primitives is
                           Full_Name (Full_Name'First + 6 .. Full_Name'Last);
             Map       : constant Lith.Objects.Object :=
                           Store.Get_Top_Level
-                            (Lith.Objects.Symbols.Get_Symbol (Map_Name));
+                            (Lith.Objects.Get_Symbol (Map_Name));
          begin
             Set (Map, Prop_Name);
          exception
@@ -255,7 +254,7 @@ package body Chaos.Expressions.Primitives is
       else
          begin
             Set (Store.Argument (1),
-                 Lith.Objects.Symbols.Get_Name
+                 Lith.Objects.Get_Name
                    (Lith.Objects.To_Symbol (Store.Argument (2))));
          exception
             when E : others =>
@@ -302,7 +301,7 @@ package body Chaos.Expressions.Primitives is
       Timeout  : constant Natural :=
                    Lith.Objects.To_Integer (Store.Argument (2));
       Key      : constant String :=
-                   Lith.Objects.Symbols.Get_Name
+                   Lith.Objects.Get_Name
                      (Lith.Objects.To_Symbol (Target));
    begin
       if Timeouts.Contains (Key) then

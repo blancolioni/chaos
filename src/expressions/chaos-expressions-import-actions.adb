@@ -3,7 +3,6 @@ with Ada.Containers.Vectors;
 with WL.String_Maps;
 
 with Lith.Objects.Interfaces;
-with Lith.Objects.Symbols;
 
 with Chaos.Logging;
 with Chaos.Paths;
@@ -50,7 +49,7 @@ package body Chaos.Expressions.Import.Actions is
      (Store : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
-      use Lith.Objects, Lith.Objects.Symbols;
+      use Lith.Objects;
       Index : constant Integer := To_Integer (Store.Argument (1));
       Action_Name : constant Symbol_Type := To_Symbol (Store.Argument (2));
       Full_Name   : constant Symbol_Type :=
@@ -112,17 +111,17 @@ package body Chaos.Expressions.Import.Actions is
 
       Action_Id_Map.Insert (Get_Name (Action_Name), Index);
 
-      Store.Push (Lambda_Symbol);
-      Store.Push (Get_Symbol ("object-1"));
-      Store.Push (Get_Symbol ("object-2"));
-      Store.Push (Get_Symbol ("object-3"));
-      Store.Push (Get_Symbol ("integer-1"));
-      Store.Push (Get_Symbol ("x"));
-      Store.Push (Get_Symbol ("y"));
-      Store.Push (Get_Symbol ("integer-2"));
-      Store.Push (Get_Symbol ("integer-3"));
-      Store.Push (Get_Symbol ("text-1"));
-      Store.Push (Get_Symbol ("text-2"));
+      Store.Push ("lambda");
+      Store.Push ("object-1");
+      Store.Push ("object-2");
+      Store.Push ("object-3");
+      Store.Push ("integer-1");
+      Store.Push ("x");
+      Store.Push ("y");
+      Store.Push ("integer-2");
+      Store.Push ("integer-3");
+      Store.Push ("text-1");
+      Store.Push ("text-2");
       Store.Create_List (10);
       Store.Push (Store.Argument (3));
       Store.Create_List (3);
@@ -189,7 +188,7 @@ package body Chaos.Expressions.Import.Actions is
       Text_1     : String;
       Text_2     : String)
    is
-      use Lith.Objects, Lith.Objects.Symbols;
+      use Lith.Objects;
       Index : constant Natural := Natural (Action_Id);
    begin
       if Index > Actions.Last_Index
@@ -202,7 +201,7 @@ package body Chaos.Expressions.Import.Actions is
          return;
       end if;
 
-      Store.Push (Actions.Element (Index).Function_Name);
+      Store.Push (To_Object (Actions.Element (Index).Function_Name));
       Store.Push (Store.Top (3, Secondary));
       Store.Push (Store.Top (2, Secondary));
       Store.Push (Store.Top (1, Secondary));
@@ -212,29 +211,29 @@ package body Chaos.Expressions.Import.Actions is
       Store.Push (To_Object (Y));
       Store.Push (To_Object (Integer_2));
       Store.Push (To_Object (Integer_3));
-      Store.Push (Quote_Symbol);
+      Store.Push (Single_Quote);
       if Text_1 /= "" then
          if Text_2 = ""
            and then Actions.Element (Index).Arguments
            (Import.Actions.Text_2)
          then
             Store.Push
-              (Get_Symbol (Text_1 (Text_1'First + 6 .. Text_1'Last)));
+              (Text_1 (Text_1'First + 6 .. Text_1'Last));
          else
-            Store.Push (Get_Symbol (Text_1));
+            Store.Push (Text_1);
          end if;
       else
          Store.Push_Nil;
       end if;
       Store.Create_List (2);
-      Store.Push (Quote_Symbol);
+      Store.Push (Single_Quote);
       if Text_2 /= "" then
-         Store.Push (Get_Symbol (Text_2));
+         Store.Push (Text_2);
       elsif Actions.Element (Index).Arguments
         (Import.Actions.Text_2)
       then
          Store.Push
-           (Get_Symbol (Text_1 (Text_1'First .. Text_1'First + 5)));
+           (Text_1 (Text_1'First .. Text_1'First + 5));
       else
          Store.Push_Nil;
       end if;
@@ -396,7 +395,7 @@ package body Chaos.Expressions.Import.Actions is
       for Obj in Object_Argument loop
          if not Have_Object (Obj) then
             Chaos.Expressions.Store.Push
-              (Lith.Objects.Symbols.Quote_Symbol);
+              (Lith.Objects.Single_Quote);
             Chaos.Expressions.Store.Push_Nil;
             Chaos.Expressions.Store.Create_List (2);
             Chaos.Expressions.Store.Push
@@ -423,7 +422,7 @@ package body Chaos.Expressions.Import.Actions is
       Lith.Objects.Interfaces.Define_Function
         (Chaos.Expressions.Store, "chaos-add-action",
          Evaluate_Chaos_Add_Action'Access);
-      No_Action := Lith.Objects.Symbols.Get_Symbol ("no-action");
+      No_Action := Lith.Objects.Get_Symbol ("no-action");
 
       if not Chaos.Expressions.Store.Load
         (Chaos.Paths.Config_File

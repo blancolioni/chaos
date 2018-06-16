@@ -1,5 +1,4 @@
 with Lith.Objects.Interfaces;
-with Lith.Objects.Symbols;
 
 with Chaos.UI;
 
@@ -108,7 +107,7 @@ package body Chaos.Game.Primitives is
       Map    : constant Lith.Objects.Object :=
                  Store.Argument (1);
       Group  : constant String :=
-                 Lith.Objects.Symbols.Get_Name
+                 Lith.Objects.Get_Name
                    (Lith.Objects.To_Symbol (Store.Argument (2)));
       Name   : constant String :=
                  Store.Show (Store.Argument (3));
@@ -142,7 +141,7 @@ package body Chaos.Game.Primitives is
                       (Store.Argument (1)));
       Entity : constant Chaos.Entities.Chaos_Entity :=
                Chaos.Entities.Search.Get_Entity
-                   (Lith.Objects.Symbols.Get_Name
+                   (Lith.Objects.Get_Name
                       (Lith.Objects.To_Symbol
                          (Store.Argument (2))));
       Item   : constant Chaos.Items.Chaos_Item :=

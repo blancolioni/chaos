@@ -1,3 +1,5 @@
+with Ada.Text_IO;
+
 with Lith.Objects;
 with Lith.Objects.Interfaces;
 
@@ -98,6 +100,7 @@ package body Chaos.UI is
    begin
       UI.Put (Text);
       UI.New_Line;
+      Ada.Text_IO.Put_Line (Text);
    end Put_Line;
 
    --------------------

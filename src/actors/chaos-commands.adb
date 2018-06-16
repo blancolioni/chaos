@@ -12,6 +12,20 @@ package body Chaos.Commands is
       Collection.Vector.Append (Command);
    end Append;
 
+   -----------------
+   -- Area_Effect --
+   -----------------
+
+   function Area_Effect
+     (Command  : Root_Command_Type;
+      Location : Chaos.Locations.Square_Location)
+      return Chaos.Locations.Square_Path
+   is
+      pragma Unreferenced (Command, Location);
+   begin
+      return Chaos.Locations.No_Path;
+   end Area_Effect;
+
    -------------
    -- Command --
    -------------
@@ -33,5 +47,33 @@ package body Chaos.Commands is
    begin
       return Collection.Vector.Last_Index;
    end Count;
+
+   --------------------
+   -- Destination_OK --
+   --------------------
+
+   function Destination_OK
+     (Command  : Root_Command_Type;
+      Location : Chaos.Locations.Square_Location)
+      return Boolean
+   is
+      pragma Unreferenced (Command, Location);
+   begin
+      return False;
+   end Destination_OK;
+
+   -----------------------
+   -- Get_Path_Feedback --
+   -----------------------
+
+   function Get_Path_Feedback
+     (Command   : Root_Command_Type;
+      Location  : Chaos.Locations.Square_Location)
+      return Path_Feedback
+   is
+      pragma Unreferenced (Command, Location);
+   begin
+      return OK;
+   end Get_Path_Feedback;
 
 end Chaos.Commands;

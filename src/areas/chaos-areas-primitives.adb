@@ -1,5 +1,4 @@
 with Lith.Objects.Interfaces;
-with Lith.Objects.Symbols;
 
 with Chaos.Logging;
 
@@ -56,7 +55,7 @@ package body Chaos.Areas.Primitives is
                      (Chaos.Objects.To_Object
                         (Store.Argument (1)));
       Code     : constant String :=
-                   Lith.Objects.Symbols.Get_Name
+                   Lith.Objects.Get_Name
                      (Lith.Objects.To_Symbol
                         (Store.Argument (2)));
       X        : constant Integer :=

@@ -1,5 +1,3 @@
-with Lith.Objects.Symbols;
-
 with Chaos.Paths;
 
 package body Chaos.Expressions.Import.Objects is
@@ -57,9 +55,9 @@ package body Chaos.Expressions.Import.Objects is
    begin
       if Name /= "" then
          Store.Push
-           (Lith.Objects.Symbols.Get_Symbol ("chaos-object-with-code"));
-         Store.Push (Lith.Objects.Symbols.Quote_Symbol);
-         Store.Push (Lith.Objects.Symbols.Get_Symbol (Name));
+           ("chaos-object-with-code");
+         Store.Push (Lith.Objects.Single_Quote);
+         Store.Push (Name);
          Store.Create_List (2);
          Store.Create_List (2);
          Store.Push (Store.Pop, Lith.Objects.Secondary);
@@ -77,8 +75,8 @@ package body Chaos.Expressions.Import.Objects is
      (Id : String)
    is
    begin
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-get-" & Id));
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("this"));
+      Store.Push ("chaos-get-" & Id);
+      Store.Push ("this");
       Store.Create_List (2);
       Store.Push (Store.Pop, Lith.Objects.Secondary);
    end Import_Object_Identifier;
@@ -92,9 +90,9 @@ package body Chaos.Expressions.Import.Objects is
    is
    begin
       Store.Push
-        (Lith.Objects.Symbols.Get_Symbol ("chaos-object-with-code"));
-      Store.Push (Lith.Objects.Symbols.Quote_Symbol);
-      Store.Push (Lith.Objects.Symbols.Get_Symbol (Name));
+        ("chaos-object-with-code");
+      Store.Push (Lith.Objects.Single_Quote);
+      Store.Push (Name);
       Store.Create_List (2);
       Store.Create_List (2);
       Store.Push (Store.Pop, Lith.Objects.Secondary);
@@ -113,7 +111,7 @@ package body Chaos.Expressions.Import.Objects is
          return;
       end if;
 
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-match-object"));
+      Store.Push ("chaos-match-object");
       for I in 1 .. 7 loop
          if I <= Tuple'Last then
             Store.Push (Tuple (I));

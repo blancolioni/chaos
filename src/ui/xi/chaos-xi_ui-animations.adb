@@ -59,7 +59,6 @@ package body Chaos.Xi_UI.Animations is
       Palette     : Chaos.Resources.Resource_Palette)
       return Xi.Texture.Xi_Texture
    is
-      use WL.Binary_IO;
       Frames   : Texture_Vectors.Vector;
    begin
       if not Animation.Custom_Textures.Contains (Identifier) then

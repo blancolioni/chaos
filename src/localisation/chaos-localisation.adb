@@ -100,7 +100,6 @@ package body Chaos.Localisation is
       -----------
 
       function Apply (Start : Positive) return String is
-         use Ada.Characters.Handling;
       begin
          if Start < Text'Last - 1
            and then Text (Start) = '{'

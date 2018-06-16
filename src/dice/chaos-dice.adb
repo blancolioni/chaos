@@ -2,8 +2,6 @@ with Ada.Characters.Handling;
 
 with WL.Random;
 
-with Lith.Objects.Symbols;
-
 with Chaos.Expressions;
 
 package body Chaos.Dice is
@@ -265,7 +263,7 @@ package body Chaos.Dice is
    is
       use Chaos.Expressions;
    begin
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-roll-dice"));
+      Store.Push ("chaos-roll-dice");
       Store.Push (Lith.Objects.To_Object (Roll.Count));
       Store.Push (Lith.Objects.To_Object (Roll.Die));
       Store.Push (Lith.Objects.To_Object (Roll.Plus));

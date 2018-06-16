@@ -59,8 +59,7 @@ package body Chaos.Commands.Attacks is
    overriding function Area_Effect
      (Command : Root_Attack_Command;
       Location : Chaos.Locations.Square_Location)
-      return Chaos.Locations.Square_Path
-   is (Chaos.Locations.No_Path);
+      return Chaos.Locations.Square_Path;
 
    overriding function Path_To
      (Command  : Root_Attack_Command;
@@ -93,6 +92,19 @@ package body Chaos.Commands.Attacks is
 --           Chaos.Creatures.Location (Command.Attacker),
 --           Location);
 --     end Area_Effect;
+
+   -----------------
+   -- Area_Effect --
+   -----------------
+
+   overriding function Area_Effect
+     (Command  : Root_Attack_Command;
+      Location : Chaos.Locations.Square_Location)
+      return Chaos.Locations.Square_Path
+   is
+   begin
+      return Chaos.Locations.No_Path;
+   end Area_Effect;
 
    --------------------
    -- Destination_OK --

@@ -19,6 +19,20 @@ package body Chaos.Entities is
       null;
    end Add_Properties;
 
+   -----------------------
+   -- Equipment_Slot_OK --
+   -----------------------
+
+   overriding function Equipment_Slot_OK
+     (Entity : Chaos_Entity_Record;
+      Slot   : Chaos.Equipment.Chaos_Equipment_Slot)
+      return Boolean
+     is
+      pragma Unreferenced (Entity, Slot);
+   begin
+      return False;
+   end Equipment_Slot_OK;
+
    ------------
    -- Exists --
    ------------

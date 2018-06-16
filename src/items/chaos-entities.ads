@@ -20,8 +20,7 @@ package Chaos.Entities is
    overriding function Equipment_Slot_OK
      (Entity : Chaos_Entity_Record;
       Slot : Chaos.Equipment.Chaos_Equipment_Slot)
-      return Boolean
-   is (False);
+      return Boolean;
 
    function Weight
      (Entity : Chaos_Entity_Record)

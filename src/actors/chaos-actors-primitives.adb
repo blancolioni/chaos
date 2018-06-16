@@ -59,7 +59,6 @@ package body Chaos.Actors.Primitives is
      (Store : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
-      use type Chaos.Objects.Chaos_Object;
       Actor  : constant Chaos.Actors.Chaos_Actor :=
                  Get_Actor (Store.Argument (1));
       Target : constant Chaos.Actors.Chaos_Actor :=

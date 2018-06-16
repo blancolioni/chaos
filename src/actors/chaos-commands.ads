@@ -44,8 +44,7 @@ package Chaos.Commands is
    function Destination_OK
      (Command  : Root_Command_Type;
       Location : Chaos.Locations.Square_Location)
-      return Boolean
-   is (False);
+      return Boolean;
 
    procedure On_Finish
      (Command : in out Root_Command_Type)
@@ -56,14 +55,12 @@ package Chaos.Commands is
    function Get_Path_Feedback
      (Command   : Root_Command_Type;
       Location  : Chaos.Locations.Square_Location)
-      return Path_Feedback
-   is (OK);
+      return Path_Feedback;
 
    function Area_Effect
      (Command  : Root_Command_Type;
       Location : Chaos.Locations.Square_Location)
-      return Chaos.Locations.Square_Path
-   is (Chaos.Locations.No_Path);
+      return Chaos.Locations.Square_Path;
 
    function Path_To
      (Command  : Root_Command_Type;

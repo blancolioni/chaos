@@ -157,8 +157,7 @@ package Chaos.Areas is
    function Part_Of_Battle
      (Area  : Chaos_Area_Record'Class;
       Actor : Chaos.Actors.Chaos_Actor)
-      return Boolean
-   is (False);
+      return Boolean;
 
    function Visibility
      (Area : Chaos_Area_Record'Class)

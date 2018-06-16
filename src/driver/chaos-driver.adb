@@ -36,7 +36,7 @@ with Chaos.Paths;
 with Chaos.Infinity_Engine;
 
 procedure Chaos.Driver is
-   Test_Only : constant Boolean := True;
+   Test_Only : constant Boolean := False;
    Text_UI : constant Boolean := False;
 
    Tlk  : Chaos.Resources.Tlk.Tlk_Resource;

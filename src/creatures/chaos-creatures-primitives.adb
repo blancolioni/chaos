@@ -1,5 +1,4 @@
 with Lith.Objects.Interfaces;
-with Lith.Objects.Symbols;
 
 with Chaos.Identifiers;
 
@@ -123,7 +122,7 @@ package body Chaos.Creatures.Primitives is
                     Chaos.Creatures.Chaos_Creature
                       (Chaos.Objects.To_Object (Store.Argument (1)));
       Group_Name : constant String :=
-                     Symbols.Get_Name (To_Symbol (Store.Argument (2)));
+                     To_Symbol_Name (Store.Argument (2));
       New_Value : Natural;
 
       procedure Set_Object_Id
@@ -144,7 +143,7 @@ package body Chaos.Creatures.Primitives is
       if Is_Symbol (Store.Argument (3)) then
          New_Value :=
            Chaos.Identifiers.Value
-             (Group_Name, Symbols.Get_Name (To_Symbol (Store.Argument (3))));
+             (Group_Name, To_Symbol_Name (Store.Argument (3)));
       else
          New_Value := To_Integer (Store.Argument (3));
       end if;

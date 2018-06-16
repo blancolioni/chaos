@@ -2,8 +2,6 @@ with Ada.Characters.Handling;
 with Ada.Directories;
 with Ada.Strings.Fixed;
 
-with Lith.Objects.Symbols;
-
 with Chaos.Parser.Tokens;              use Chaos.Parser.Tokens;
 with Chaos.Parser.Lexical;             use Chaos.Parser.Lexical;
 
@@ -338,7 +336,7 @@ package body Chaos.Parser is
       Count : Natural := 0;
    begin
       Open (Path);
-      Store.Push (Lith.Objects.Symbols.Begin_Symbol);
+      Store.Push ("begin");
       while Tok /= Tok_End_Of_File loop
          Parse_Expression;
          Count := Count + 1;
@@ -372,8 +370,7 @@ package body Chaos.Parser is
 
       Open_String (Clean_Text (1 .. Length));
 
-      Chaos.Expressions.Store.Push
-        (Lith.Objects.Symbols.Get_Symbol ("begin"));
+      Chaos.Expressions.Store.Push ("begin");
 
       while Tok = Tok_Identifier loop
          declare
@@ -432,14 +429,14 @@ package body Chaos.Parser is
          else
             Store.Push
               (Lith.Objects.To_Object
-                 (Lith.Objects.Symbols.Get_Symbol (Tok_Text)));
+                 (Lith.Objects.Get_Symbol (Tok_Text)));
          end if;
          Scan;
       elsif Tok = Tok_Quote then
          Scan;
          if Tok = Tok_Identifier then
-            Store.Push (Lith.Objects.Symbols.Quote_Symbol);
-            Store.Push (Lith.Objects.Symbols.Get_Symbol (Tok_Text));
+            Store.Push (Lith.Objects.Single_Quote);
+            Store.Push (Tok_Text);
             Store.Create_List (2);
             Scan;
          else
@@ -535,10 +532,10 @@ package body Chaos.Parser is
          if Tok = Tok_Identifier then
             if Next_Tok = Tok_Assign then
                Store.Push
-                 (Lith.Objects.Symbols.Get_Symbol ("chaos-set-property"));
+                 ("chaos-set-property");
                Store.Swap;
-               Store.Push (Lith.Objects.Symbols.Quote_Symbol);
-               Store.Push (Lith.Objects.Symbols.Get_Symbol (Tok_Text));
+               Store.Push (Lith.Objects.Single_Quote);
+               Store.Push (Tok_Text);
                Store.Create_List (2);
 
                Scan;
@@ -551,11 +548,10 @@ package body Chaos.Parser is
                Store.Cons;
                Store.Cons;
             else
-               Store.Push
-                 (Lith.Objects.Symbols.Get_Symbol ("chaos-get-property"));
+               Store.Push ("chaos-get-property");
                Store.Swap;
-               Store.Push (Lith.Objects.Symbols.Quote_Symbol);
-               Store.Push (Lith.Objects.Symbols.Get_Symbol (Tok_Text));
+               Store.Push (Lith.Objects.Single_Quote);
+               Store.Push (Tok_Text);
                Store.Create_List (2);
                Scan;
 
@@ -584,7 +580,7 @@ package body Chaos.Parser is
       end if;
 
       if Tok = Tok_If then
-         Store.Push (Lith.Objects.Symbols.Get_Symbol ("if"));
+         Store.Push ("if");
          Scan;
          Parse_Expression;
 
@@ -672,10 +668,10 @@ package body Chaos.Parser is
       Indent : constant Positive := Tok_Indent;
       Argument_Count : Natural := 0;
    begin
-      Store.Push (Lith.Objects.Symbols.Lambda_Symbol);
+      Store.Push ("lambda");
 
       while Tok = Tok_Identifier loop
-         Store.Push (Lith.Objects.Symbols.Get_Symbol (Tok_Text));
+         Store.Push (Tok_Text);
          Scan;
          Argument_Count := Argument_Count + 1;
       end loop;
@@ -721,9 +717,8 @@ package body Chaos.Parser is
 
       while At_Operator and then Operator_Precedence (Tok) = Precedence loop
          Store.Push
-           (Lith.Objects.Symbols.Get_Symbol
-              (Ada.Strings.Fixed.Trim
-                   (Operator_Name (Tok), Ada.Strings.Right)));
+           (Ada.Strings.Fixed.Trim
+              (Operator_Name (Tok), Ada.Strings.Right));
          Store.Swap;
          Scan;
          if Precedence = 1 then
@@ -757,8 +752,7 @@ package body Chaos.Parser is
 
       Open_String (Clean_Text (1 .. Length));
 
-      Chaos.Expressions.Store.Push
-        (Lith.Objects.Symbols.Get_Symbol ("and"));
+      Chaos.Expressions.Store.Push ("and");
 
       while Tok = Tok_Identifier or else Tok = Tok_Exclam loop
          declare

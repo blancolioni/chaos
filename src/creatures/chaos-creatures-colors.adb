@@ -57,7 +57,7 @@ package body Chaos.Creatures.Colors is
       for Y in 0 .. 119 loop
          for X in 0 .. 11 loop
             declare
-               C : constant Colour_Type := Colour (BM, X, Y);
+               C : constant Color_Type := Color (BM, X, Y);
             begin
                Standard_Palette (Y, X) :=
                  (R => Word_8 (C.R), G => Word_8 (C.G),

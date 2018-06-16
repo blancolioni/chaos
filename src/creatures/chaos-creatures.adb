@@ -156,7 +156,6 @@ package body Chaos.Creatures is
       return Chaos.Defences.Defence_Score_Range
    is
       use all type Chaos.Defences.Defence;
-      use type Chaos.Defences.Defence_Score_Range;
       use type Chaos.Abilities.Ability_Score_Range;
       Base : constant Integer :=
                10 + Natural (Creature.Level) / 2;

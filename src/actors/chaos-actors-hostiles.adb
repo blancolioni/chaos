@@ -15,7 +15,6 @@ package body Chaos.Actors.Hostiles is
       Location : Chaos.Locations.Square_Location)
       return Boolean
    is
-      use Chaos.Actors;
       use Chaos.Locations;
       Ns : constant Chaos.Locations.Square_Path :=
              Actor.Area.Neighbours (Location);

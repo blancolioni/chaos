@@ -22,7 +22,6 @@ package body Chaos.Entities.Misc.Import is
       ---------------
 
       procedure Configure (Entity : in out Chaos_Misc_Entity_Record'Class) is
-         use Chaos.Localisation;
       begin
          Entity.Initialize
            (Code, False,

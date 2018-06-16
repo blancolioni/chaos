@@ -3,8 +3,6 @@ with Ada.Text_IO;
 
 with WL.Binary_IO;                     use WL.Binary_IO;
 
-with Lith.Objects.Symbols;
-
 with Chaos.Expressions.Maps;
 
 with Chaos.Expressions.Import.Actions;
@@ -214,7 +212,7 @@ package body Chaos.Expressions.Import is
       Count  : Natural := 0;
    begin
       Skip_Line (Resource, "CO", Index);
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("and"));
+      Store.Push ("and");
       while Resource.Line (Index) = "TR" loop
          Import_TR (Resource, Index);
          Count := Count + 1;
@@ -242,7 +240,7 @@ package body Chaos.Expressions.Import is
    is
    begin
       Skip_Line (Resource, "CR", Index);
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("if"));
+      Store.Push ("if");
       Import_CO (Resource, Index);
       Import_RS (Resource, Index);
       Skip_Line (Resource, "CR", Index);
@@ -312,7 +310,7 @@ package body Chaos.Expressions.Import is
       Response_Count : Natural := 0;
    begin
       Skip_Line (Resource, "RS", Index);
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("random-choice"));
+      Store.Push ("random-choice");
       while Resource.Line (Index) = "RE" loop
          Skip_Line (Resource, "RE", Index);
          declare
@@ -322,7 +320,7 @@ package body Chaos.Expressions.Import is
                              Scan_Integer (Resource.Line (Index), Line_Index);
          begin
             Store.Push (Probability);
-            Store.Push (Lith.Objects.Symbols.Begin_Symbol);
+            Store.Push ("begin");
             while Resource.Line (Index) /= "RE" loop
                Import_AC (Resource, Index);
                Action_Count := Action_Count + 1;
@@ -375,7 +373,7 @@ package body Chaos.Expressions.Import is
       Count : Natural := 0;
    begin
       Skip_Line (Resource, "SC", Index);
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("begin"));
+      Store.Push ("begin");
       while Resource.Line (Index) = "CR" loop
          Import_CR (Resource, Index);
          Count := Count + 1;
@@ -397,7 +395,7 @@ package body Chaos.Expressions.Import is
       if Script_Cache = Lith.Objects.Nil then
          Script_Cache := Chaos.Expressions.Maps.Create;
          Store.Define_Top_Level
-           (Lith.Objects.Symbols.Get_Symbol ("chaos-script-cache"),
+           (Lith.Objects.Get_Symbol ("chaos-script-cache"),
             Script_Cache);
       end if;
 
@@ -437,20 +435,20 @@ package body Chaos.Expressions.Import is
    is
       Block_Count : Natural := 0;
    begin
-      Store.Push (Lith.Objects.Symbols.Begin_Symbol);
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-set-flag"));
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("this"));
-      Store.Push (Lith.Objects.Symbols.Quote_Symbol);
-      Store.Push (Lith.Objects.Symbols.Get_Symbol ("script-continue"));
+      Store.Push ("begin");
+      Store.Push ("chaos-set-flag");
+      Store.Push ("this");
+      Store.Push (Lith.Objects.Single_Quote);
+      Store.Push ("script-continue");
       Store.Create_List (2);
       Store.Create_List (3);
       for Resource of Scripts loop
          if Chaos.Resources.Has_Resource (Resource) then
-            Store.Push (Lith.Objects.Symbols.If_Symbol);
-            Store.Push (Lith.Objects.Symbols.Get_Symbol ("chaos-flag"));
-            Store.Push (Lith.Objects.Symbols.Get_Symbol ("this"));
-            Store.Push (Lith.Objects.Symbols.Quote_Symbol);
-            Store.Push (Lith.Objects.Symbols.Get_Symbol ("script-continue"));
+            Store.Push ("if");
+            Store.Push ("chaos-flag");
+            Store.Push ("this");
+            Store.Push (Lith.Objects.Single_Quote);
+            Store.Push ("script-continue");
             Store.Create_List (2);
             Store.Create_List (3);
             Import_Script (Resource);

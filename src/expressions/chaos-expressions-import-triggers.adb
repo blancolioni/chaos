@@ -3,7 +3,6 @@ with Ada.Containers.Vectors;
 with WL.String_Maps;
 
 with Lith.Objects.Interfaces;
-with Lith.Objects.Symbols;
 
 with Chaos.Identifiers;
 
@@ -51,7 +50,7 @@ package body Chaos.Expressions.Import.Triggers is
      (Store : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
-      use Lith.Objects, Lith.Objects.Symbols;
+      use Lith.Objects;
       Index : constant Integer := To_Integer (Store.Argument (1));
       Name  : constant Symbol_Type := To_Symbol (Store.Argument (2));
       Info  : Trigger_Info;
@@ -104,17 +103,17 @@ package body Chaos.Expressions.Import.Triggers is
 
       Trigger_Id_Map.Insert (Get_Name (Name), Index);
 
-      Store.Push (Lambda_Symbol);
-      Store.Push (Get_Symbol ("integer-1"));
-      Store.Push (Get_Symbol ("flags"));
-      Store.Push (Get_Symbol ("integer-2"));
-      Store.Push (Get_Symbol ("text-1"));
-      Store.Push (Get_Symbol ("text-2"));
-      Store.Push (Get_Symbol ("object"));
+      Store.Push ("lambda");
+      Store.Push ("integer-1");
+      Store.Push ("flags");
+      Store.Push ("integer-2");
+      Store.Push ("text-1");
+      Store.Push ("text-2");
+      Store.Push ("object");
       Store.Create_List (6);
       if Info.Arguments (Object_Reference) then
-         Store.Push (Lith.Objects.Symbols.Get_Symbol ("and"));
-         Store.Push (Lith.Objects.Symbols.Get_Symbol ("object"));
+         Store.Push ("and");
+         Store.Push ("object");
          Store.Push (Store.Argument (3));
          Store.Create_List (3);
       else
@@ -182,7 +181,7 @@ package body Chaos.Expressions.Import.Triggers is
       Text_1     : String;
       Text_2     : String)
    is
-      use Lith.Objects, Lith.Objects.Symbols;
+      use Lith.Objects;
       Index : constant Positive := Trigger_Id mod 16#4000#;
    begin
       if Index > Triggers.Last_Index
@@ -196,33 +195,33 @@ package body Chaos.Expressions.Import.Triggers is
          return;
       end if;
 
-      Store.Push (Triggers.Element (Index).Function_Name);
+      Store.Push (To_Object (Triggers.Element (Index).Function_Name));
       Store.Push (To_Object (Integer_1));
       Store.Push (To_Object (Natural (Flags)));
       Store.Push (To_Object (Integer_2));
-      Store.Push (Quote_Symbol);
+      Store.Push (Single_Quote);
       if Text_1 /= "" then
          if Text_2 = ""
            and then Triggers.Element (Index).Arguments
            (Import.Triggers.Text_2)
          then
             Store.Push
-              (Get_Symbol (Text_1 (Text_1'First + 6 .. Text_1'Last)));
+              (Text_1 (Text_1'First + 6 .. Text_1'Last));
          else
-            Store.Push (Get_Symbol (Text_1));
+            Store.Push (Text_1);
          end if;
       else
          Store.Push_Nil;
       end if;
       Store.Create_List (2);
-      Store.Push (Quote_Symbol);
+      Store.Push (Single_Quote);
       if Text_2 /= "" then
-         Store.Push (Get_Symbol (Text_2));
+         Store.Push (Text_2);
       elsif Triggers.Element (Index).Arguments
         (Import.Triggers.Text_2)
       then
          Store.Push
-           (Get_Symbol (Text_1 (Text_1'First .. Text_1'First + 5)));
+           (Text_1 (Text_1'First .. Text_1'First + 5));
       else
          Store.Push_Nil;
       end if;
@@ -231,7 +230,7 @@ package body Chaos.Expressions.Import.Triggers is
       Store.Create_List (7);
 
       if Flags mod 2 = 1 then
-         Store.Push (Get_Symbol ("not"));
+         Store.Push ("not");
          Store.Swap;
          Store.Create_List (2);
       end if;
@@ -327,7 +326,7 @@ package body Chaos.Expressions.Import.Triggers is
 
       if not Found (Object_Reference) then
          Chaos.Expressions.Store.Push
-           (Lith.Objects.Symbols.Quote_Symbol);
+           (Lith.Objects.Single_Quote);
          Chaos.Expressions.Store.Push_Nil;
          Chaos.Expressions.Store.Create_List (2);
          Chaos.Expressions.Store.Push
@@ -349,7 +348,7 @@ package body Chaos.Expressions.Import.Triggers is
    begin
       Lith.Objects.Interfaces.Define_Function
         (Store, "chaos-add-trigger", Evaluate_Chaos_Add_Trigger'Access);
-      No_Trigger := Lith.Objects.Symbols.Get_Symbol ("no-trigger");
+      No_Trigger := Lith.Objects.Get_Symbol ("no-trigger");
       if not Chaos.Expressions.Store.Load
         (Chaos.Paths.Config_File
            ("script/triggers.scm"))

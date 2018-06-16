@@ -52,7 +52,6 @@ package body Chaos.Objects.Search is
             Chaos.Resources.Creature_Resource)
          then
             declare
-               use type Chaos.Creatures.Chaos_Creature;
                Creature : constant Chaos.Creatures.Chaos_Creature :=
                             Chaos.Creatures.Import.Import_Creature
                               (Code);

@@ -163,7 +163,7 @@ package body Chaos.Dialog is
         Chaos.Objects.Root_Chaos_Object_Record'Class)
       return Dialog_Cursor
    is
-      use Lith.Objects, Chaos.Expressions;
+      use Lith.Objects;
       State : Natural := 0;
    begin
       while State <= Dialog.States.Last_Index loop

@@ -1,5 +1,4 @@
 with Lith.Objects.Interfaces;
-with Lith.Objects.Symbols;
 
 with Chaos.Objects.Search;
 
@@ -43,7 +42,7 @@ package body Chaos.Objects.Primitives is
      (Store : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is (Lith.Objects.To_Object
-         (Lith.Objects.Symbols.Get_Symbol
+         (Lith.Objects.Get_Symbol
           (To_Object (Store.Argument (1)).Identifier)));
 
    procedure Set_Flag_Value
@@ -97,7 +96,7 @@ package body Chaos.Objects.Primitives is
      (Store : in out Lith.Objects.Object_Store'Class)
       return Lith.Objects.Object
    is
-      use Lith.Objects, Lith.Objects.Symbols;
+      use Lith.Objects;
       This : constant Object := Store.Argument (1);
       Object : constant Chaos_Object :=
                  (if Is_Object (This)
@@ -137,7 +136,7 @@ package body Chaos.Objects.Primitives is
                       (To_Object (Store.Argument (1)).all);
             Item : constant Chaos_Object :=
                      Search.Find_Entity_Object
-                       (Lith.Objects.Symbols.Get_Name
+                       (Lith.Objects.Get_Name
                           (Lith.Objects.To_Symbol
                              (Store.Argument (2))));
             Result : constant Boolean :=
@@ -161,7 +160,7 @@ package body Chaos.Objects.Primitives is
       return Lith.Objects.Object
    is
       Code : constant String :=
-               Lith.Objects.Symbols.Get_Name
+               Lith.Objects.Get_Name
                  (Lith.Objects.To_Symbol (Store.Argument (1)));
       Result : constant Chaos_Object :=
                  Chaos.Objects.Search.Find_Object (Code);
@@ -195,7 +194,7 @@ package body Chaos.Objects.Primitives is
      (Store : in out Lith.Objects.Object_Store'Class;
       Value : Boolean)
    is
-      use Lith.Objects, Lith.Objects.Symbols;
+      use Lith.Objects;
       This   : constant Object := Store.Argument (1);
       Object : constant Chaos_Object :=
                  (if Is_Object (This)
@@ -207,7 +206,7 @@ package body Chaos.Objects.Primitives is
                     with "expected a code or object, but found "
                   & Store.Show (This));
       Flag   : constant String :=
-                 Lith.Objects.Symbols.Get_Name
+                 Lith.Objects.Get_Name
                    (Lith.Objects.To_Symbol (Store.Argument (2)));
 
       procedure Update_Flag (Rec : not null access

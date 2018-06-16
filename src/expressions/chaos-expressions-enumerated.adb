@@ -2,8 +2,6 @@ with Ada.Characters.Handling;
 
 with WL.String_Maps;
 
-with Lith.Objects.Symbols;
-
 package body Chaos.Expressions.Enumerated is
 
    package Enum_Maps is
@@ -40,7 +38,7 @@ package body Chaos.Expressions.Enumerated is
       end if;
       return Lith.Objects.Is_Symbol (Value)
         and then Enum_Values.Contains
-          (Lith.Objects.Symbols.Get_Name
+          (Lith.Objects.Get_Name
              (Lith.Objects.To_Symbol (Value)));
    end Is_Enum;
 
@@ -51,7 +49,7 @@ package body Chaos.Expressions.Enumerated is
    function To_Enum (Value : Lith.Objects.Object) return Enum is
    begin
       return Enum_Values.Element
-        (Lith.Objects.Symbols.Get_Name
+        (Lith.Objects.Get_Name
            (Lith.Objects.To_Symbol (Value)));
    end To_Enum;
 
@@ -83,7 +81,7 @@ package body Chaos.Expressions.Enumerated is
       end if;
 
       return Lith.Objects.To_Object
-        (Lith.Objects.Symbols.Get_Symbol (To_Name (Value)));
+        (Lith.Objects.Get_Symbol (To_Name (Value)));
    end To_Object;
 
 begin

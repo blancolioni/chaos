@@ -97,6 +97,7 @@ package body Chaos.Xi_UI.Areas is
    Base_Model_Created : Boolean := False;
 
    procedure Create_Base_Model;
+   procedure Reset_Base_Model;
 
    type Area_Model_Record is
      new Chaos.Xi_UI.Models.Root_Chaos_Xi_Model with
@@ -278,9 +279,7 @@ package body Chaos.Xi_UI.Areas is
 
       Current_Area_Model := null;
 
-      if not Base_Model_Created then
-         Create_Base_Model;
-      end if;
+      Reset_Base_Model;
 
       if Model_Cache.Contains (Area.Identifier) then
          Model := Model_Cache.Element (Area.Identifier);
@@ -747,7 +746,6 @@ package body Chaos.Xi_UI.Areas is
       ------------------------
 
       procedure Check_Mouse_Square is
-         use type Chaos.Actors.Chaos_Actor;
       begin
          if not Got_Mouse_Square then
 
@@ -832,7 +830,6 @@ package body Chaos.Xi_UI.Areas is
               (Area.Passable (Mouse_Square));
 
             declare
-               use type Chaos.Actors.Chaos_Actor;
                Square_Cursor_Index : constant Natural :=
                                        (if Area.Has_Feature (Mouse_Square)
                                         then Area.Feature (Mouse_Square)
@@ -962,6 +959,19 @@ package body Chaos.Xi_UI.Areas is
             Interaction => Chaos.Game.Default);
       end if;
    end On_Square_Click;
+
+   ----------------------
+   -- Reset_Base_Model --
+   ----------------------
+
+   procedure Reset_Base_Model is
+   begin
+      if not Base_Model_Created then
+         Create_Base_Model;
+      else
+         Base_Model.Actor_Top.Clear_Children;
+      end if;
+   end Reset_Base_Model;
 
    -----------------------
    -- To_World_Position --

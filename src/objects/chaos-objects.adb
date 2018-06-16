@@ -1,7 +1,5 @@
 with Ada.Characters.Handling;
 
-with Lith.Objects.Symbols;
-
 with Chaos.Expressions;
 
 with Chaos.Localisation;
@@ -80,7 +78,7 @@ package body Chaos.Objects is
    is
    begin
       Chaos.Expressions.Store.Define_Top_Level
-        (Lith.Objects.Symbols.Get_Symbol
+        (Lith.Objects.Get_Symbol
            (Object.Object_Database.Database_Class_Name
             & "-" & Object.Identifier),
          Object.To_Expression);
@@ -378,7 +376,7 @@ package body Chaos.Objects is
                     & Object.Object_Database.Database_Class_Name
                     & "-list";
       List_Symbol : constant Lith.Objects.Symbol_Type :=
-                      Lith.Objects.Symbols.Get_Symbol (List_Name);
+                      Lith.Objects.Get_Symbol (List_Name);
       List        : Lith.Objects.Object;
       Have_List   : Boolean;
    begin
